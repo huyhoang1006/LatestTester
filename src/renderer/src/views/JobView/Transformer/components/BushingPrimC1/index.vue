@@ -1,0 +1,706 @@
+<template>
+    <div id="dc-winding-resistance-prim">
+        <div style="position: sticky; left: 0; display: inline-block;">
+            <!-- Cấu hình -->
+            <el-row class="mgb-10">
+                <el-col>
+                    <el-button class="btn-action" size="small" type="success" @click="openAssessmentDialog = true">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> Assessment settings
+                    </el-button>
+                    <el-button class="btn-action" size="small" type="success"
+                        @click="openConditionIndicatorDialog = true">
+                        <i class="fa-solid fa-hammer"></i> Condition indicatior settings
+                    </el-button>
+                </el-col>
+            </el-row>
+
+            <!-- Tương tác với bảng -->
+            <el-row class="mgb-10">
+                <el-col>
+                    <el-button size="small" type="primary" class="btn-action" @click="calculator"> <i
+                            class="fas fa-circle-play"></i> Assess results </el-button>
+                    <el-button size="small" type="primary" class="btn-action" @click="clear"> <i
+                            class="fas fa-xmark"></i> Clear all</el-button>
+                </el-col>
+            </el-row>
+        </div>
+
+        <table class="table-strip-input-data" style="width: 100% ; font-size: 12px;">
+            <thead>
+                <tr>
+                    <th class="no-col fix_width">No</th>
+                    <th>Measurement</th>
+                    <th>Test mode</th>
+                    <th>V test (kV)</th>
+                    <th>DF ref (%)</th>
+                    <th>C ref (pF)</th>
+                    <th>DF meas (%)</th>
+                    <th>C meas (pF)</th>
+                    <th>DF change</th>
+                    <th>ΔC cal (%)</th>
+                    <th class="assessment-col">Assessment</th>
+                    <th class="condition-indicator-col fix_width">DF Condition indicator</th>
+                    <th class="condition-indicator-col fix_width">C Condition indicator</th>
+                    <th @click="add()" class="action-col"><i class="fa-solid fa-plus pointer"></i></th>
+                    <th @click="removeAll()" class="action-col"><i class="fa-solid fa-trash pointer"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in testData.table.table1" :key="index">
+                    <td style="text-align: center;">{{ index + 1 }}</td>
+                    <td style="display: flex;">
+                        <el-input size="small" type="text" v-model="item.measurement.value"></el-input>
+                        <div
+                            :class="{ colorTableRed: index % 3 == 0, colorTableYellow: index % 3 == 1, colorTableBlue: index % 3 == 2 }">
+                        </div>
+                    </td>
+                    <td>
+                        <el-select size="small" v-model="item.test_mode.value">
+                            <el-option label="GST" value="GST"></el-option>
+                            <el-option label="GSTg-A" value="GSTg-A"></el-option>
+                            <el-option label="GSTg-B" value="GSTg-B"></el-option>
+                            <el-option label="GSTg-A+B" value="GSTg-A+B"></el-option>
+                            <el-option label="UST-A" value="UST-A"></el-option>
+                            <el-option label="UST-B" value="UST-B"></el-option>
+                            <el-option label="UST-A+B" value="UST-A+B"></el-option>
+                        </el-select>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.test_voltage.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.df_ref.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.c_ref.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.df_meas.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.c_meas.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.df_change.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.delta_c_percent.value"></el-input>
+                    </td>
+                    <td>
+                        <el-select class="assessment" size="small" v-model="item.assessment.value">
+                            <el-option value="Pass"><i class="fa-solid fa-square-check pass"></i> Pass</el-option>
+                            <el-option value="Fail"><i class="fa-solid fa-xmark fail"></i> Fail</el-option>
+                        </el-select>
+                        <span v-if="item.assessment.value === 'Pass'"
+                            class="fa-solid fa-square-check pass icon-status"></span>
+                        <span v-else-if="item.assessment.value === 'Fail'"
+                            class="fa-solid fa-xmark fail icon-status"></span>
+                    </td>
+                    <td>
+                        <el-select :class="nameColor(item.condition_indicator_df.value)" id="condition" type="text"
+                            size="small" v-model="item.condition_indicator_df.value">
+                            <el-option value="Good">Good</el-option>
+                            <el-option value="Fair">Fair</el-option>
+                            <el-option value="Poor">Poor</el-option>
+                            <el-option value="Bad">Bad</el-option>
+                        </el-select>
+                    </td>
+                    <td>
+                        <el-select :class="nameColor(item.condition_indicator_c.value)" id="condition" type="text"
+                            size="small" v-model="item.condition_indicator_c.value">
+                            <el-option value="Good">Good</el-option>
+                            <el-option value="Fair">Fair</el-option>
+                            <el-option value="Poor">Poor</el-option>
+                            <el-option value="Bad">Bad</el-option>
+                        </el-select>
+                    </td>
+                    <td>
+                        <el-button size="small" type="primary" class="w-100" @click="addTest(index)">
+                            <i class="fa-solid fa-plus"></i>
+                        </el-button>
+                    </td>
+                    <td>
+                        <el-button size="small" type="danger" class="w-100" @click="deleteTest(index)">
+                            <i class="fas fa-trash"></i>
+                        </el-button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Assessment settings -->
+        <el-dialog append-to-body title="Assessment settings" v-model="openAssessmentDialog" width="860px">
+            <!-- <el-form size="small" label-position="left" label-width="140px">
+                <el-form-item label="Option">
+                    <el-select class="w-100" placeholder="please select" v-model="assessmentSetting.option.value">
+                        <el-option label="IEC 60137 (2017)" value="IEC"></el-option>
+                        <el-option label="IEEE C57.19.01 (2017)" value="IEEE"></el-option>
+                        <el-option label="Customized limit" value="Custom"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+
+            <table v-if="assessmentSetting.option.value === 'IEC'" class="table-strip-input-data">
+                <thead>
+                    <tr>
+                        <th colspan="4">Limit</th>
+                        <th rowspan="2">Assessment</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>OIP</th>
+                        <th>RIP</th>
+                        <th>RBP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="width100">DF meas (%)</th>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.iec.oip.df_meas.value }}</td>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.iec.rip.df_meas.value }}</td>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.iec.rbp.df_meas.value }}</td>
+                        <th class="width100"><i class="fas fa-check-square pass"></i> Pass</th>
+                    </tr>
+                    <tr>
+                        <th class="width100">ΔC cal (%)</th>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.iec.oip.delta_c_percent.value }}</td>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.iec.rip.delta_c_percent.value }}</td>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.iec.rbp.delta_c_percent.value }}</td>
+                        <th class="width100"><i class="fas fa-check-square pass"></i> Pass</th>
+                    </tr>
+                    <tr>
+                        <th class="width100">DF meas (%)</th>
+                        <td class="width100"> > {{ assessmentSetting.data.iec.oip.df_meas.value }}</td>
+                        <td class="width100"> > {{ assessmentSetting.data.iec.rip.df_meas.value }}</td>
+                        <td class="width100"> > {{ assessmentSetting.data.iec.rbp.df_meas.value }}</td>
+                        <th class="width100"><i class="fa-solid fa-xmark fail"></i> Fail</th>
+                    </tr>
+                    <tr>
+                        <th class="width100">ΔC cal (%)</th>
+                        <td class="width100"> > {{ assessmentSetting.data.iec.oip.delta_c_percent.value }}</td>
+                        <td class="width100"> > {{ assessmentSetting.data.iec.rip.delta_c_percent.value }}</td>
+                        <td class="width100"> > {{ assessmentSetting.data.iec.rbp.delta_c_percent.value }}</td>
+                        <th class="width100"><i class="fa-solid fa-xmark fail"></i> Fail</th>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table v-else-if="assessmentSetting.option === 'IEEE'" class="table-strip-input-data">
+                <thead>
+                    <tr>
+                        <th colspan="4">Limit</th>
+                        <th rowspan="2">Assessment</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>OIP</th>
+                        <th>RIP</th>
+                        <th>RBP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="width100">DF meas (%)</th>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.ieee.oip.df_meas.value }}</td>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.ieee.rip.df_meas.value }}</td>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.ieee.rbp.df_meas.value }}</td>
+                        <th class="width100"><i class="fas fa-check-square pass"></i> Pass</th>
+                    </tr>
+                    <tr>
+                        <th class="width100">ΔC cal (%)</th>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.ieee.oip.delta_c_percent.value }}</td>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.ieee.rip.delta_c_percent.value }}</td>
+                        <td class="width100"> ≤ {{ assessmentSetting.data.ieee.rbp.delta_c_percent.value }}</td>
+                        <th class="width100"><i class="fas fa-check-square pass"></i> Pass</th>
+                    </tr>
+                    <tr>
+                        <th class="width100">DF meas (%)</th>
+                        <td class="width100"> > {{ assessmentSetting.data.ieee.oip.df_meas.value }}</td>
+                        <td class="width100"> > {{ assessmentSetting.data.ieee.rip.df_meas.value }}</td>
+                        <td class="width100"> > {{ assessmentSetting.data.ieee.rbp.df_meas.value }}</td>
+                        <th class="width100"><i class="fa-solid fa-xmark fail"></i> Fail</th>
+                    </tr>
+                    <tr>
+                        <th class="width100">ΔC cal (%)</th>
+                        <td class="width100"> > {{ assessmentSetting.data.ieee.oip.delta_c_percent.value }}</td>
+                        <td class="width100"> > {{ assessmentSetting.data.ieee.rip.delta_c_percent.value }}</td>
+                        <td class="width100"> > {{ assessmentSetting.data.ieee.rbp.delta_c_percent.value }}</td>
+                        <th class="width100"><i class="fa-solid fa-xmark fail"></i> Fail</th>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table v-else-if="assessmentSetting.option.value === 'Custom'" class="table-strip-input-data">
+                <thead>
+                    <tr>
+                        <th colspan="4">Limit</th>
+                        <th rowspan="2">Assessment</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>OIP</th>
+                        <th>RIP</th>
+                        <th>RBP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>DF meas (%)</th>
+                        <td>≤ <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.oip.df_meas.value"></el-input></td>
+                        <td>≤ <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.rip.df_meas.value"></el-input></td>
+                        <td>≤ <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.rbp.df_meas.value"></el-input></td>
+                        <th><i class="fas fa-check-square pass"></i> Pass</th>
+                    </tr>
+                    <tr>
+                        <th>ΔC cal (%)</th>
+                        <td>≤ <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.oip.delta_c_percent.value"></el-input></td>
+                        <td>≤ <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.rip.delta_c_percent.value"></el-input></td>
+                        <td>≤ <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.rbp.delta_c_percent.value"></el-input></td>
+                        <th><i class="fas fa-check-square pass"></i> Pass</th>
+                    </tr>
+                    <tr>
+                        <th>DF meas (%)</th>
+                        <td>> <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.oip.df_meas.value"></el-input></td>
+                        <td>> <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.rip.df_meas.value"></el-input></td>
+                        <td>> <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.rbp.df_meas.value"></el-input></td>
+                        <th><i class="fa-solid fa-xmark fail"></i> Fail</th>
+                    </tr>
+                    <tr>
+                        <th>ΔC cal (%)</th>
+                        <td>> <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.oip.delta_c_percent.value"></el-input></td>
+                        <td>> <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.rip.delta_c_percent.value"></el-input></td>
+                        <td>> <el-input style="width: 100px;" size="small" v-model="assessmentSetting.data.custom.rbp.delta_c_percent.value"></el-input></td>
+                        <th><i class="fa-solid fa-xmark fail"></i> Fail</th>
+                    </tr>
+                </tbody>
+            </table> -->
+        </el-dialog>
+
+        <!-- Condition indicator settings -->
+        <el-dialog append-to-body title="Condition indicator settings" v-model="openConditionIndicatorDialog"
+            width="860px">
+            <!-- <table class="table-strip-input-data mgb-10">
+                <thead>
+                    <tr>
+                        <th>Result</th>
+                        <th class="condition-indicator-col">Condition Indicator DF</th>
+                        <th class="score-col">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="flex-container">
+                                <div>DF meas ≤ <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.good.df_meas[0].value"></el-input> or</div>
+                                <div>
+                                    DF change ≤ <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.good.df_change[0].value"></el-input> time
+                                    previous, new values
+                                </div>
+                            </div>
+                        </td>
+                        <td class="Good">Good</td>
+                        <td><el-input size="small" v-model="conditionIndicatorDf.good.score.value"></el-input></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="flex-container">
+                                <div>
+                                    <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.fair.df_meas[0].value"></el-input> &lt; DF meas ≤
+                                    <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.fair.df_meas[1].value"></el-input> or
+                                </div>
+                                <div>
+                                    <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.fair.df_change[0].value"></el-input> &lt; DF change ≤
+                                    <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.fair.df_change[1].value"></el-input> time previous, new values
+                                </div>
+                            </div>
+                        </td>
+                        <td class="Fair">Fair</td>
+                        <td><el-input size="small" v-model="conditionIndicatorDf.fair.score.value"></el-input></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="flex-container">
+                                <div>
+                                    <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.poor.df_meas[0].value"></el-input> &lt; DF meas ≤
+                                    <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.poor.df_meas[1].value"></el-input> or
+                                </div>
+                                <div>
+                                    <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.poor.df_change[0].value"></el-input> &lt; DF change ≤
+                                    <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.poor.df_change[1].value"></el-input> time previous, new values
+                                </div>
+                            </div>
+                        </td>
+                        <td class="Poor">Poor</td>
+                        <td><el-input size="small" v-model="conditionIndicatorDf.poor.score.value"></el-input></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="flex-container">
+                                <div>DF meas > <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.bad.df_meas[1].value"></el-input> or</div>
+                                <div>
+                                    DF change > <el-input size="small" class="w-100px" v-model="conditionIndicatorDf.bad.df_change[1].value"></el-input> time previous,
+                                    new values
+                                </div>
+                            </div>
+                        </td>
+                        <td class="Bad">Bad</td>
+                        <td><el-input size="small" v-model="conditionIndicatorDf.bad.score.value"></el-input></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table-strip-input-data mgb-10">
+                <thead>
+                    <tr>
+                        <th>Result</th>
+                        <th class="condition-indicator-col">Condition Indicator C</th>
+                        <th class="score-col">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ΔC cal ≤ <el-input size="small" class="w-100px" v-model="conditionIndicatorC.good.delta_c_percent[0].value"></el-input></td>
+                        <td class="Good">Good</td>
+                        <td><el-input size="small" v-model="conditionIndicatorC.good.score.value"></el-input></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <el-input size="small" class="w-100px" v-model="conditionIndicatorC.fair.delta_c_percent[0].value"></el-input> &lt; ΔC cal ≤
+                            <el-input size="small" class="w-100px" v-model="conditionIndicatorC.fair.delta_c_percent[1].value"></el-input>
+                        </td>
+                        <td class="Fair">Fair</td>
+                        <td><el-input size="small" v-model="conditionIndicatorC.fair.score.value"></el-input></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <el-input size="small" class="w-100px" v-model="conditionIndicatorC.poor.delta_c_percent[0].value"></el-input> &lt; ΔC cal ≤
+                            <el-input size="small" class="w-100px" v-model="conditionIndicatorC.poor.delta_c_percent[1].value"></el-input>
+                        </td>
+                        <td class="Poor">Poor</td>
+                        <td><el-input size="small" v-model="conditionIndicatorC.poor.score.value"></el-input></td>
+                    </tr>
+                    <tr>
+                        <td>ΔC cal > <el-input size="small" class="w-100px" v-model="conditionIndicatorC.bad.delta_c_percent[1].value"></el-input></td>
+                        <td class="Bad">Bad</td>
+                        <td><el-input size="small" v-model="conditionIndicatorC.bad.score.value"></el-input></td>
+                    </tr>
+                </tbody>
+            </table> -->
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+import TransformerTestMap from '@/config/test-definitions/Transformer'
+import * as common from '../../../Common/index'
+export default {
+    name: 'BushingPrimC1',
+    data() {
+        return {
+            openAssessmentDialog: false,
+            openConditionIndicatorDialog: false
+        }
+    },
+    props: {
+        data: {
+            type: Object,
+            require: true
+        }
+    },
+    computed: {
+        testData() {
+            return this.data
+        },
+        assessmentSetting() {
+            return this.data.assessment_setting
+        },
+        conditionIndicatorDf() {
+            return this.data.condition_indicator_df
+        },
+        conditionIndicatorC() {
+            return this.data.condition_indicator_c
+        },
+        rowData() {
+            return common.buildEmptyTestRow(TransformerTestMap['BushingPrimC1'].columns)
+        }
+    },
+    watch: {
+        'assessmentSetting.option': {
+            handler: function () {
+                this.testData.table.forEach(element => {
+                    element.assessment = ''
+                })
+            }
+        }
+    },
+    methods: {
+        add() {
+            this.testData.table.table1.push(JSON.parse(JSON.stringify(this.rowData)))
+        },
+        removeAll() {
+            this.$confirm('This will delete the file. Continue?', 'Warning', {
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Cancel',
+                type: 'warning'
+            }).then(() => {
+                this.testData.table.table1 = []
+            }).catch(() => {})
+        },
+        deleteTest(index) {
+            this.testData.table.table1.splice(index, 1)
+        },
+        addTest(index) {
+            const data = JSON.parse(JSON.stringify(this.rowData))
+            this.testData.table.table1.splice(index + 1, 0, data)
+        },
+        async calculator() {
+            // await this.dfChangeCal()
+            // await this.deltaCcalCal()
+            // await this.dfmeasAssessment()
+            // await this.deltaCAssessment()
+            this.$message.success('Calculating successfully')
+        },
+        // async dfChangeCal() {
+        //     this.testData.table.forEach(element => {
+        //         if (!isNaN(parseFloat(element.df_meas))) {
+        //             if (!isNaN(parseFloat(element.df_ref)) && element.df_ref != 0) {
+        //                 element.df_change = element.df_meas / element.df_ref
+        //             }
+        //         }
+        //     })
+        // },
+        // async deltaCcalCal() {
+        //     this.testData.table.forEach(element => {
+        //         if (!isNaN(parseFloat(element.c_meas))) {
+        //             if (!isNaN(parseFloat(element.c_ref)) && element.c_ref != 0) {
+        //                 element.delta_c_percent = 100 * (element.c_meas - element.c_ref) / element.c_ref
+        //             }
+        //         }
+        //     })
+        // },
+        // async dfmeasAssessment() {
+        //     this.testData.table.forEach((element) => {
+        //         if (this.assessmentSetting.option === "IEC") {
+        //             if (!isNaN(parseFloat(element.df_meas))) {
+        //                 if (element.insulation === "Resin-bonded paper") {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.iec.rbp.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 } else if (element.insulation === "Resin-impregnated paper") {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.iec.rip.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 } else {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.iec.oip.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 }
+        //             }
+        //         } else if (this.assessmentSetting.option === "IEEE") {
+        //             if (!isNaN(parseFloat(element.df_meas))) {
+        //                 if (element.insulation === "Resin-bonded paper") {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.ieee.rbp.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 } else if (element.insulation === "Resin-impregnated paper") {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.ieee.rip.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 } else {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.ieee.oip.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 }
+        //             }
+        //         } else {
+        //             if (!isNaN(parseFloat(element.df_meas))) {
+        //                 if (element.insulation === "Resin-bonded paper") {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.custom.rbp.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 } else if (element.insulation === "Resin-impregnated paper") {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.custom.rip.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 } else {
+        //                     if (Math.abs(element.df_meas) <= this.assessmentSetting.data.custom.oip.df_meas) {
+        //                         element.assessment = "Pass"
+        //                     } else {
+        //                         element.assessment = "Fail"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     })
+        // },
+        // async deltaCAssessment() {
+        //     this.testData.table.forEach((element) => {
+        //         if (element.assessment === "Pass") {
+        //             if (this.assessmentSetting.option === "IEC") {
+        //                 if (!isNaN(parseFloat(element.delta_c_percent))) {
+        //                     if (element.insulation === "Resin-bonded paper") {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.iec.rbp.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     } else if (element.insulation === "Resin-impregnated paper") {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.iec.rip.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     } else {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.iec.oip.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     }
+        //                 }
+        //             } else if (this.assessmentSetting.option === "IEEE") {
+        //                 if (!isNaN(parseFloat(element.delta_c_percent))) {
+        //                     if (element.insulation === "Resin-bonded paper") {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.ieee.rbp.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     } else if (element.insulation === "Resin-impregnated paper") {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.ieee.rip.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     } else {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.ieee.oip.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     }
+        //                 }
+        //             } else {
+        //                 if (!isNaN(parseFloat(element.delta_c_percent))) {
+        //                     if (element.insulation === "Resin-bonded paper") {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.custom.rbp.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     } else if (element.insulation === "Resin-impregnated paper") {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.custom.rip.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     } else {
+        //                         if (Math.abs(element.delta_c_percent) <= this.assessmentSetting.data.custom.oip.delta_c_percent) {
+        //                             element.assessment = "Pass"
+        //                         } else {
+        //                             element.assessment = "Fail"
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     })
+        // },
+        clear() {
+            this.testData.table.table1.forEach(row => {
+                Object.keys(row).forEach(key => {
+                    if (key === "mrid") return;
+                    if (row[key] && typeof row[key] === "object" && "value" in row[key]) {
+                        row[key].value = ""
+                    }
+                })
+            })
+        },
+        nameColor(data) {
+            if (data === this.$constant.GOOD) {
+                return 'Good'
+            }
+            else if (data === this.$constant.FAIR) {
+                return 'Fair'
+            }
+            else if (data === this.$constant.POOR) {
+                return 'Poor'
+            }
+            else if (data === this.$constant.BAD) {
+                return 'Bad'
+            }
+            else {
+                return;
+            }
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+.w-100px {
+    width: 100px;
+}
+
+th:not(:nth-child(1)):not(:nth-last-child(1)):not(:nth-last-child(2)) {
+    min-width: 106px;
+}
+
+th:nth-child(1) {
+    min-width: 30px;
+    text-align: center;
+}
+
+th.fix_width {
+    white-space: nowrap;
+}
+
+th.no-col {
+    width: 30px !important;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+
+    div {
+        padding: 1px;
+    }
+}
+
+.Good {
+    background: #00CC00;
+}
+
+.Fair {
+    background: #ffff00;
+}
+
+.Poor {
+    background: #ff9900;
+}
+
+.Bad {
+    background: #ff3300;
+}
+
+.width100 {
+    width: 100px;
+}
+</style>

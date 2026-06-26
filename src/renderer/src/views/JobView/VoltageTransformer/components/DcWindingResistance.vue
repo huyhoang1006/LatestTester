@@ -1,0 +1,317 @@
+<template>
+    <div id="dc-winding-resistance-prim">
+
+        <!-- Cấu hình -->
+        <div style="position: sticky; left: 0; display: inline-block;">
+            <el-row class="mgb-10">
+                <el-col>
+                    <el-button class="btn-action" size="small" type="success" @click="openAssessmentDialog = true">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> Assessment settings
+                    </el-button>
+                    <el-button class="btn-action" size="small" type="success"
+                        @click="openConditionIndicatorDialog = true">
+                        <i class="fa-solid fa-hammer"></i> Condition indicatior settings
+                    </el-button>
+                </el-col>
+            </el-row>
+
+            <!-- Tương tác với bảng -->
+            <el-row class="mgb-10">
+                <el-col>
+                    <el-button size="small" type="primary" class="btn-action" @click="calculator"> <i
+                            class="fas fa-circle-play"></i> Assess results </el-button>
+                    <el-button size="small" type="primary" class="btn-action" @click="clear"> <i
+                            class="fas fa-xmark"></i> Clear all</el-button>
+                </el-col>
+            </el-row>
+        </div>
+
+        <table class="table-strip-input-data" style="width: 100% ; font-size: 12px;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>R meas (Ω)</th>
+                    <th>R ref (Ω)</th>
+                    <th>R corr (Ω)</th>
+                    <th>R dev (%)</th>
+                    <th class="assessment-col">Assessment</th>
+                    <th class="condition-indicator-col">Condition indicator</th>
+                    <th @click="add()" class="action-col"><i class="fa-solid fa-plus pointer"></i></th>
+                    <th @click="removeAll()" class="action-col"><i class="fa-solid fa-trash pointer"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in testData.table.table1" :key="index">
+                    <td>
+                        <el-input size="small" type="text" v-model="item.name.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.r_meas.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.r_ref.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.r_corr.value"></el-input>
+                    </td>
+                    <td>
+                        <el-input size="small" type="text" number="positive" v-model="item.r_dev.value"></el-input>
+                    </td>
+                    <td>
+                        <el-select class="assessment" size="small" v-model="item.assessment.value">
+                            <el-option value="Pass"><i class="fa-solid fa-square-check pass"></i> Pass</el-option>
+                            <el-option value="Fail"><i class="fa-solid fa-xmark fail"></i> Fail</el-option>
+                        </el-select>
+                        <span v-if="item.assessment.value === 'Pass'"
+                            class="fa-solid fa-square-check pass icon-status"></span>
+                        <span v-else-if="item.assessment.value === 'Fail'"
+                            class="fa-solid fa-xmark fail icon-status"></span>
+                    </td>
+                    <td>
+                        <el-select :class="nameColor(item.condition_indicator.value)" id="condition" type="text"
+                            size="small" v-model="item.condition_indicator.value">
+                            <el-option value="Good">Good</el-option>
+                            <el-option value="Fair">Fair</el-option>
+                            <el-option value="Poor">Poor</el-option>
+                            <el-option value="Bad">Bad</el-option>
+                        </el-select>
+                    </td>
+                    <td>
+                        <el-button size="small" type="primary" class="w-100" @click="addTest(index)">
+                            <i class="fa-solid fa-plus"></i>
+                        </el-button>
+                    </td>
+                    <td>
+                        <el-button size="small" type="danger" class="w-100" @click="deleteTest(index)">
+                            <i class="fas fa-trash"></i>
+                        </el-button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Assessment settings -->
+        <el-dialog title="Assessment settings" v-model="openAssessmentDialog" width="860px">
+        </el-dialog>
+
+        <!-- Condition indicator settings -->
+        <el-dialog title="Condition indicator settings" v-model="openConditionIndicatorDialog" width="860px">
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+import voltageTransformerTestMap from '@/config/test-definitions/VoltageTransformer'
+import * as common from '@/views/JobView/Common/index'
+
+export default {
+    name: "DcWindingResistance",
+    data() {
+        return {
+            openAssessmentDialog: false,
+            openConditionIndicatorDialog: false,
+        }
+    },
+    mounted() {
+        // Initialize table if needed
+        this.$nextTick(() => {
+            this.initializeTable()
+        })
+    },
+    props: {
+        data: {
+            type: Object,
+            require: true
+        },
+        asset: {
+            type: Object,
+            require: true
+        },
+        testCondition: {
+            type: Object,
+            require: true
+        }
+    },
+    computed: {
+        testData() {
+            return this.data
+        },
+        assetData() {
+            return this.asset
+        },
+        testConditionData() {
+            return this.testCondition
+        },
+        rowData() {
+            return common.buildEmptyTestRow(voltageTransformerTestMap['DcWindingResistance'].columns)
+        }
+    },
+    watch: {
+        'testData.table': {
+            immediate: true,
+            handler: function (newVal) {
+                // Convert array to object if needed (for backward compatibility)
+                if (newVal && Array.isArray(newVal)) {
+                    const tableObject = { table1: newVal }
+                    this.testData.table = tableObject
+                    return
+                }
+
+                // Initialize table if empty
+                if (!newVal || (typeof newVal === 'object' && Object.keys(newVal).length === 0)) {
+                    this.$nextTick(() => {
+                        this.initializeTable()
+                    })
+                }
+            }
+        }
+    },
+    methods: {
+        initializeTable() {
+            if (!this.testData.table) {
+                this.testData.table = {}
+            }
+
+            if (Object.keys(this.testData.table).length === 0) {
+                this.testData.table.table1 = []
+            }
+
+            // Ensure table1 exists
+            if (!this.testData.table.table1) {
+                this.testData.table.table1 = []
+            }
+        },
+        add() {
+            if (!this.testData.table.table1) {
+                this.initializeTable()
+            }
+            this.testData.table.table1.push(
+                JSON.parse(JSON.stringify(this.rowData))
+            )
+        },
+        removeAll() {
+            this.$confirm('This will delete the file. Continue?', 'Warning', {
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Cancel',
+                type: 'warning'
+            }).then(() => {
+                this.testData.table.table1 = []
+            }).catch(() => { })
+        },
+        deleteTest(index) {
+            this.testData.table.table1.splice(index, 1)
+        },
+        addTest(index) {
+            const data = JSON.parse(JSON.stringify(this.rowData))
+            this.testData.table.table1.splice(index + 1, 0, data)
+        },
+        calculator() {
+            this.calcRcorr()
+            this.calcRdev()
+            this.$message.success('Calculating successfully')
+        },
+
+        calcRcorr() {
+            if (!this.testData.table.table1) {
+                this.initializeTable()
+                return
+            }
+            this.testData.table.table1.forEach((item) => {
+                // Always calculate r_corr when r_meas has value
+                if (!isNaN(parseFloat(item.r_meas.value))) {
+                    // Check if testCondition and condition exist
+                    if (this.testConditionData && this.testConditionData.condition &&
+                        this.testConditionData.condition.winding_temp &&
+                        this.testConditionData.condition.reference_temp &&
+                        !isNaN(parseFloat(this.testConditionData.condition.winding_temp.value)) &&
+                        !isNaN(parseFloat(this.testConditionData.condition.reference_temp.value))) {
+                        item.r_corr.value = parseFloat(parseFloat(item.r_meas.value) * (235 + parseFloat(this.testConditionData.condition.reference_temp.value)) / (235 + parseFloat(this.testConditionData.condition.winding_temp.value))).toFixed(4)
+                    }
+                    else {
+                        // Fallback: không có temperature correction
+                        item.r_corr.value = item.r_meas.value
+                    }
+                }
+            })
+        },
+        calcRdev() {
+            if (!this.testData.table.table1) {
+                this.initializeTable()
+                return
+            }
+            this.testData.table.table1.forEach((item) => {
+                // Use r_corr (corrected resistance) instead of r_meas for deviation calculation
+                if (!isNaN(parseFloat(item.r_corr.value)) && !isNaN(parseFloat(item.r_ref.value)) && item.r_ref.value != 0) {
+                    item.r_dev.value = (100 * (parseFloat(item.r_corr.value) - parseFloat(item.r_ref.value)) / parseFloat(item.r_ref.value)).toFixed(4)
+                }
+            })
+        },
+
+        clear() {
+            if (!this.testData.table.table1) {
+                this.initializeTable()
+                return
+            }
+            this.testData.table.table1.forEach(row => {
+                Object.keys(row).forEach(key => {
+                    if (key === "mrid") return;
+                    if (row[key] && typeof row[key] === "object" && "value" in row[key]) {
+                        row[key].value = ""
+                    }
+                })
+            })
+        },
+        nameColor(data) {
+            if (data === this.$constant.GOOD) {
+                return 'Good'
+            }
+            else if (data === this.$constant.FAIR) {
+                return 'Fair'
+            }
+            else if (data === this.$constant.POOR) {
+                return 'Poor'
+            }
+            else if (data === this.$constant.BAD) {
+                return 'Bad'
+            }
+            else {
+                return;
+            }
+        }
+    }
+}
+</script>
+
+<style lang="scss" scoped>
+table,
+th,
+td,
+tr {
+    white-space: nowrap;
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+
+    div {
+        padding: 1px;
+    }
+}
+
+.Good input {
+    background: #00CC00;
+}
+
+.Fair input {
+    background: #ffff00;
+}
+
+.Poor input {
+    background: #ff9900;
+}
+
+.Bad input {
+    background: #ff3300;
+}
+</style>

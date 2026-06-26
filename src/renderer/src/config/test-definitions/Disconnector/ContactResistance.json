@@ -1,0 +1,55 @@
+{
+  "testId": "2456d847-c65f-4b0b-bb34-3f90b8f971ef",
+  "testCode": "ContactResistance",
+  "testName": "Contact resistance",
+  "columns": [
+    {
+      "mrid": "c2b9f0a1-1a9d-4a22-8e44-000000000004",
+      "code": "measurement",
+      "name": "Measurement",
+      "type": "string"
+    },
+    {
+      "mrid": "899bc9df-acf5-4bde-b8f7-f690263aabee",
+      "code": "i_test",
+      "name": "I test",
+      "type": "analog",
+      "unit": "A"
+    },
+    {
+      "mrid": "d24f5034-3d7d-4bb2-9788-86405874a2e4",
+      "code": "contact_resistance",
+      "name": "Contact resistance",
+      "type": "analog",
+      "unit": "µ|Ω"
+    },
+    {
+      "mrid": "e1d1c6f0-8d8e-4d4b-8b44-2e4c71bdf001",
+      "code": "assessment",
+      "name": "Assessment",
+      "type": "discrete",
+      "valueAliasSetId": "40c60468-232a-4643-851f-50616900f601",
+      "options": [
+        { "value": 0, "alias": "Fail", "mrid": "d8858564-e438-4034-9273-030919163001" },
+        { "value": 1, "alias": "Pass", "mrid": "d8858564-e438-4034-9273-030919163002" }
+      ]
+    },
+    {
+      "mrid": "7e52c7e5-1c3b-4fd1-9a91-3e94db29a002",
+      "code": "condition_indicator",
+      "name": "Condition indicator",
+      "type": "discrete",
+      "valueAliasSetId": "8e323053-481b-4348-89c0-67258380d701",
+      "options": [
+        { "value": 0, "alias": "Bad", "mrid": "e9969675-f549-4145-a384-141020274001" },
+        { "value": 1, "alias": "Poor", "mrid": "e9969675-f549-4145-a384-141020274002" },
+        { "value": 2, "alias": "Fair", "mrid": "e9969675-f549-4145-a384-141020274003" },
+        { "value": 3, "alias": "Good", "mrid": "e9969675-f549-4145-a384-141020274004" }
+      ]
+    }
+  ],
+  "defaultRows": [
+    { "measurement": "Main contact" },
+    { "measurement": "Earth switch" }
+  ]
+}

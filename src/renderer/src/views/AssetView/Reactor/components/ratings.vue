@@ -1,0 +1,63 @@
+<template>
+    <div style="font-size: 12px;" class="col-content">
+        <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
+            <span class="bolder">Ratings</span>
+            <el-divider></el-divider>
+            <el-form-item label="Rated voltage">
+                <el-input type="number" number="positive" v-model="ratingsData.rated_voltage.value">
+                    <template #append>kV</template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="Rated frequency">
+                <el-input type="number" number="positive" v-model="ratingsData.rated_frequency.value">
+                    <template #append>Hz</template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="Rated current">
+                <el-input type="number" number="positive" v-model="ratingsData.rated_current.value">
+                    <template #append>A</template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="Rated power">
+                <el-input type="number" number="positive" v-model="ratingsData.rated_power.value">
+                    <template #append>kVAr</template>
+                </el-input>
+            </el-form-item>      
+            <el-form-item label="Inductance">
+                <el-input type="number" number="positive" v-model="ratingsData.inductance.value">
+                    <template #append>H</template>
+                </el-input>
+            </el-form-item>      
+        </el-form>
+    </div>
+</template>
+<script>
+export default {
+    name: 'RatingsReactor',
+    data() {
+        return {
+            labelWidth: '120px',
+        }
+    },
+    props: {
+        data: {
+            type: Object,
+            default: () => ({})
+        },
+    },
+    computed: {
+        ratingsData() {
+            return this.data
+        }
+    }
+}
+</script>
+<style scoped>
+:deep(.el-input__inner,
+:deep) .el-select .el-input__inner {
+    font-size: 12px !important;
+}
+:deep(.el-form-item__label) {
+    font-size: 12px !important;
+}
+</style>

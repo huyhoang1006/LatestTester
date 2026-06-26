@@ -1,0 +1,369 @@
+{
+  "columns": [
+    {
+      "mrid": "a2b3c4d5-e6f7-4890-a1b2-c3d4e5f67890",
+      "code": "phase",
+      "name": "Phase",
+      "type": "string"
+    },
+    {
+      "mrid": "0bd89524-919d-4597-bbfa-556b19db1636",
+      "code": "applied_terminal",
+      "name": "Applied Terminal",
+      "type": "string"
+    },
+    {
+      "mrid": "509a7f7d-357b-4e6e-9e99-547f4eabfcb8",
+      "code": "closing_time",
+      "name": "Closing time",
+      "type": "analog",
+      "unit": "m|s"
+    },
+    {
+      "mrid": "ed668284-e6da-468e-99e7-e0901fb19edf",
+      "code": "closing_sync_between_phase",
+      "name": "Closing sync. between phase (ms)",
+      "type": "analog",
+      "unit": "m|s"
+    },
+    {
+      "mrid": "db8c190c-ac81-4ada-b786-fbb50d1627c5",
+      "code": "duration",
+      "name": "Test duration",
+      "type": "analog",
+      "unit": "min"
+    },
+    {
+      "mrid": "3ca74239-df46-4260-9420-79599d155945",
+      "code": "frequency",
+      "name": "Frequency",
+      "type": "analog",
+      "unit": "Hz"
+    },
+    {
+      "mrid": "f6f2b092-1c9e-49e8-b4a7-2c81f0310fdc",
+      "code": "leakage_current",
+      "name": "Leakage current",
+      "type": "analog",
+      "unit": "m|A"
+    },
+    {
+      "mrid": "8387cbb8-43c9-4730-b2d4-3fe6d0e5a202",
+      "code": "closing_sync_between_interrupter",
+      "name": "Closing sync. between interrupter (ms)",
+      "type": "analog",
+      "unit": "m|s"
+    },
+    {
+      "mrid": "cbf48165-6f7a-4716-8258-bb4eae410b3b",
+      "code": "interrupter",
+      "name": "Interrupter",
+      "type": "analog",
+      "unit": ""
+    },
+    {
+      "mrid": "c92fh65g-a311-4827-f012-5357a7b8c92e",
+      "code": "open_close_time",
+      "name": "Open-Close time",
+      "type": "analog",
+      "unit": "m|s"
+    },
+    {
+      "mrid": "7213c077-fd8a-4f12-888c-1263570aa8d6",
+      "code": "r_meas",
+      "name": "R meas",
+      "type": "analog",
+      "unit": "Ω"
+    },
+    {
+      "mrid": "23cd8c00-4073-4fa0-bac0-cbbe1d27b1c3",
+      "code": "r_ref",
+      "name": "R ref",
+      "type": "analog",
+      "unit": "Ω"
+    },
+    {
+      "mrid": "93b591f4-4c4c-4034-9d61-a544bdf49019",
+      "code": "r_corr",
+      "name": "R corr",
+      "type": "analog",
+      "unit": "Ω"
+    },
+    {
+      "mrid": "494cc6d4-e98f-4895-84cc-03322b5bc610",
+      "code": "r_dev",
+      "name": "R dev",
+      "type": "analog",
+      "unit": "%"
+    },
+    {
+      "mrid": "a7d78f25-725a-4777-831d-69e602537bd8",
+      "code": "rk",
+      "name": "Rk",
+      "type": "analog",
+      "unit": "Ω"
+    },
+    {
+      "mrid": "cee0c8ba-6c8b-4fa1-8ff8-bbf2f6d2a792",
+      "code": "xk",
+      "name": "Xk",
+      "type": "analog",
+      "unit": "Ω"
+    },
+    {
+      "mrid": "5f7ef146-ecd1-4a8d-91df-bc64bbcc344f",
+      "code": "zk",
+      "name": "Zk",
+      "type": "analog",
+      "unit": "Ω"
+    },
+    {
+      "mrid": "02121b30-c92a-41cc-aa0e-b7a4e6592f46",
+      "code": "uk_cal",
+      "name": "Uk cal",
+      "type": "analog",
+      "unit": "%"
+    },
+    {
+      "mrid": "68ebea17-7af1-4438-87bf-cf7bda61e691",
+      "code": "uk_dev",
+      "name": "Uk dev",
+      "type": "analog",
+      "unit": "%"
+    },
+    {
+      "mrid": "01c47c67-4295-4bf6-a0c5-9c14ec8d905e",
+      "code": "test_mode",
+      "name": "Test mode",
+      "type": "string"
+    },
+    {
+      "mrid": "c74b6a9a-5e33-4040-be57-a2e7c82e5e19",
+      "code": "df_ref",
+      "name": "DF ref",
+      "type": "analog",
+      "unit": "%"
+    },
+    {
+      "mrid": "610bb02e-0e71-452e-80b3-34753b9cf484",
+      "code": "c_ref",
+      "name": "C ref",
+      "type": "analog",
+      "unit": "pF"
+    },
+    {
+      "mrid": "1e2050bd-da5f-44fc-ad75-0c5c416fa14f",
+      "code": "df_meas",
+      "name": "DF meas",
+      "type": "analog",
+      "unit": "%"
+    },
+    {
+      "mrid": "1d340ee5-9c57-422a-a049-ea57d2beedb7",
+      "code": "c_meas",
+      "name": "C meas",
+      "type": "analog",
+      "unit": "pF"
+    },
+    {
+      "mrid": "ba9140a3-5f0b-45d1-a25c-e114e043ba16",
+      "code": "delta_c_percent",
+      "name": "△C cal",
+      "type": "analog",
+      "unit": "%"
+    },
+    {
+      "mrid": "dcddcd9a-ff10-40b0-8baa-70962f587cbe",
+      "code": "df_change",
+      "name": "DF change",
+      "type": "analog",
+      "unit": ""
+    },
+    {
+      "mrid": "126fc51c-a0b5-470b-9017-47e56131cc56",
+      "code": "ratio_meas",
+      "name": "Ratio meas",
+      "type": "string"
+    },
+    {
+      "mrid": "1d510b78-7413-4777-a344-4b65d4e3e920",
+      "code": "ratio_dev",
+      "name": "Ratio dev",
+      "type": "string"
+    },
+    {
+      "mrid": "e6527699-a044-4633-8572-ac1f84fe78f6",
+      "code": "polarity",
+      "name": "Polarity",
+      "type": "string"
+    },
+    {
+      "mrid": "c2d3e4f5-a6b7-48c9-9d0e-1f2a3b4c5d6e",
+      "code": "close_coil_no",
+      "name": "Close Coil No",
+      "type": "string"
+    },
+    {
+      "mrid": "8a1f2b3c-4d5e-4a6b-9c01-0f1e2d3c4b5a",
+      "code": "test_voltage",
+      "name": "Test voltage",
+      "type": "analog",
+      "unit": "k|V"
+    },
+    {
+      "mrid": "6c9d0e1f-2a3b-4c13-9009-000000000017",
+      "code": "r60s",
+      "name": "R60s",
+      "type": "analog",
+      "unit": "m|Ω"
+    },
+    {
+      "mrid": "b1c2d3e4-f5a6-47b8-8c9d-0e1f2a3b4c5d",
+      "code": "trip_coil_no",
+      "name": "Trip Coil No",
+      "type": "string"
+    },
+    {
+      "mrid": "b9bae747-59f5-4ecb-b35b-75c5ce84c5fa",
+      "code": "trip_coil",
+      "name": "Trip coil",
+      "type": "analog",
+      "unit": ""
+    },
+    {
+      "mrid": "e58bd21c-69dd-4483-b678-1f13c3d4e58a",
+      "code": "opening_time",
+      "name": "Opening time",
+      "type": "analog",
+      "unit": "m|s"
+    },
+    {
+      "mrid": "0db2ebdc-19eb-45f9-b748-43ff95d4e700",
+      "code": "opening_sync_between_phase",
+      "name": "Opening sync. between phase (ms)",
+      "type": "analog",
+      "unit": "m|s"
+    },
+    {
+      "mrid": "6976f705-74ee-4988-9886-a7750ec28925",
+      "code": "opening_sync_between_interrupter",
+      "name": "Opening sync. between interrupter (ms)",
+      "type": "analog",
+      "unit": "m|s"
+    },
+    {
+      "mrid": "c2b9f0a1-1a9d-4a22-8e44-000000000004",
+      "code": "measurement",
+      "name": "Measurement",
+      "type": "string"
+    },
+    {
+      "mrid": "8a44e2f7-19f6-4ac4-b691-69a96231c06e",
+      "code": "type",
+      "name": "Type",
+      "type": "string"
+    },
+    {
+      "mrid": "f02b9353-bb57-40a6-a08b-0340346e2057",
+      "code": "name",
+      "name": "Name",
+      "type": "string"
+    },
+    {
+      "mrid": "9f1b8c4e-2e44-4b8a-9a33-000000000003",
+      "code": "item",
+      "name": "Item",
+      "type": "string"
+    },
+    {
+      "mrid": "899bc9df-acf5-4bde-b8f7-f690263aabee",
+      "code": "i_test",
+      "name": "I test",
+      "type": "analog",
+      "unit": "A"
+    },
+    {
+      "mrid": "d24f5034-3d7d-4bb2-9788-86405874a2e4",
+      "code": "contact_resistance",
+      "name": "Contact resistance",
+      "type": "analog",
+      "unit": "µ|Ω"
+    },
+    {
+      "mrid": "b3c4d5e6-f7a8-4901-b2c3-d4e5f6g78901",
+      "code": "unit_no",
+      "name": "Unit number",
+      "type": "analog"
+    },
+    {
+      "mrid": "a679697d-18b2-4e7d-a49c-3d29afdff1e4",
+      "code": "tap",
+      "name": "Tap",
+      "type": "analog"
+    },
+    {
+      "mrid": "32d5115d-c712-408f-8392-0b1641474cc7",
+      "code": "dev_r_ref",
+      "name": "Dev with R ref (%)",
+      "type": "analog",
+      "unit": "%"
+    },
+    {
+      "mrid": "59459bfe-10d4-4cda-b6fc-ad67a18e172a",
+      "code": "dev_phase",
+      "name": "Dev within phases (%)",
+      "type": "analog",
+      "unit": "%"
+    },
+    {
+      "mrid": "e1d1c6f0-8d8e-4d4b-8b44-2e4c71bdf001",
+      "code": "assessment",
+      "name": "Assessment",
+      "type": "discrete",
+      "valueAliasSetId": "40c60468-232a-4643-851f-50616900f601",
+      "options": [
+        { "value": 0, "alias": "Fail", "mrid": "d8858564-e438-4034-9273-030919163001" },
+        { "value": 1, "alias": "Pass", "mrid": "d8858564-e438-4034-9273-030919163002" }
+      ]
+    },
+    {
+      "mrid": "7e52c7e5-1c3b-4fd1-9a91-3e94db29a002",
+      "code": "condition_indicator",
+      "name": "Condition indicator",
+      "type": "discrete",
+      "valueAliasSetId": "8e323053-481b-4348-89c0-67258380d701",
+      "options": [
+        { "value": 0, "alias": "Bad", "mrid": "e9969675-f549-4145-a384-141020274001" },
+        { "value": 1, "alias": "Poor", "mrid": "e9969675-f549-4145-a384-141020274002" },
+        { "value": 2, "alias": "Fair", "mrid": "e9969675-f549-4145-a384-141020274003" },
+        { "value": 3, "alias": "Good", "mrid": "e9969675-f549-4145-a384-141020274004" }
+      ]
+    },
+    {
+      "mrid": "781be6f8-7265-4e98-9161-e20acd4fcb7a",
+      "code": "condition_indicator_df",
+      "name": "Condition indicator DF",
+      "type": "discrete",
+      "valueAliasSetId": "8e323053-481b-4348-89c0-67258380d701",
+      "options": [
+        { "value": 0, "alias": "Bad", "mrid": "e9969675-f549-4145-a384-141020274001" },
+        { "value": 1, "alias": "Poor", "mrid": "e9969675-f549-4145-a384-141020274002" },
+        { "value": 2, "alias": "Fair", "mrid": "e9969675-f549-4145-a384-141020274003" },
+        { "value": 3, "alias": "Good", "mrid": "e9969675-f549-4145-a384-141020274004" }
+      ]
+    },
+    {
+      "mrid": "ced18b6f-f05a-491c-a134-e41e38ee0487",
+      "code": "condition_indicator_c",
+      "name": "Condition indicator C",
+      "type": "discrete",
+      "valueAliasSetId": "8e323053-481b-4348-89c0-67258380d701",
+      "options": [
+        { "value": 0, "alias": "Bad", "mrid": "e9969675-f549-4145-a384-141020274001" },
+        { "value": 1, "alias": "Poor", "mrid": "e9969675-f549-4145-a384-141020274002" },
+        { "value": 2, "alias": "Fair", "mrid": "e9969675-f549-4145-a384-141020274003" },
+        { "value": 3, "alias": "Good", "mrid": "e9969675-f549-4145-a384-141020274004" }
+      ]
+    }
+  ]
+}

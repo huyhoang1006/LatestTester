@@ -1,0 +1,436 @@
+<template>
+    <div 
+        v-if="visible"
+        class="context-menu"
+        :style="{ top: `${position.y}px`, left: `${position.x}px` }"
+    >
+        <!-- Menu chuột phải -->
+        <transition name="fade">
+            <ul v-if="sign == 'onlysubs'">
+                <li @click="addSubs">
+                    <i class="fa-solid fa-plus"></i> Add substation
+                </li>
+            </ul>
+            <ul v-else>
+                <li v-if="selectedNode && selectedNode.mode == 'organisation'" @click="addOrganisation">
+                    <i class="fa-solid fa-plus"></i> Add organisation
+                </li>
+                <li v-if="selectedNode && selectedNode.mode == 'organisation'" @click="addSubsInTree">
+                    <i class="fa-solid fa-plus"></i> Add substation
+                </li>
+                <li v-if="selectedNode && selectedNode.mode == 'substation'" @click="addVoltageLevel">
+                    <i class="fa-solid fa-plus"></i> Add voltage level
+                </li>
+                <li v-if="selectedNode && (selectedNode.mode == 'voltageLevel' || selectedNode.mode == 'substation')" @click="addBay">
+                    <i class="fa-solid fa-plus"></i> Add bay
+                </li>
+                <li class="has-submenu" v-if="selectedNode && (selectedNode.mode == 'bay' || selectedNode.mode == 'substation')">
+                    <i class="fa-solid fa-plus"></i> Add asset
+                    <ul class="submenu">
+                        <li @click="addTransformer"><i class="fa-solid fa-bolt"></i> Add transformer</li>
+                        <li @click="addBushing"><i class="fa-solid fa-shield"></i> Add Bushing</li>
+                        <li @click="addBreaker"><i class="fa-solid fa-plug"></i> Add Breaker</li>
+                        <li @click="addCt"><i class="fa-solid fa-ruler"></i> Add CT</li>
+                        <li @click="addVt"><i class="fa-solid fa-bolt-lightning"></i> Add VT</li>
+                        <li @click="addSurgeArrester"><i class="fa-solid fa-shield-halved"></i> Add Surge Arrester</li>
+                        <li @click="addPowerCable"><i class="fa-solid fa-route"></i> Add Power Cable</li>
+                        <li @click="addDisconnector"><i class="fa-solid fa-plug-circle-xmark"></i> Add Disconnector</li>
+                        <li @click="addRotatingMachine"><i class="fa-solid fa-group-arrows-rotate"></i> Add Rotating Machine</li>
+                        <li @click="addCapacitor"><i class="fa-solid fa-bolt"></i> Add Capacitor</li>
+                        <li @click="addReactor"><i class="fa-solid fa-bolt"></i> Add Reactor</li>
+                    </ul>
+                </li>
+                <li @click="addJob" v-if="selectedNode && selectedNode.mode == 'asset'">
+                    <i class="fa-solid fa-plus"></i> Add job
+                </li>
+                <li v-if="selectedNode && selectedNode.mode == 'substation'" @click="showZeroDiagram">
+                    <i class="fa-solid fa-project-diagram"></i> Zero diagram
+                </li>
+                <li @click="show">
+                    <i class="fa-solid fa-eye"></i> Show
+                </li>
+                <li @click="refresh">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </li>
+                <li>
+                    <i class="fa-solid fa-file-arrow-down"></i> Download
+                </li>
+                <li @click="move">
+                    <i class="fa-solid fa-arrows-up-down-left-right"></i> Move
+                </li>
+                <li @click="deleteNode">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </li>
+                <li @click="duplicate">
+                    <i class="fa-solid fa-copy"></i> Duplicate
+                </li>
+                <li class="has-submenu">
+                    <i class="fa-solid fa-file-export"></i> Export
+                    <ul class="submenu">
+                        <li class="has-submenu">
+                            <i class="fa-solid fa-file-code"></i> Export to JSON
+                            <ul class="submenu">
+                                <li @click="exportJSON"><i class="fa-solid fa-file-code"></i> Export JSON</li>
+                                <li @click="exportJSONCIM"><i class="fa-solid fa-file-code"></i> Export JSON by CIM</li>
+                            </ul>
+                        </li>
+                        <li @click="exportXML"><i class="fa-solid fa-file-code"></i> Export to XML</li>
+                        <li @click="exportExcel"><i class="fa-solid fa-file-excel"></i> Export to Excel</li>
+                        <li @click="exportWord"><i class="fa-solid fa-file-word"></i> Export to Word</li>
+                        <li @click="exportPDF"><i class="fa-solid fa-file-pdf"></i> Export to PDF</li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <i class="fa-solid fa-file-import"></i> Import
+                    <ul class="submenu">
+                        <li class="has-submenu">
+                            <i class="fa-solid fa-file-code"></i> Import from JSON
+                            <ul class="submenu">
+                                <li @click="importJSON"><i class="fa-solid fa-file-code"></i> Import JSON</li>
+                                <li @click="importJSONCIM"><i class="fa-solid fa-file-code"></i> Import JSON by CIM</li>
+                            </ul>
+                        </li>
+                        <li @click="importXML"><i class="fa-solid fa-file-code"></i> Import from XML</li>
+                        <li @click="importExcel"><i class="fa-solid fa-file-excel"></i> Import from Excel</li>
+                        <li @click="importWord"><i class="fa-solid fa-file-word"></i> Import from Word</li>
+                        <li @click="importPDF"><i class="fa-solid fa-file-pdf"></i> Import from PDF</li>
+                    </ul>
+</li>
+            </ul>
+        </transition>
+    </div>
+</template>
+
+
+<script>
+/* eslint-disable */
+export default {
+    data() {
+        return {
+            visible: false,
+            position: { x: 0, y: 0 },
+            selectedNode: null, // Lưu trữ node đang mở menu
+            sign : '',
+            organisationId: '00000000-0000-0000-0000-000000000000' // Mặc định là ID của tổ chức
+        };
+    },
+    methods: {
+        openContextMenu(event, node, { top, left } = {}) {
+            event.preventDefault();
+            
+            // Sử dụng tọa độ từ mouse event để đặt menu ngay tại vị trí con trỏ chuột
+            let x = event.clientX;
+            let y = event.clientY;
+            
+            // Nếu có tọa độ custom được truyền vào, sử dụng chúng
+            if (top !== undefined && left !== undefined) {
+                x = left;
+                y = top;
+            }
+            
+            // Kiểm tra và điều chỉnh để menu không bị cắt khỏi viewport
+            const menuWidth = 200; // Ước tính chiều rộng menu
+            const menuHeight = 400; // Ước tính chiều cao menu tối đa
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Điều chỉnh x nếu menu bị tràn ra ngoài bên phải
+            if (x + menuWidth > viewportWidth) {
+                x = viewportWidth - menuWidth - 10; // Trừ 10px để có khoảng cách
+            }
+            
+            // Điều chỉnh y nếu menu bị tràn ra ngoài bên dưới
+            if (y + menuHeight > viewportHeight) {
+                y = viewportHeight - menuHeight - 10; // Trừ 10px để có khoảng cách
+            }
+            
+            // Đảm bảo menu không bị âm (ra ngoài bên trái hoặc bên trên)
+            x = Math.max(5, x);
+            y = Math.max(5, y);
+            
+            this.position = { x, y };
+            this.selectedNode = node;
+            this.visible = true;
+            document.addEventListener("click", this.closeContextMenu);
+        },
+
+        openContextMenuSubstation(event, organisationId) {
+            event.preventDefault();
+            
+            // Sử dụng tọa độ từ mouse event để đặt menu ngay tại vị trí con trỏ chuột
+            let x = event.clientX;
+            let y = event.clientY;
+            
+            // Kiểm tra và điều chỉnh để menu không bị cắt khỏi viewport
+            const menuWidth = 200; // Ước tính chiều rộng menu
+            const menuHeight = 100; // Menu substation nhỏ hơn
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Điều chỉnh x nếu menu bị tràn ra ngoài bên phải
+            if (x + menuWidth > viewportWidth) {
+                x = viewportWidth - menuWidth - 10;
+            }
+            
+            // Điều chỉnh y nếu menu bị tràn ra ngoài bên dưới
+            if (y + menuHeight > viewportHeight) {
+                y = viewportHeight - menuHeight - 10;
+            }
+            
+            // Đảm bảo menu không bị âm
+            x = Math.max(5, x);
+            y = Math.max(5, y);
+            
+            this.position = { x, y };
+            this.sign = 'onlysubs';
+            this.organisationId = organisationId;
+            this.visible = true;
+            
+            // Đóng menu khi click ra ngoài
+            document.addEventListener("click", this.closeContextMenu);
+        },
+
+        closeContextMenu() {
+            this.visible = false;
+            this.selectedNode = null;
+            this.sign = ''
+            document.removeEventListener("click", this.closeContextMenu);
+        },
+        deleteNode() {
+            this.$emit("delete-data", this.selectedNode)
+            this.closeContextMenu();
+        },
+        addChild() {
+            this.closeContextMenu();
+        },
+        show() {
+            this.$emit("show-data", this.selectedNode)
+            this.closeContextMenu()
+        },
+        edit() {
+            this.closeContextMenu();
+        },
+        duplicate() {
+            this.$emit("duplicate-node", this.selectedNode);
+            this.closeContextMenu();
+        },
+        move() {
+            this.$emit("move-node", this.selectedNode);
+            this.closeContextMenu();
+        },
+        addSubs() {
+            this.$emit("show-addSubs", this.organisationId)
+            this.closeContextMenu()
+        },
+        addSubsInTree() {
+            this.$emit("show-addSubsInTree", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addOrganisation() {
+            this.$emit("show-addOrganisation", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addVoltageLevel() {
+            this.$emit("show-addVoltageLevel", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addBay() {
+            this.$emit("show-addBay", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addTransformer() {
+            this.$emit("show-addTransformer", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addBushing() {
+            this.$emit("show-addBushing", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addSurgeArrester() {
+            this.$emit("show-addSurgeArrester", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addBreaker() {
+            this.$emit("show-addCircuit", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addCt() {
+            this.$emit("show-addCt", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addCapacitor() {
+            this.$emit("show-addCapacitor", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addReactor() {
+            this.$emit("show-addReactor", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addVt() {
+            this.$emit("show-addVt", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addPowerCable() {
+            this.$emit("show-addPowerCable", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addDisconnector() {
+            this.$emit("show-addDisconnector", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addRotatingMachine() {
+            this.$emit("show-addRotatingMachine", this.selectedNode)
+            this.closeContextMenu()
+        },
+        addAsset() {
+            this.$emit("show-addAsset", this.selectedNode)
+            
+            this.closeContextMenu()
+        },
+        addJob() {
+            this.$emit("show-addJob", this.selectedNode)
+            this.closeContextMenu()
+        },
+        exportJSON() {
+            this.$emit("export-json", this.selectedNode)
+            this.closeContextMenu()
+        },
+        exportJSONCIM() {
+            this.$emit("export-json-cim", this.selectedNode)
+            this.closeContextMenu()
+        },
+        exportXML() {
+            this.$emit("export-xml", this.selectedNode)
+            this.closeContextMenu()
+        },
+        exportExcel() {
+            this.$emit("export-excel", this.selectedNode)
+            this.closeContextMenu()
+        },
+        exportWord() {
+            this.$emit("export-word", this.selectedNode)
+            this.closeContextMenu()
+        },
+        exportPDF() {
+            this.$emit("export-pdf", this.selectedNode)
+            this.closeContextMenu()
+        },
+        importJSON() {
+            this.$emit("import-json", this.selectedNode)
+            this.closeContextMenu()
+        },
+        importJSONCIM() {
+            this.$emit("import-json-cim", this.selectedNode)
+            this.closeContextMenu()
+        },
+        importXML() {
+            this.$emit("import-xml", this.selectedNode)
+            this.closeContextMenu()
+        },
+        importExcel() {
+            this.$emit("import-excel", this.selectedNode)
+            this.closeContextMenu()
+        },
+        importWord() {
+            this.$emit("import-word", this.selectedNode)
+            this.closeContextMenu()
+        },
+        importPDF() {
+            this.$emit("import-pdf", this.selectedNode)
+            this.closeContextMenu()
+        },
+        showZeroDiagram() {
+        this.$emit("show-zero-diagram", this.selectedNode)
+        this.closeContextMenu()
+    },
+        refresh() {
+            this.$emit("refresh-node", this.selectedNode)
+            this.closeContextMenu()
+        }
+    }
+};
+</script>
+
+<style>
+/* Context Menu */
+.context-menu {
+    position: fixed; /* Thay đổi từ absolute thành fixed để positioning chính xác hơn */
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    list-style: none;
+    padding: 8px 0;
+    z-index: 9999; /* Tăng z-index để đảm bảo menu luôn ở trên cùng */
+    min-width: 160px;
+    font-size: 12px;
+    animation: fadeIn 0.2s ease-in-out;
+    border: 1px solid #e0e0e0; /* Thêm border để menu rõ ràng hơn */
+}
+
+.context-menu ul {
+    margin: 0;
+    padding: 0;
+}
+
+.context-menu li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.context-menu li:hover {
+    background-color: #F0F0F0;
+}
+
+
+/* Hiệu ứng menu */
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+/* Keyframes cho menu */
+@keyframes fadeIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Định dạng submenu */
+.has-submenu {
+    position: relative;
+}
+
+.has-submenu > .submenu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    min-width: 160px;
+    z-index: 1001;
+    padding: 8px 0;
+    white-space: nowrap;
+}
+
+.has-submenu:hover > .submenu {
+    display: block;
+}
+
+/* Nested submenu - submenu trong submenu */
+.submenu .has-submenu > .submenu {
+    z-index: 1002;
+}
+</style>

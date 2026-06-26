@@ -1,0 +1,490 @@
+
+/* Element Plus CSS Variables - Match Element UI (Vue 2) Theme */
+:root {
+    /* Primary Colors */
+    --el-color-primary: #012596;
+    --el-color-primary-light-3: #3375b9;
+    --el-color-primary-light-5: #2a598a;
+    --el-color-primary-light-7: #213d5b;
+    --el-color-primary-light-8: #1d3043;
+    --el-color-primary-light-9: #18222b;
+    --el-color-primary-dark-2: #66b1ff;
+    --el-color-primary-rgb: 1, 37, 150;
+
+    /* Success Colors */
+    --el-color-success: #007E33;
+    --el-color-success-light-3: #4e8e2f;
+    --el-color-success-light-5: #3e6b27;
+    --el-color-success-light-7: #2d481f;
+    --el-color-success-light-8: #25371c;
+    --el-color-success-light-9: #1c2518;
+    --el-color-success-dark-2: #85ce61;
+    --el-color-success-rgb: 0, 126, 51;
+
+    /* Warning Colors */
+    --el-color-warning: #FF8800;
+    --el-color-warning-light-3: #a77730;
+    --el-color-warning-light-5: #7d5b28;
+    --el-color-warning-light-7: #533f20;
+    --el-color-warning-light-8: #3e301c;
+    --el-color-warning-light-9: #292218;
+    --el-color-warning-dark-2: #ebb563;
+    --el-color-warning-rgb: 255, 136, 0;
+
+    /* Danger Colors */
+    --el-color-danger: #CC0514;
+    --el-color-danger-light-3: #b25252;
+    --el-color-danger-light-5: #854040;
+    --el-color-danger-light-7: #582e2e;
+    --el-color-danger-light-8: #412626;
+    --el-color-danger-light-9: #2a1d1d;
+    --el-color-danger-dark-2: #f78989;
+    --el-color-danger-rgb: 204, 5, 20;
+
+    /* Error Colors (same as danger) */
+    --el-color-error: #CC0514;
+    --el-color-error-light-3: #b25252;
+    --el-color-error-light-5: #854040;
+    --el-color-error-light-7: #582e2e;
+    --el-color-error-light-8: #412626;
+    --el-color-error-light-9: #2a1d1d;
+    --el-color-error-dark-2: #f78989;
+    --el-color-error-rgb: 204, 5, 20;
+
+    /* Info Colors */
+    --el-color-info: #808080;
+    --el-color-info-light-3: #6b6d71;
+    --el-color-info-light-5: #525457;
+    --el-color-info-light-7: #393a3c;
+    --el-color-info-light-8: #2d2d2f;
+    --el-color-info-light-9: #202121;
+    --el-color-info-dark-2: #a6a9ad;
+    --el-color-info-rgb: 128, 128, 128;
+
+    /* Basic Colors */
+    --el-color-white: #ffffff;
+    --el-color-black: #000000;
+
+    /* Text Colors */
+    --el-text-color-primary: #17202A;
+    --el-text-color-regular: #3d4a5c;
+    --el-text-color-secondary: #82848a;
+    --el-text-color-placeholder: #a8abb2;
+    --el-text-color-disabled: #bfbfbf;
+
+    /* Border Colors */
+    --el-border-color-base: #808B96;
+    --el-border-color-light: #ABB2B9;
+    --el-border-color-lighter: #D5D8DC;
+    --el-border-color-extra-light: #E9EAF0;
+    --el-border-color-dark: #4c4d4f;
+    --el-border-color-darker: #363637;
+
+    /* Fill Colors */
+    --el-fill-color-base: #ffffff;
+    --el-fill-color-light: #f5f7fa;
+    --el-fill-color-lighter: #fafafa;
+    --el-fill-color-extra-light: #fafcff;
+    --el-fill-color-dark: #ebedef;
+    --el-fill-color-darker: #e3e7ec;
+    --el-fill-color-blank: #ffffff;
+
+    /* Background Colors */
+    --el-bg-color: #ffffff;
+    --el-bg-color-page: #f2f3f5;
+    --el-bg-color-overlay: #ffffff;
+
+    /* Box Shadow */
+    --el-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    --el-box-shadow-light: 0 2px 8px 0 rgba(0, 0, 0, 0.06);
+    --el-box-shadow-lighter: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+    --el-box-shadow-dark: 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+
+    /* Font Settings */
+    --el-font-size-extra-large: 20px;
+    --el-font-size-large: 18px;
+    --el-font-size-medium: 16px;
+    --el-font-size-base: 14px;
+    --el-font-size-small: 13px;
+    --el-font-size-extra-small: 12px;
+    --el-font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+    --el-font-weight-primary: 500;
+    --el-font-line-height-primary: 24px;
+
+    /* Border Radius */
+    --el-border-radius-base: 4px;
+    --el-border-radius-small: 2px;
+    --el-border-radius-round: 20px;
+    --el-border-radius-circle: 100%;
+
+    /* Component Sizes - Match Element UI (Vue 2): large 40, default 36, small 32, mini 28 */
+    --el-component-size-large: 40px;
+    --el-component-size: 36px;
+    --el-component-size-small: 32px;
+    --el-component-size-mini: 28px;
+
+    /* Transition */
+    --el-transition-duration: 0.3s;
+    --el-transition-duration-fast: 0.2s;
+    --el-transition-function-ease-in-out-bezier: cubic-bezier(0.645, 0.045, 0.355, 1);
+    --el-transition-function-fast-bezier: cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* Z-Index */
+    --el-index-normal: 1;
+    --el-index-top: 1000;
+    --el-index-popper: 2000;
+
+    /* Disabled */
+    --el-disabled-bg-color: #f5f7fa;
+    --el-disabled-text-color: #a8abb2;
+    --el-disabled-border-color: #e4e7ed;
+
+    /* Mask */
+    --el-mask-color: rgba(255, 255, 255, 0.9);
+    --el-mask-color-extra-light: rgba(255, 255, 255, 0.7);
+
+    /* Dialog */
+    --el-dialog-bg-color: var(--el-bg-color);
+    --el-dialog-title-font-size: var(--el-font-size-large);
+    --el-dialog-padding-primary: 20px;
+
+    /* Table */
+    --el-table-border-color: var(--el-border-color-lighter);
+    --el-table-text-color: var(--el-text-color-regular);
+    --el-table-header-text-color: var(--el-text-color-secondary);
+    --el-table-row-hover-bg-color: var(--el-fill-color-light);
+    --el-table-current-row-bg-color: var(--el-color-primary-light-9);
+    --el-table-header-bg-color: var(--el-fill-color-light);
+
+    /* Tabs */
+    --el-tabs-header-height: 40px;
+}
+
+/* ============== Divider ============== */
+.el-divider--horizontal {
+    margin: 5px 0 !important;
+}
+
+.el-divider {
+    background-color: #17202A !important;
+}
+
+/* ============== Form Item ============== */
+.el-form-item {
+    margin-bottom: 18px !important;
+}
+
+.el-form-item--mini {
+    margin-bottom: 5px !important;
+}
+
+.el-form-item--small {
+    margin-bottom: 10px !important;
+}
+
+.el-form-item__label {
+    font-size: 12px !important;
+    line-height: 28px !important;
+    color: var(--el-text-color-regular) !important;
+    padding: 0 12px 0 0 !important;
+}
+
+.el-form-item__content {
+    line-height: 28px !important;
+    width: 100% !important;
+}
+
+.el-form-item__label-wrap {
+    line-height: 28px !important;
+}
+
+/* Form item with label on top */
+.form-item-top .el-form-item__label {
+    float: none !important;
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.form-item-top .el-form-item__content {
+    width: 100% !important;
+    margin-left: 0 !important;
+    display: block !important;
+    min-height: 28px !important;
+}
+
+/* ============== Voltage Row ============== */
+.voltage-row {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.voltage-row.el-row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    row-gap: 8px !important;
+}
+
+.voltage-row .el-col {
+    min-width: 80px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    box-sizing: border-box !important;
+    flex: 0 0 auto !important;
+}
+
+.voltage-row .voltage-value-col {
+    flex: 1 1 auto !important;
+    min-width: 100px !important;
+}
+
+.voltage-row .el-col .el-select,
+.voltage-row .el-col .el-input {
+    width: 100% !important;
+    display: block !important;
+    min-width: 0 !important;
+}
+
+.voltage-row .el-col .el-select .el-input__wrapper,
+.voltage-row .el-col .el-input .el-input__wrapper {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 8px !important;
+}
+
+.voltage-row .el-col .el-select .el-input__inner,
+.voltage-row .el-col .el-input .el-input__inner {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* ============== Select Dropdown ============== */
+.el-select-dropdown__item {
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 12px !important;
+    padding: 0 10px !important;
+}
+
+.el-select-dropdown__list {
+    padding: 4px 0 !important;
+}
+
+/* ============== Input Number ============== */
+.el-input-number__decrease,
+.el-input-number__increase {
+    display: none !important;
+}
+
+.el-input-number {
+    width: 100% !important;
+}
+
+/* ============== Dialog ============== */
+.el-dialog {
+    min-width: 400px !important;
+    border-radius: 6px !important;
+}
+
+.el-dialog--center {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.el-dialog__body {
+    padding: 15px 20px !important;
+}
+
+.el-dialog__header {
+    padding: 15px 20px 10px !important;
+}
+
+.el-dialog__footer {
+    padding: 10px 20px !important;
+    border-top: 1px solid #ebeef5 !important;
+}
+
+/* ============== Button ============== */
+.el-button {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    border-radius: 4px !important;
+    height: 36px !important;
+    line-height: 1 !important;
+}
+
+.el-button--small {
+    padding: 9px 15px !important;
+    font-size: 13px !important;
+    height: 32px !important;
+}
+
+.el-button--mini {
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+    height: 28px !important;
+}
+
+/* ============== Input (default = 36px) ============== */
+.el-input {
+    width: 100% !important;
+}
+
+.el-input .el-input__wrapper {
+    padding: 0 12px !important;
+    width: 100% !important;
+}
+
+.el-input .el-input__inner {
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 14px !important;
+    width: 100% !important;
+}
+
+/* ============== Input (small = 32px) ============== */
+.el-input--small .el-input__wrapper {
+    padding: 0 10px !important;
+    width: 100% !important;
+}
+
+.el-input--small .el-input__inner {
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 13px !important;
+    width: 100% !important;
+}
+
+/* ============== Input (mini = 28px) - chuẩn Element UI ============== */
+.el-input--mini .el-input__wrapper {
+    padding: 0 8px !important;
+    width: 100% !important;
+    min-height: 28px !important;
+}
+
+.el-input--mini .el-input__inner {
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 12px !important;
+    width: 100% !important;
+}
+
+/* ============== Textarea ============== */
+.el-textarea__inner {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+}
+
+/* ============== Select ============== */
+.el-select {
+    width: 100% !important;
+    display: inline-block !important;
+    min-width: 0 !important;
+}
+
+.el-select .el-input__wrapper {
+    padding: 0 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.el-select .el-input__inner {
+    height: 36px !important;
+    line-height: 36px !important;
+    font-size: 14px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* Select small = 32px */
+.el-select--small .el-input__wrapper {
+    padding: 0 10px !important;
+    width: 100% !important;
+    min-height: 32px !important;
+    min-width: 0 !important;
+}
+
+.el-select--small .el-input__inner {
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 13px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* Select mini = 28px - chuẩn Element UI */
+.el-select--mini .el-input__wrapper {
+    padding: 0 8px !important;
+    width: 100% !important;
+    min-height: 28px !important;
+    min-width: 0 !important;
+}
+
+.el-select--mini .el-input__inner {
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* ============== Date Picker ============== */
+.el-date-editor.el-input {
+    width: 100% !important;
+}
+
+.el-date-editor .el-input__wrapper {
+    padding: 0 8px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+}
+
+.el-date-editor .el-input__inner {
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 12px !important;
+}
+
+/* ============== Cascader ============== */
+.el-cascader {
+    width: 100% !important;
+}
+
+.el-cascader .el-input__wrapper {
+    height: 28px !important;
+    min-height: 28px !important;
+}
+
+/* ============== Checkbox and Radio ============== */
+.el-checkbox__label,
+.el-radio__label {
+    font-size: 12px !important;
+    line-height: 20px !important;
+}
+
+.el-checkbox, .el-radio {
+    line-height: 28px !important;
+    margin-right: 12px !important;
+}
+
+/* ============== Table ============== */
+.el-table td,
+.el-table th {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+}
+
+.el-table--small td,
+.el-table--small th {
+    padding: 4px 6px !important;
+    font-size: 12px !important;
+}
+
+/* ============== Input Group ============== */
+.el-input-group__append,
+.el-input-group__prepend {
+    padding: 0px 8px !important;
+}
