@@ -1,0 +1,67 @@
+import db from '../../datacontext/index'
+
+export const getStandardById = async (mrid: string) => {
+  return new Promise<any>((resolve, reject) => {
+    db.get('SELECT * FROM standard WHERE mrid=?', [mrid], (err, row) => {
+      if (err) return reject({ success: false, err: err, message: 'Get standard by id failed' })
+      if (!row) return resolve({ success: false, data: null, message: 'Standard not found' })
+      return resolve({ success: true, data: row, message: 'Get standard by id completed' })
+    })
+  })
+}
+
+export const insertStandard: any = async (standard: any) => {
+  return new Promise<any>((resolve, reject) => {
+    db.run(
+      `INSERT INTO standard(mrid, name, code)
+             VALUES (?, ?, ?)
+             ON CONFLICT(mrid) DO UPDATE SET
+                name = excluded.name,
+                code = excluded.code`,
+      [standard.mrid, standard.name, standard.code],
+      function (this: any, err: Error | null) {
+        if (err) return reject({ success: false, err, message: 'Insert standard failed' })
+        return resolve({ success: true, data: standard, message: 'Insert standard completed' })
+      }
+    )
+  })
+}
+
+export const insertStandardTransaction: any = async (standard: any, dbsql: any) => {
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `INSERT INTO standard(mrid, name, code)
+             VALUES (?, ?, ?)
+             ON CONFLICT(mrid) DO UPDATE SET
+                name = excluded.name,
+                code = excluded.code`,
+      [standard.mrid, standard.name, standard.code],
+      function (this: any, err: Error | null) {
+        if (err) return reject({ success: false, err, message: 'Insert standard failed' })
+        return resolve({ success: true, data: standard, message: 'Insert standard completed' })
+      }
+    )
+  })
+}
+
+export const deleteStandardById = async (mrid: string) => {
+  return new Promise<any>((resolve, reject) => {
+    db.run('DELETE FROM standard WHERE mrid=?', [mrid], function (this: any, err: Error | null) {
+      if (err) return reject({ success: false, err, message: 'Delete standard failed' })
+      if (this.changes === 0)
+        return resolve({ success: false, data: null, message: 'Standard not found' })
+      return resolve({ success: true, data: null, message: 'Delete standard completed' })
+    })
+  })
+}
+
+export const deleteStandardByIdTransaction = async (mrid: string, dbsql: any) => {
+  return new Promise((resolve, reject) => {
+    dbsql.run('DELETE FROM standard WHERE mrid=?', [mrid], function (this: any, err: Error | null) {
+      if (err) return reject({ success: false, err, message: 'Delete standard failed' })
+      if (this.changes === 0)
+        return resolve({ success: false, data: null, message: 'Standard not found' })
+      return resolve({ success: true, data: null, message: 'Delete standard completed' })
+    })
+  })
+}

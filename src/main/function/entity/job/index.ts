@@ -11,15 +11,15 @@ import * as capacitorJob from './capacitor/index.js'
 import * as circuitBreakerJob from './circuitBreaker/index.js'
 
 export {
-    surgeArresterJob,
-    powerCableJob,
-    currentTransformerJob,
-    voltageTransformerJob,
-    rotatingMachineJob,
-    transformerJob,
-    bushingJob,
-    reactorJob,
-    disconnectorJob,
-    capacitorJob,
-    circuitBreakerJob
+  surgeArresterJob,
+  powerCableJob,
+  currentTransformerJob,
+  voltageTransformerJob,
+  rotatingMachineJob,
+  transformerJob,
+  bushingJob,
+  reactorJob,
+  disconnectorJob,
+  capacitorJob,
+  circuitBreakerJob
 }

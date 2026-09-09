@@ -31,33 +31,32 @@
 	FOREIGN KEY("um_rms") REFERENCES "voltage"("mrid")
 );
  */
-import CurrentTransformerInfo from "../CurrentTransformerInfo";
-import Frequency from "../Frequency";
-import Seconds from "../Seconds";
-import Voltage from "../Voltage";
-import Percent from "../Percent";
-import Temperature from "../Temperature";
+import CurrentTransformerInfo from '../CurrentTransformerInfo'
+import Frequency from '../Frequency'
+import Seconds from '../Seconds'
+import Voltage from '../Voltage'
+import Percent from '../Percent'
+import Temperature from '../Temperature'
 
 class OldCurrentTransformerInfo extends CurrentTransformerInfo {
-    constructor() {
-        super();
-                this.standard = null;
-                this.ratedFrequency = new Frequency();
-                this.primaryWindingCount = null;
-                this.umRms = null;
-                this.uWithstandRms = null;
-                this.uLightningPeak = null;
-                this.iCth = null;
-                this.iDynamicPeak = null;
-                this.ithRms = null;
-                this.ithDuration = new Seconds();
-                this.systemVoltage = new Voltage();
-                this.systemVoltageType = new Voltage();
-                this.bil = new Voltage();
-                this.ratingFactor = new Percent();
-                this.ratingFactorTemp = new Temperature();
-    }
-
+  constructor() {
+    super()
+    this.standard = null
+    this.ratedFrequency = new Frequency()
+    this.primaryWindingCount = null
+    this.umRms = null
+    this.uWithstandRms = null
+    this.uLightningPeak = null
+    this.iCth = null
+    this.iDynamicPeak = null
+    this.ithRms = null
+    this.ithDuration = new Seconds()
+    this.systemVoltage = new Voltage()
+    this.systemVoltageType = new Voltage()
+    this.bil = new Voltage()
+    this.ratingFactor = new Percent()
+    this.ratingFactorTemp = new Temperature()
+  }
 }
 
-export default OldCurrentTransformerInfo;
+export default OldCurrentTransformerInfo

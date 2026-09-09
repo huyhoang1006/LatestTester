@@ -1,112 +1,158 @@
 <template>
-    <div id="insulation-resistance">
-        <div style="position: sticky; left: 0; display: inline-block;">
-            <!-- Cấu hình -->
-            <el-row class="mgb-10">
-                <el-col>
-                    <el-button class="btn-action" size="small" type="success" @click="openAssessmentDialog = true">
-                        <i class="fa-solid fa-screwdriver-wrench"></i> Assessment settings
-                    </el-button>
-                    <el-button class="btn-action" size="small" type="success"
-                        @click="openConditionIndicatorDialog = true">
-                        <i class="fa-solid fa-hammer"></i> Condition indicatior settings
-                    </el-button>
-                </el-col>
-            </el-row>
+  <div id="insulation-resistance">
+    <div style="position: sticky; left: 0; display: inline-block">
+      <!-- Cấu hình -->
+      <el-row class="mgb-10">
+        <el-col>
+          <el-button
+            class="btn-action"
+            size="small"
+            type="success"
+            @click="openAssessmentDialog = true"
+          >
+            <i class="fa-solid fa-screwdriver-wrench"></i> Assessment settings
+          </el-button>
+          <el-button
+            class="btn-action"
+            size="small"
+            type="success"
+            @click="openConditionIndicatorDialog = true"
+          >
+            <i class="fa-solid fa-hammer"></i> Condition indicatior settings
+          </el-button>
+        </el-col>
+      </el-row>
 
-            <el-row :gutter="20" class="mgt-10">
-                <el-col :span="24">
-                    <el-button size="small" type="primary" class="btn-action" @click="calculator"> <i
-                            class="fas fa-circle-play"></i> Assess results </el-button>
-                    <el-button size="small" type="primary" class="btn-action" @click="clear"> <i
-                            class="fas fa-xmark"></i> Clear all </el-button>
-                </el-col>
-            </el-row>
-        </div>
+      <el-row :gutter="20" class="mgt-10">
+        <el-col :span="24">
+          <el-button size="small" type="primary" class="btn-action" @click="calculator">
+            <i class="fas fa-circle-play"></i> Assess results
+          </el-button>
+          <el-button size="small" type="primary" class="btn-action" @click="clear">
+            <i class="fas fa-xmark"></i> Clear all
+          </el-button>
+        </el-col>
+      </el-row>
+    </div>
 
-        <table class="mgt-10 table-strip-input-data" style=" width: 130%; font-size: 12px; text-align: center;">
-            <thead>
-                <tr>
-                    <th class="no-col">No</th>
-                    <th style="width: 160px;" @click="displayType">Measurement</th>
-                    <th @click="displayType">Type</th>
-                    <th>R<sub>15s</sub> (MΩ)</th>
-                    <th>R<sub>60s</sub> (MΩ)</th>
-                    <th style="width: 90px;">R<sub>10min</sub> (MΩ)</th>
-                    <th>DAR</th>
-                    <th>PI</th>
-                    <th class="assessment-col">Assessment</th>
-                    <th class="assessment-col">Condition indicator</th>
-                    <th @click="add()" class="action-col"><i class="fa-solid fa-plus pointer"></i></th>
-                    <th @click="removeAll()" class="action-col"><i class="fa-solid fa-trash pointer"></i></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item, index) in testData.table.table1" :key="index">
-                    <td style="text-align: center;">
-                        {{ index + 1 }}
-                    </td>
-                    <td style="display: flex; width: 100%;">
-                        <el-input size="small" v-model="item.measurement.value"></el-input>
-                        <div
-                            :class="{ colorTableRed: index % 3 == 0, colorTableYellow: index % 3 == 1, colorTableBlue: index % 3 == 2 }">
-                        </div>
-                    </td>
-                    <td>
-                        <el-select size="small" v-model="item.type.value">
-                            <el-option label="HV-E" value="HV-E"></el-option>
-                            <el-option label="LV-E" value="LV-E"></el-option>
-                        </el-select>
-                    </td>
-                    <td>
-                        <el-input size="small" type="text" number="positive" v-model="item.r15s.value"> </el-input>
-                    </td>
-                    <td><el-input size="small" type="text" number="positive" v-model="item.r60s.value"> </el-input></td>
-                    <td>
-                        <el-input size="small" type="text" number="positive" v-model="item.r_10m.value"></el-input>
-                    </td>
-                    <td>
-                        <el-input size="small" type="text" number="positive" v-model="item.dar.value"></el-input>
-                    </td>
-                    <td>
-                        <el-input size="small" type="text" number="positive" v-model="item.pi.value"></el-input>
-                    </td>
-                    <td>
-                        <el-select class="assessment" size="small" v-model="item.assessment.value">
-                            <el-option value="Pass"><i class="fa-solid fa-square-check pass"></i> Pass</el-option>
-                            <el-option value="Fail"><i class="fa-solid fa-xmark fail"></i> Fail</el-option>
-                        </el-select>
-                        <span v-if="item.assessment.value === 'Pass'"
-                            class="fa-solid fa-square-check pass icon-status"></span>
-                        <span v-else-if="item.assessment.value === 'Fail'"
-                            class="fa-solid fa-xmark fail icon-status"></span>
-                    </td>
-                    <td>
-                        <el-select :class="nameColor(item.condition_indicator.value)" id="condition" type="text"
-                            size="small" v-model="item.condition_indicator.value">
-                            <el-option value="Good">Good</el-option>
-                            <el-option value="Fair">Fair</el-option>
-                            <el-option value="Poor">Poor</el-option>
-                            <el-option value="Bad">Bad</el-option>
-                        </el-select>
-                    </td>
-                    <td>
-                        <el-button size="small" type="primary" class="w-100" @click="addTest(index)">
-                            <i class="fa-solid fa-plus"></i>
-                        </el-button>
-                    </td>
-                    <td>
-                        <el-button size="small" type="danger" class="w-100" @click="deleteTest(index)">
-                            <i class="fas fa-trash"></i>
-                        </el-button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <table
+      class="mgt-10 table-strip-input-data"
+      style="width: 130%; font-size: 12px; text-align: center"
+    >
+      <thead>
+        <tr>
+          <th class="no-col">No</th>
+          <th style="width: 160px" @click="displayType">Measurement</th>
+          <th @click="displayType">Type</th>
+          <th>R<sub>15s</sub> (MΩ)</th>
+          <th>R<sub>60s</sub> (MΩ)</th>
+          <th style="width: 90px">R<sub>10min</sub> (MΩ)</th>
+          <th>DAR</th>
+          <th>PI</th>
+          <th class="assessment-col">Assessment</th>
+          <th class="assessment-col">Condition indicator</th>
+          <th @click="add()" class="action-col"><i class="fa-solid fa-plus pointer"></i></th>
+          <th @click="removeAll()" class="action-col"><i class="fa-solid fa-trash pointer"></i></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in testData.table.table1" :key="index">
+          <td style="text-align: center">
+            {{ index + 1 }}
+          </td>
+          <td style="display: flex; width: 100%">
+            <el-input size="small" v-model="item.measurement.value"></el-input>
+            <div
+              :class="{
+                colorTableRed: index % 3 == 0,
+                colorTableYellow: index % 3 == 1,
+                colorTableBlue: index % 3 == 2
+              }"
+            ></div>
+          </td>
+          <td>
+            <el-select size="small" v-model="item.type.value">
+              <el-option label="HV-E" value="HV-E"></el-option>
+              <el-option label="LV-E" value="LV-E"></el-option>
+            </el-select>
+          </td>
+          <td>
+            <el-input size="small" type="text" number="positive" v-model="item.r15s.value">
+            </el-input>
+          </td>
+          <td>
+            <el-input size="small" type="text" number="positive" v-model="item.r60s.value">
+            </el-input>
+          </td>
+          <td>
+            <el-input
+              size="small"
+              type="text"
+              number="positive"
+              v-model="item.r_10m.value"
+            ></el-input>
+          </td>
+          <td>
+            <el-input
+              size="small"
+              type="text"
+              number="positive"
+              v-model="item.dar.value"
+            ></el-input>
+          </td>
+          <td>
+            <el-input size="small" type="text" number="positive" v-model="item.pi.value"></el-input>
+          </td>
+          <td>
+            <el-select class="assessment" size="small" v-model="item.assessment.value">
+              <el-option value="Pass"><i class="fa-solid fa-square-check pass"></i> Pass</el-option>
+              <el-option value="Fail"><i class="fa-solid fa-xmark fail"></i> Fail</el-option>
+            </el-select>
+            <span
+              v-if="item.assessment.value === 'Pass'"
+              class="fa-solid fa-square-check pass icon-status"
+            ></span>
+            <span
+              v-else-if="item.assessment.value === 'Fail'"
+              class="fa-solid fa-xmark fail icon-status"
+            ></span>
+          </td>
+          <td>
+            <el-select
+              :class="nameColor(item.condition_indicator.value)"
+              id="condition"
+              type="text"
+              size="small"
+              v-model="item.condition_indicator.value"
+            >
+              <el-option value="Good">Good</el-option>
+              <el-option value="Fair">Fair</el-option>
+              <el-option value="Poor">Poor</el-option>
+              <el-option value="Bad">Bad</el-option>
+            </el-select>
+          </td>
+          <td>
+            <el-button size="small" type="primary" class="w-100" @click="addTest(index)">
+              <i class="fa-solid fa-plus"></i>
+            </el-button>
+          </td>
+          <td>
+            <el-button size="small" type="danger" class="w-100" @click="deleteTest(index)">
+              <i class="fas fa-trash"></i>
+            </el-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-        <!-- Assessment settings -->
-        <el-dialog append-to-body title="Assessment settings" v-model="openAssessmentDialog" width="600px">
-            <!-- <el-form size="small" label-position="left" label-width="140px">
+    <!-- Assessment settings -->
+    <el-dialog
+      append-to-body
+      title="Assessment settings"
+      v-model="openAssessmentDialog"
+      width="600px"
+    >
+      <!-- <el-form size="small" label-position="left" label-width="140px">
                 <el-form-item label="Option">
                     <el-select class="w-100" placeholder="please select" v-model="assessmentSetting.option.value">
                         <el-option label="CIGRE 445 " value="cigre"></el-option>
@@ -175,12 +221,16 @@
                     </tr>
                 </tbody>
             </table> -->
-        </el-dialog>
+    </el-dialog>
 
-        <!-- Condition indicator settings -->
-        <el-dialog :modal="false" title="Condition indicator settings" v-model="openConditionIndicatorDialog"
-            width="670px">
-            <!-- <table class="table-strip-input-data">
+    <!-- Condition indicator settings -->
+    <el-dialog
+      :modal="false"
+      title="Condition indicator settings"
+      v-model="openConditionIndicatorDialog"
+      width="670px"
+    >
+      <!-- <table class="table-strip-input-data">
                 <thead>
                     <tr>
                         <th>Result</th>
@@ -241,187 +291,193 @@
                     </tr>
                 </tbody>
             </table> -->
-        </el-dialog>
-    </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
 import TransformerTestMap from '@/config/test-definitions/Transformer'
 import * as common from '../../../Common/index'
 export default {
-    name: 'InsulationResistance',
-    data() {
-        return {
-            openAssessmentDialog: false,
-            openConditionIndicatorDialog: false,
-        }
-    },
-    props: {
-        data: {
-            type: Object,
-            require: true,
-        },
-        asset: {
-            type: Object,
-            require: true
-        }
-    },
-    computed: {
-        testData() {
-            return this.data
-        },
-        assetData() {
-            return this.asset
-        },
-        rowData() {
-            return common.buildEmptyTestRow(TransformerTestMap['InsulationResistance'].columns)
-        },
-        conditionIndicatorSetting() {
-            return this.data.condition_indicator_setting
-        },
-        assessmentSetting() {
-            return this.data.assessment_setting
-        },
-        voltageRatings() {
-            return JSON.parse(this.asset.voltage_ratings)
-        },
-        asset_type() {
-            return this.asset.asset_type
-        }
-    },
-    methods: {
-        add() {
-            this.testData.table.table1.push(JSON.parse(JSON.stringify(this.rowData)))
-        },
-        removeAll() {
-            this.$confirm('This will delete the file. Continue?', 'Warning', {
-                confirmButtonText: 'OK',
-                cancelButtonText: 'Cancel',
-                type: 'warning'
-            }).then(() => {
-                this.testData.table.table1 = []
-            }).catch(() => { })
-        },
-        deleteTest(index) {
-            this.testData.table.table1.splice(index, 1)
-        },
-        addTest(index) {
-            const data = JSON.parse(JSON.stringify(this.rowData))
-            this.testData.table.table1.splice(index + 1, 0, data)
-        },
-        calculator() {
-            let voltage_ll = null
-
-            for (let index = 0; index < this.voltageRatings.length; index++) {
-                const element = this.voltageRatings[index]
-                if ((element.winding === 'Prim') & (element.voltage_ll.unit === 'kV')) {
-                    voltage_ll = element.voltage_ll.value
-                    break
-                }
-            }
-
-            this.testData.table.forEach((item) => {
-                if (!isNaN(parseFloat(item.r60s)) && (!isNaN(parseFloat(item.r15s))) && parseFloat(item.r15s) != '0') {
-                    item.kht = (item.r60s / item.r15s).toFixed(4)
-                }
-                if (!isNaN(parseFloat(item.r10min)) && (!isNaN(parseFloat(item.r60s))) && parseFloat(item.r60s) != '0') {
-                    item.pi = (item.r10min / item.r60s).toFixed(4)
-                }
-
-                if (this.assessmentSetting.option === 'cigre') {
-                    if (!isNaN(parseFloat(item.r60s)) && voltage_ll !== null) {
-                        item.assessment = 'Fail'
-                        if (
-                            (voltage_ll > parseInt(this.assessmentSetting.data.cigre.pass_1.prim) &&
-                                item.r60s > parseInt(this.assessmentSetting.data.cigre.pass_1.r60s)) ||
-                            (voltage_ll <= parseInt(this.assessmentSetting.data.cigre.pass_2.prim) &&
-                                item.r60s > parseInt(this.assessmentSetting.data.cigre.pass_2.r60s))
-                        ) {
-                            item.assessment = 'Pass'
-                        }
-                    }
-                } else if (this.assessmentSetting.option === 'custom') {
-                    if (!isNaN(parseFloat(item.r60s)) && voltage_ll !== null) {
-                        item.assessment = 'Fail'
-                        if (
-                            (voltage_ll > parseInt(this.assessmentSetting.data.custom.pass_1.prim) &&
-                                item.r60s > parseInt(this.assessmentSetting.data.custom.pass_1.r60s)) ||
-                            (voltage_ll <= parseInt(this.assessmentSetting.data.custom.pass_2.prim) &&
-                                item.r60s > parseInt(this.assessmentSetting.data.custom.pass_2.r60s))
-                        ) {
-                            item.assessment = 'Pass'
-                        }
-                    }
-                }
-            })
-        },
-        clear() {
-            this.testData.table.table1.forEach(row => {
-                Object.keys(row).forEach(key => {
-                    if (key === "mrid") return;
-                    if (row[key] && typeof row[key] === "object" && "value" in row[key]) {
-                        row[key].value = ""
-                    }
-                })
-            })
-        },
-        displayType() {
-            if (this.isdisplay === 'none') {
-                this.isdisplay = ''
-            } else {
-                this.isdisplay = 'none'
-            }
-        },
-        nameColor(data) {
-            if (data === this.$constant.GOOD) {
-                return 'Good'
-            }
-            else if (data === this.$constant.FAIR) {
-                return 'Fair'
-            }
-            else if (data === this.$constant.POOR) {
-                return 'Poor'
-            }
-            else if (data === this.$constant.BAD) {
-                return 'Bad'
-            }
-            else {
-                return;
-            }
-        }
+  name: 'InsulationResistance',
+  data() {
+    return {
+      openAssessmentDialog: false,
+      openConditionIndicatorDialog: false
     }
+  },
+  props: {
+    data: {
+      type: Object,
+      require: true
+    },
+    asset: {
+      type: Object,
+      require: true
+    }
+  },
+  computed: {
+    testData() {
+      return this.data
+    },
+    assetData() {
+      return this.asset
+    },
+    rowData() {
+      return common.buildEmptyTestRow(TransformerTestMap['InsulationResistance'].columns)
+    },
+    conditionIndicatorSetting() {
+      return this.data.condition_indicator_setting
+    },
+    assessmentSetting() {
+      return this.data.assessment_setting
+    },
+    voltageRatings() {
+      return JSON.parse(this.asset.voltage_ratings)
+    },
+    asset_type() {
+      return this.asset.asset_type
+    }
+  },
+  methods: {
+    add() {
+      this.testData.table.table1.push(JSON.parse(JSON.stringify(this.rowData)))
+    },
+    removeAll() {
+      this.$confirm('This will delete the file. Continue?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      })
+        .then(() => {
+          this.testData.table.table1 = []
+        })
+        .catch(() => {})
+    },
+    deleteTest(index) {
+      this.testData.table.table1.splice(index, 1)
+    },
+    addTest(index) {
+      const data = JSON.parse(JSON.stringify(this.rowData))
+      this.testData.table.table1.splice(index + 1, 0, data)
+    },
+    calculator() {
+      let voltage_ll = null
+
+      for (let index = 0; index < this.voltageRatings.length; index++) {
+        const element = this.voltageRatings[index]
+        if ((element.winding === 'Prim') & (element.voltage_ll.unit === 'kV')) {
+          voltage_ll = element.voltage_ll.value
+          break
+        }
+      }
+
+      this.testData.table.forEach((item) => {
+        if (
+          !isNaN(parseFloat(item.r60s)) &&
+          !isNaN(parseFloat(item.r15s)) &&
+          parseFloat(item.r15s) != '0'
+        ) {
+          item.kht = (item.r60s / item.r15s).toFixed(4)
+        }
+        if (
+          !isNaN(parseFloat(item.r10min)) &&
+          !isNaN(parseFloat(item.r60s)) &&
+          parseFloat(item.r60s) != '0'
+        ) {
+          item.pi = (item.r10min / item.r60s).toFixed(4)
+        }
+
+        if (this.assessmentSetting.option === 'cigre') {
+          if (!isNaN(parseFloat(item.r60s)) && voltage_ll !== null) {
+            item.assessment = 'Fail'
+            if (
+              (voltage_ll > parseInt(this.assessmentSetting.data.cigre.pass_1.prim) &&
+                item.r60s > parseInt(this.assessmentSetting.data.cigre.pass_1.r60s)) ||
+              (voltage_ll <= parseInt(this.assessmentSetting.data.cigre.pass_2.prim) &&
+                item.r60s > parseInt(this.assessmentSetting.data.cigre.pass_2.r60s))
+            ) {
+              item.assessment = 'Pass'
+            }
+          }
+        } else if (this.assessmentSetting.option === 'custom') {
+          if (!isNaN(parseFloat(item.r60s)) && voltage_ll !== null) {
+            item.assessment = 'Fail'
+            if (
+              (voltage_ll > parseInt(this.assessmentSetting.data.custom.pass_1.prim) &&
+                item.r60s > parseInt(this.assessmentSetting.data.custom.pass_1.r60s)) ||
+              (voltage_ll <= parseInt(this.assessmentSetting.data.custom.pass_2.prim) &&
+                item.r60s > parseInt(this.assessmentSetting.data.custom.pass_2.r60s))
+            ) {
+              item.assessment = 'Pass'
+            }
+          }
+        }
+      })
+    },
+    clear() {
+      this.testData.table.table1.forEach((row) => {
+        Object.keys(row).forEach((key) => {
+          if (key === 'mrid') return
+          if (row[key] && typeof row[key] === 'object' && 'value' in row[key]) {
+            row[key].value = ''
+          }
+        })
+      })
+    },
+    displayType() {
+      if (this.isdisplay === 'none') {
+        this.isdisplay = ''
+      } else {
+        this.isdisplay = 'none'
+      }
+    },
+    nameColor(data) {
+      if (data === this.$constant.GOOD) {
+        return 'Good'
+      } else if (data === this.$constant.FAIR) {
+        return 'Fair'
+      } else if (data === this.$constant.POOR) {
+        return 'Poor'
+      } else if (data === this.$constant.BAD) {
+        return 'Bad'
+      } else {
+        return
+      }
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 div.el-divider.el-divider--horizontal {
-    width: 500px !important;
+  width: 500px !important;
 }
 
 .flex-container {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    div {
-        padding: 1px;
-        height: 30px;
-        line-height: 30px;
-    }
+  div {
+    padding: 1px;
+    height: 30px;
+    line-height: 30px;
+  }
 }
 
 .Good input {
-    background: #00CC00;
+  background: #00cc00;
 }
 
 .Fair input {
-    background: #FFFF00;
+  background: #ffff00;
 }
 
 .Poor input {
-    background: #FFC000;
+  background: #ffc000;
 }
 
 .Bad input {
-    background: #FF0000;
+  background: #ff0000;
 }
 </style>

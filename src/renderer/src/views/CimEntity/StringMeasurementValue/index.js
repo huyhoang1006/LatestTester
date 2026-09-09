@@ -1,11 +1,11 @@
-import MeasurementValue from "@/views/Cim/MeasurementValue";
-import StringMeasurement from "../StringMeasurement";
+import MeasurementValue from '@/views/Cim/MeasurementValue'
+import StringMeasurement from '../StringMeasurement'
 class StringMeasurementValue extends MeasurementValue {
-    constructor() {
-        super();
-                this.value = null;
-                this.stringMeasurement = new StringMeasurement();
-    }
+  constructor() {
+    super()
+    this.value = null
+    this.stringMeasurement = new StringMeasurement()
+  }
 }
 
-export default StringMeasurementValue;
+export default StringMeasurementValue

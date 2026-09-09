@@ -10,42 +10,42 @@ import JointCableInfo from '@/views/Cim/JointCableInfo'
 import SheathVoltageLimiter from '@/views/Cim/SheathVoltageLimiter'
 
 class PowerCableEntity {
-    area: any
-    asset: any
-    assetPsr: any
-    attachment: any
-    concentricNeutral: any
-    currentFlow: any
-    frequency: any
-    joint: any
-    length: any
-    lifecycleDate: any
-    oldCableInfo: any
-    productAssetModel: any
-    second: any
-    sheathVoltageLimiter: any
-    temperature: any
-    terminal: any
-    voltage: any
-    constructor() {
-        this.asset = new Asset()
-        this.productAssetModel = new ProductAssetModel()
-        this.concentricNeutral = new ConcentricNeutralCableInfo()
-        this.oldCableInfo = new OldCableInfo()
-        this.attachment = new Attachment()
-        this.length = []
-        this.area = []
-        this.temperature = []
-        this.frequency = []
-        this.voltage = []
-        this.currentFlow = []
-        this.lifecycleDate = new LifecycleDate()
-        this.assetPsr = new AssetPsr()
-        this.terminal = new TerminalCableInfo()
-        this.joint = new JointCableInfo()
-        this.sheathVoltageLimiter = new SheathVoltageLimiter()
-        this.second = []
-    }
+  area: any
+  asset: any
+  assetPsr: any
+  attachment: any
+  concentricNeutral: any
+  currentFlow: any
+  frequency: any
+  joint: any
+  length: any
+  lifecycleDate: any
+  oldCableInfo: any
+  productAssetModel: any
+  second: any
+  sheathVoltageLimiter: any
+  temperature: any
+  terminal: any
+  voltage: any
+  constructor() {
+    this.asset = new Asset()
+    this.productAssetModel = new ProductAssetModel()
+    this.concentricNeutral = new ConcentricNeutralCableInfo()
+    this.oldCableInfo = new OldCableInfo()
+    this.attachment = new Attachment()
+    this.length = []
+    this.area = []
+    this.temperature = []
+    this.frequency = []
+    this.voltage = []
+    this.currentFlow = []
+    this.lifecycleDate = new LifecycleDate()
+    this.assetPsr = new AssetPsr()
+    this.terminal = new TerminalCableInfo()
+    this.joint = new JointCableInfo()
+    this.sheathVoltageLimiter = new SheathVoltageLimiter()
+    this.second = []
+  }
 }
 
 export default PowerCableEntity

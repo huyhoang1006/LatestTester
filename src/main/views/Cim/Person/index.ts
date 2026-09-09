@@ -1,26 +1,26 @@
-import IdentifiedObject from "../IdentifiedObject"
+import IdentifiedObject from '../IdentifiedObject'
 
 class Person extends IdentifiedObject {
-    electronic_address: any
-    first_name: any
-    landline_phone: any
-    last_name: any
-    m_name: any
-    mobile_phone: any
-    prefix: any
-    special_need: any
-    suffix: any
-    constructor() {
-        super()
-        this.electronic_address = null
-        this.first_name = null
-        this.landline_phone = null
-        this.last_name = null
-        this.m_name = null
-        this.mobile_phone = null
-        this.prefix = null
-        this.special_need = null
-        this.suffix = null
-    }
+  electronic_address: any
+  first_name: any
+  landline_phone: any
+  last_name: any
+  m_name: any
+  mobile_phone: any
+  prefix: any
+  special_need: any
+  suffix: any
+  constructor() {
+    super()
+    this.electronic_address = null
+    this.first_name = null
+    this.landline_phone = null
+    this.last_name = null
+    this.m_name = null
+    this.mobile_phone = null
+    this.prefix = null
+    this.special_need = null
+    this.suffix = null
+  }
 }
 export default Person

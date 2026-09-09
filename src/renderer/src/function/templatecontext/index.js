@@ -12,7 +12,6 @@ if (process.env.NODE_ENV === 'development') {
   templateDir = path.join(app.getPath('userData'), 'template')
 }
 
-
 // Đảm bảo thư mục tồn tại
 if (!fs.existsSync(templateDir)) {
   fs.mkdirSync(templateDir, { recursive: true })
@@ -27,4 +26,3 @@ export function getTemplatePath(filename) {
 export function getTemplateDir() {
   return templateDir
 }
-

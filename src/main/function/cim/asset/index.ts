@@ -2,63 +2,76 @@ import db from '../../datacontext/index'
 import * as IdentifiedObjectFunc from '../identifiedObject/index.js'
 
 export const getAssetById = async (mrid: string) => {
-    try {
-        const identifiedResult: any = await IdentifiedObjectFunc.getIdentifiedObjectById(mrid)
-        if (!identifiedResult.success) {
-            console.warn(`[DEBUG] IdentifiedObject NOT found for MRID: ${mrid}`, identifiedResult)
-            return { success: false, data: null, message: 'Identified object not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get('SELECT * FROM asset WHERE mrid=?', [mrid], (err: Error | null, row: any) => {
-                if (err) {
-                    console.error(`[DEBUG] SQLite Error in getAssetById for MRID: ${mrid}`, err)
-                    return reject({ success: false, err: err, message: 'Get asset by id failed' })
-                }
-                if (!row) {
-                    console.warn(`[DEBUG] Asset Table row NOT found for MRID: ${mrid} (but IdentifiedObject existed)`)
-                    return resolve({ success: false, data: null, message: 'Asset not found' })
-                }
-                const data = { ...identifiedResult.data, ...row }
-                return resolve({ success: true, data: data, message: 'Get asset by id completed' })
-            })
-        })
-    } catch (err) {
-        console.error(`[DEBUG] Unexpected Exception in getAssetById for MRID: ${mrid}`, err)
-        return { success: false, err: err, message: 'Get asset by id failed' }
+  try {
+    const identifiedResult: any = await IdentifiedObjectFunc.getIdentifiedObjectById(mrid)
+    if (!identifiedResult.success) {
+      console.warn(`[DEBUG] IdentifiedObject NOT found for MRID: ${mrid}`, identifiedResult)
+      return { success: false, data: null, message: 'Identified object not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM asset WHERE mrid=?', [mrid], (err: Error | null, row: any) => {
+        if (err) {
+          console.error(`[DEBUG] SQLite Error in getAssetById for MRID: ${mrid}`, err)
+          return reject({ success: false, err: err, message: 'Get asset by id failed' })
+        }
+        if (!row) {
+          console.warn(
+            `[DEBUG] Asset Table row NOT found for MRID: ${mrid} (but IdentifiedObject existed)`
+          )
+          return resolve({ success: false, data: null, message: 'Asset not found' })
+        }
+        const data = { ...identifiedResult.data, ...row }
+        return resolve({ success: true, data: data, message: 'Get asset by id completed' })
+      })
+    })
+  } catch (err) {
+    console.error(`[DEBUG] Unexpected Exception in getAssetById for MRID: ${mrid}`, err)
+    return { success: false, err: err, message: 'Get asset by id failed' }
+  }
 }
 
 export const getAssetByAssetInfoId = async (assetInfoId: string) => {
-    try {
-        return new Promise((resolve, reject) => {
-            db.get('SELECT mrid FROM asset WHERE asset_info=?', [assetInfoId], async (err: Error | null, row: any) => {
-                if (err) {
-                    console.error(`[DEBUG] SQLite Error in getAssetByAssetInfoId for AssetInfoId: ${assetInfoId}`, err)
-                    return reject({ success: false, err: err, message: 'Find Asset by AssetInfoId failed' })
-                }
+  try {
+    return new Promise((resolve, reject) => {
+      db.get(
+        'SELECT mrid FROM asset WHERE asset_info=?',
+        [assetInfoId],
+        async (err: Error | null, row: any) => {
+          if (err) {
+            console.error(
+              `[DEBUG] SQLite Error in getAssetByAssetInfoId for AssetInfoId: ${assetInfoId}`,
+              err
+            )
+            return reject({ success: false, err: err, message: 'Find Asset by AssetInfoId failed' })
+          }
 
-                if (!row) {
-                    return resolve({ success: false, data: null, message: 'Asset not found for this AssetInfo' })
-                }
-
-                try {
-                    const result: any = await getAssetById(row.mrid)
-                    return resolve(result)
-                } catch (error) {
-                    return reject(error)
-                }
+          if (!row) {
+            return resolve({
+              success: false,
+              data: null,
+              message: 'Asset not found for this AssetInfo'
             })
-        })
-    } catch (err) {
-        console.error(`[DEBUG] Unexpected Exception in getAssetByAssetInfoId`, err)
-        return { success: false, err: err, message: 'Get Asset by AssetInfoId failed' }
-    }
+          }
+
+          try {
+            const result: any = await getAssetById(row.mrid)
+            return resolve(result)
+          } catch (error) {
+            return reject(error)
+          }
+        }
+      )
+    })
+  } catch (err) {
+    console.error(`[DEBUG] Unexpected Exception in getAssetByAssetInfoId`, err)
+    return { success: false, err: err, message: 'Get Asset by AssetInfoId failed' }
+  }
 }
 
 export const getAssetByLocationId = async (locationId: string) => {
-    try {
-        return new Promise((resolve, reject) => {
-            const query = `
+  try {
+    return new Promise((resolve, reject) => {
+      const query = `
                 SELECT
                     a.*,
                     io.name AS name,
@@ -68,24 +81,24 @@ export const getAssetByLocationId = async (locationId: string) => {
                 JOIN identified_object io ON a.mrid = io.mrid
                 WHERE a.location = ?
             `
-            db.all(query, [locationId], (err: Error | null, rows: unknown[]) => {
-                if (err) {
-                    return reject({ success: false, err: err, message: 'Query failed' })
-                }
-                if (!rows || rows.length === 0) {
-                    return resolve({ success: false, data: [], message: 'No assets found for this location' })
-                }
-                return resolve({ success: true, data: rows, message: 'Get assets by locationId completed' })
-            })
-        })
-    } catch (err) {
-        return { success: false, err: err, message: 'Unexpected error' }
-    }
+      db.all(query, [locationId], (err: Error | null, rows: unknown[]) => {
+        if (err) {
+          return reject({ success: false, err: err, message: 'Query failed' })
+        }
+        if (!rows || rows.length === 0) {
+          return resolve({ success: false, data: [], message: 'No assets found for this location' })
+        }
+        return resolve({ success: true, data: rows, message: 'Get assets by locationId completed' })
+      })
+    })
+  } catch (err) {
+    return { success: false, err: err, message: 'Unexpected error' }
+  }
 }
 
 export const getAssetByPsrIdAndKind = (psrId: string, kind: string) => {
-    return new Promise((resolve, reject) => {
-        const query = `
+  return new Promise((resolve, reject) => {
+    const query = `
             SELECT DISTINCT
                 a.*,
                 io.name AS apparatus_id,
@@ -104,32 +117,48 @@ export const getAssetByPsrIdAndKind = (psrId: string, kind: string) => {
               AND a.kind = ?
         `
 
-        db.all(query, [psrId, kind], (err: Error | null, rows: unknown[]) => {
-            if (err) {
-                reject({ success: false, error: err.message, message: 'Database query failed when getting Asset by PSR ID and kind' })
-                return
-            }
-            if (!rows || rows.length === 0) {
-                resolve({ success: false, data: [], message: `No Asset found for PSR ID: ${psrId} with kind: ${kind}` })
-                return
-            }
-            resolve({ success: true, data: rows, message: 'Asset retrieved successfully by PSR ID and kind' })
+    db.all(query, [psrId, kind], (err: Error | null, rows: unknown[]) => {
+      if (err) {
+        reject({
+          success: false,
+          error: err.message,
+          message: 'Database query failed when getting Asset by PSR ID and kind'
         })
+        return
+      }
+      if (!rows || rows.length === 0) {
+        resolve({
+          success: false,
+          data: [],
+          message: `No Asset found for PSR ID: ${psrId} with kind: ${kind}`
+        })
+        return
+      }
+      resolve({
+        success: true,
+        data: rows,
+        message: 'Asset retrieved successfully by PSR ID and kind'
+      })
     })
+  })
 }
 
 export const insertAsset = async (asset: any) => {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.run('BEGIN TRANSACTION')
-            IdentifiedObjectFunc.insertIdentifiedObjectTransaction(asset, db)
-                .then((identifiedResult: any) => {
-                    if (!identifiedResult.success) {
-                        db.run('ROLLBACK')
-                        return reject({ success: false, message: 'Insert identified object failed', err: identifiedResult.err })
-                    }
-                    db.run(
-                        `INSERT INTO asset(
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION')
+      IdentifiedObjectFunc.insertIdentifiedObjectTransaction(asset, db)
+        .then((identifiedResult: any) => {
+          if (!identifiedResult.success) {
+            db.run('ROLLBACK')
+            return reject({
+              success: false,
+              message: 'Insert identified object failed',
+              err: identifiedResult.err
+            })
+          }
+          db.run(
+            `INSERT INTO asset(
                             mrid, acceptance_test, critical, electronic_address, initial_condition, initial_loss_of_life,
                             in_use_date, in_use_state, kind, lifecycle_date, lifecycle_state, lot_number, position,
                             retired_reason, serial_number, status, type, utc_number, asset_info, product_asset_model,
@@ -159,61 +188,65 @@ export const insertAsset = async (asset: any) => {
                             country_of_origin = excluded.country_of_origin,
                             manufacturer_type = excluded.manufacturer_type
                         `,
-                        [
-                            asset.mrid,
-                            asset.acceptance_test,
-                            asset.critical,
-                            asset.electronic_address,
-                            asset.initial_condition,
-                            asset.initial_loss_of_life,
-                            asset.in_use_date,
-                            asset.in_use_state,
-                            asset.kind,
-                            asset.lifecycle_date,
-                            asset.lifecycle_state,
-                            asset.lot_number,
-                            asset.position,
-                            asset.retired_reason,
-                            asset.serial_number,
-                            asset.status,
-                            asset.type,
-                            asset.utc_number,
-                            asset.asset_info,
-                            asset.product_asset_model,
-                            asset.location,
-                            asset.country_of_origin,
-                            asset.manufacturer_type
-                        ],
-                        function (this: { lastID: number; changes: number }, err: Error | null) {
-                            if (err) {
-                                db.run('ROLLBACK')
-                                return reject({ success: false, err: err, message: 'Insert asset failed' })
-                            }
-                            db.run('COMMIT')
-                            return resolve({ success: true, data: asset, message: 'Insert asset completed' })
-                        }
-                    )
-                })
-                .catch((err: Error) => {
-                    db.run('ROLLBACK')
-                    return reject({ success: false, err: err, message: 'Insert asset transaction failed' })
-                })
+            [
+              asset.mrid,
+              asset.acceptance_test,
+              asset.critical,
+              asset.electronic_address,
+              asset.initial_condition,
+              asset.initial_loss_of_life,
+              asset.in_use_date,
+              asset.in_use_state,
+              asset.kind,
+              asset.lifecycle_date,
+              asset.lifecycle_state,
+              asset.lot_number,
+              asset.position,
+              asset.retired_reason,
+              asset.serial_number,
+              asset.status,
+              asset.type,
+              asset.utc_number,
+              asset.asset_info,
+              asset.product_asset_model,
+              asset.location,
+              asset.country_of_origin,
+              asset.manufacturer_type
+            ],
+            function (this: { lastID: number; changes: number }, err: Error | null) {
+              if (err) {
+                db.run('ROLLBACK')
+                return reject({ success: false, err: err, message: 'Insert asset failed' })
+              }
+              db.run('COMMIT')
+              return resolve({ success: true, data: asset, message: 'Insert asset completed' })
+            }
+          )
+        })
+        .catch((err: Error) => {
+          db.run('ROLLBACK')
+          return reject({ success: false, err: err, message: 'Insert asset transaction failed' })
         })
     })
+  })
 }
 
 export const updateAsset = async (mrid: string, asset: any) => {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.run('BEGIN TRANSACTION')
-            IdentifiedObjectFunc.updateIdentifiedObjectByIdTransaction(mrid, asset, db)
-                .then((identifiedResult: any) => {
-                    if (!identifiedResult.success) {
-                        db.run('ROLLBACK')
-                        return reject({ success: false, message: 'Update identified object failed', err: identifiedResult.err })
-                    }
-                    db.run(
-                        `UPDATE asset SET
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION')
+      IdentifiedObjectFunc.updateIdentifiedObjectByIdTransaction(mrid, asset, db)
+        .then((identifiedResult: any) => {
+          if (!identifiedResult.success) {
+            db.run('ROLLBACK')
+            return reject({
+              success: false,
+              message: 'Update identified object failed',
+              err: identifiedResult.err
+            })
+          }
+          db.run(
+            `UPDATE asset SET
                             acceptance_test = ?,
                             critical = ?,
                             electronic_address = ?,
@@ -236,72 +269,87 @@ export const updateAsset = async (mrid: string, asset: any) => {
                             location = ?,
                             country_of_origin = ?
                         WHERE mrid = ?`,
-                        [
-                            asset.acceptance_test,
-                            asset.critical,
-                            asset.electronic_address,
-                            asset.initial_condition,
-                            asset.initial_loss_of_life,
-                            asset.in_use_date,
-                            asset.in_use_state,
-                            asset.kind,
-                            asset.lifecycle_date,
-                            asset.lifecycle_state,
-                            asset.lot_number,
-                            asset.position,
-                            asset.retired_reason,
-                            asset.serial_number,
-                            asset.status,
-                            asset.type,
-                            asset.utc_number,
-                            asset.asset_info,
-                            asset.product_asset_model,
-                            asset.location,
-                            asset.country_of_origin,
-                            mrid
-                        ],
-                        function (this: { lastID: number; changes: number }, err: Error | null) {
-                            if (err) {
-                                db.run('ROLLBACK')
-                                return reject({ success: false, err: err, message: 'Update asset failed' })
-                            }
-                            db.run('COMMIT')
-                            return resolve({ success: true, data: asset, message: 'Update asset completed' })
-                        }
-                    )
-                })
-                .catch((err: Error) => {
-                    db.run('ROLLBACK')
-                    return reject({ success: false, err: err, message: 'Update asset transaction failed' })
-                })
+            [
+              asset.acceptance_test,
+              asset.critical,
+              asset.electronic_address,
+              asset.initial_condition,
+              asset.initial_loss_of_life,
+              asset.in_use_date,
+              asset.in_use_state,
+              asset.kind,
+              asset.lifecycle_date,
+              asset.lifecycle_state,
+              asset.lot_number,
+              asset.position,
+              asset.retired_reason,
+              asset.serial_number,
+              asset.status,
+              asset.type,
+              asset.utc_number,
+              asset.asset_info,
+              asset.product_asset_model,
+              asset.location,
+              asset.country_of_origin,
+              mrid
+            ],
+            function (this: { lastID: number; changes: number }, err: Error | null) {
+              if (err) {
+                db.run('ROLLBACK')
+                return reject({ success: false, err: err, message: 'Update asset failed' })
+              }
+              db.run('COMMIT')
+              return resolve({ success: true, data: asset, message: 'Update asset completed' })
+            }
+          )
+        })
+        .catch((err: Error) => {
+          db.run('ROLLBACK')
+          return reject({ success: false, err: err, message: 'Update asset transaction failed' })
         })
     })
+  })
 }
 
 export const deleteAssetById = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        IdentifiedObjectFunc.deleteIdentifiedObjectByIdTransaction(mrid, db)
-            .then((result: any) => {
-                if (!result.success) {
-                    return reject({ success: false, message: 'Delete identified object failed', err: result.err })
-                }
-                return resolve({ success: true, data: mrid, message: 'Delete asset (and cascade identified object) completed' })
-            })
-            .catch((err: Error) => {
-                return reject({ success: false, err: err, message: 'Delete asset transaction failed' })
-            })
-    })
+  return new Promise((resolve, reject) => {
+    IdentifiedObjectFunc.deleteIdentifiedObjectByIdTransaction(mrid, db)
+      .then((result: any) => {
+        if (!result.success) {
+          return reject({
+            success: false,
+            message: 'Delete identified object failed',
+            err: result.err
+          })
+        }
+        return resolve({
+          success: true,
+          data: mrid,
+          message: 'Delete asset (and cascade identified object) completed'
+        })
+      })
+      .catch((err: Error) => {
+        return reject({ success: false, err: err, message: 'Delete asset transaction failed' })
+      })
+  })
 }
 
 export const insertAssetTransaction = (asset: any, dbsql: typeof db) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const identifiedResult: any = await IdentifiedObjectFunc.insertIdentifiedObjectTransaction(asset, dbsql)
-            if (!identifiedResult.success) {
-                return reject({ success: false, message: 'Insert identified object failed', err: identifiedResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO asset(
+  return new Promise(async (resolve, reject) => {
+    try {
+      const identifiedResult: any = await IdentifiedObjectFunc.insertIdentifiedObjectTransaction(
+        asset,
+        dbsql
+      )
+      if (!identifiedResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert identified object failed',
+          err: identifiedResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO asset(
                     mrid, acceptance_test, critical, electronic_address, initial_condition, initial_loss_of_life,
                     in_use_date, in_use_state, kind, lifecycle_date, lifecycle_state, lot_number, position,
                     retired_reason, serial_number, status, type, utc_number, asset_info, product_asset_model,
@@ -330,54 +378,62 @@ export const insertAssetTransaction = (asset: any, dbsql: typeof db) => {
                     location = excluded.location,
                     country_of_origin = excluded.country_of_origin
                 `,
-                [
-                    asset.mrid,
-                    asset.acceptance_test,
-                    asset.critical,
-                    asset.electronic_address,
-                    asset.initial_condition,
-                    asset.initial_loss_of_life,
-                    asset.in_use_date,
-                    asset.in_use_state,
-                    asset.kind,
-                    asset.lifecycle_date,
-                    asset.lifecycle_state,
-                    asset.lot_number,
-                    asset.position,
-                    asset.retired_reason,
-                    asset.serial_number,
-                    asset.status,
-                    asset.type,
-                    asset.utc_number,
-                    asset.asset_info,
-                    asset.product_asset_model,
-                    asset.location,
-                    asset.country_of_origin
-                ],
-                function (this: { lastID: number; changes: number }, err: Error | null) {
-                    if (err) {
-                        console.error(`[DEBUG] insertAssetTransaction FAILED for MRID: ${asset.mrid}`, err)
-                        return resolve({ success: false, err: err, message: 'Insert asset transaction failed' })
-                    }
-                    console.log(`[DEBUG] insertAssetTransaction SUCCESS for MRID: ${asset.mrid}`)
-                    return resolve({ success: true, data: asset, message: 'Insert asset transaction completed' })
-                }
-            )
-        } catch (err) {
+        [
+          asset.mrid,
+          asset.acceptance_test,
+          asset.critical,
+          asset.electronic_address,
+          asset.initial_condition,
+          asset.initial_loss_of_life,
+          asset.in_use_date,
+          asset.in_use_state,
+          asset.kind,
+          asset.lifecycle_date,
+          asset.lifecycle_state,
+          asset.lot_number,
+          asset.position,
+          asset.retired_reason,
+          asset.serial_number,
+          asset.status,
+          asset.type,
+          asset.utc_number,
+          asset.asset_info,
+          asset.product_asset_model,
+          asset.location,
+          asset.country_of_origin
+        ],
+        function (this: { lastID: number; changes: number }, err: Error | null) {
+          if (err) {
+            console.error(`[DEBUG] insertAssetTransaction FAILED for MRID: ${asset.mrid}`, err)
             return resolve({ success: false, err: err, message: 'Insert asset transaction failed' })
+          }
+          return resolve({
+            success: true,
+            data: asset,
+            message: 'Insert asset transaction completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return resolve({ success: false, err: err, message: 'Insert asset transaction failed' })
+    }
+  })
 }
 
 export const updateAssetTransaction = (mrid: string, asset: any, dbsql: typeof db) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const identifiedResult: any = await IdentifiedObjectFunc.updateIdentifiedObjectByIdTransaction(mrid, asset, dbsql)
-            if (!identifiedResult.success) {
-                return reject({ success: false, message: 'Update identified object failed', err: identifiedResult.err })
-            }
-            dbsql.run(
-                `UPDATE asset SET
+  return new Promise(async (resolve, reject) => {
+    try {
+      const identifiedResult: any =
+        await IdentifiedObjectFunc.updateIdentifiedObjectByIdTransaction(mrid, asset, dbsql)
+      if (!identifiedResult.success) {
+        return reject({
+          success: false,
+          message: 'Update identified object failed',
+          err: identifiedResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE asset SET
                     acceptance_test = ?,
                     critical = ?,
                     electronic_address = ?,
@@ -400,54 +456,66 @@ export const updateAssetTransaction = (mrid: string, asset: any, dbsql: typeof d
                     location = ?,
                     country_of_origin = ?
                 WHERE mrid = ?`,
-                [
-                    asset.acceptance_test,
-                    asset.critical,
-                    asset.electronic_address,
-                    asset.initial_condition,
-                    asset.initial_loss_of_life,
-                    asset.in_use_date,
-                    asset.in_use_state,
-                    asset.kind,
-                    asset.lifecycle_date,
-                    asset.lifecycle_state,
-                    asset.lot_number,
-                    asset.position,
-                    asset.retired_reason,
-                    asset.serial_number,
-                    asset.status,
-                    asset.type,
-                    asset.utc_number,
-                    asset.asset_info,
-                    asset.product_asset_model,
-                    asset.location,
-                    asset.country_of_origin,
-                    mrid
-                ],
-                function (this: { lastID: number; changes: number }, err: Error | null) {
-                    if (err) {
-                        return resolve({ success: false, err: err, message: 'Update asset transaction failed' })
-                    }
-                    return resolve({ success: true, data: asset, message: 'Update asset transaction completed' })
-                }
-            )
-        } catch (err) {
+        [
+          asset.acceptance_test,
+          asset.critical,
+          asset.electronic_address,
+          asset.initial_condition,
+          asset.initial_loss_of_life,
+          asset.in_use_date,
+          asset.in_use_state,
+          asset.kind,
+          asset.lifecycle_date,
+          asset.lifecycle_state,
+          asset.lot_number,
+          asset.position,
+          asset.retired_reason,
+          asset.serial_number,
+          asset.status,
+          asset.type,
+          asset.utc_number,
+          asset.asset_info,
+          asset.product_asset_model,
+          asset.location,
+          asset.country_of_origin,
+          mrid
+        ],
+        function (this: { lastID: number; changes: number }, err: Error | null) {
+          if (err) {
             return resolve({ success: false, err: err, message: 'Update asset transaction failed' })
+          }
+          return resolve({
+            success: true,
+            data: asset,
+            message: 'Update asset transaction completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return resolve({ success: false, err: err, message: 'Update asset transaction failed' })
+    }
+  })
 }
 
 export const deleteAssetByIdTransaction = async (mrid: string, dbsql: typeof db) => {
-    return new Promise((resolve, reject) => {
-        IdentifiedObjectFunc.deleteIdentifiedObjectByIdTransaction(mrid, dbsql)
-            .then((result: any) => {
-                if (!result.success) {
-                    return reject({ success: false, message: 'Delete identified object failed', err: result.err })
-                }
-                return resolve({ success: true, data: mrid, message: 'Delete asset (and cascade identified object) completed' })
-            })
-            .catch((err: Error) => {
-                return reject({ success: false, err: err, message: 'Delete asset transaction failed' })
-            })
-    })
+  return new Promise((resolve, reject) => {
+    IdentifiedObjectFunc.deleteIdentifiedObjectByIdTransaction(mrid, dbsql)
+      .then((result: any) => {
+        if (!result.success) {
+          return reject({
+            success: false,
+            message: 'Delete identified object failed',
+            err: result.err
+          })
+        }
+        return resolve({
+          success: true,
+          data: mrid,
+          message: 'Delete asset (and cascade identified object) completed'
+        })
+      })
+      .catch((err: Error) => {
+        return reject({ success: false, err: err, message: 'Delete asset transaction failed' })
+      })
+  })
 }

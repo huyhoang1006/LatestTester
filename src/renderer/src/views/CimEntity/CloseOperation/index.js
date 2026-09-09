@@ -1,13 +1,13 @@
 class CloseOperation {
-    constructor() {
-        this.mRID = null;
-                this.auxiliaryContactsBreakerInfoId = null;
-                this.parameterName = null;
-                this.tMin = null;
-                this.tMax = null;
-                this.tRef = null;
-                this.tDev = null;
-    }
+  constructor() {
+    this.mRID = null
+    this.auxiliaryContactsBreakerInfoId = null
+    this.parameterName = null
+    this.tMin = null
+    this.tMax = null
+    this.tRef = null
+    this.tDev = null
+  }
 }
 
-export default CloseOperation;
+export default CloseOperation

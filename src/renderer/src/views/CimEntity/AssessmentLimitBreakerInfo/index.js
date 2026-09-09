@@ -1,10 +1,9 @@
 class AssessmentLimitBreakerInfo {
-    constructor() {
-        this.mRID = null
-        this.breakerInfoId = null;
-        this.limitType = null;
-    }
+  constructor() {
+    this.mRID = null
+    this.breakerInfoId = null
+    this.limitType = null
+  }
 }
 
-export default AssessmentLimitBreakerInfo;
-
+export default AssessmentLimitBreakerInfo

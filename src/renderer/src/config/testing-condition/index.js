@@ -11,17 +11,17 @@ import surgeArresterConditionMap from './SurgeArrester/index'
 import bushingConditionMap from './Bushing/index'
 
 const testConditionMap = {
-    Transformer: transformerConditionMap,
-    CircuitBreaker: circuitBreakerConditionMap,
-    Disconnector: disconnectorConditionMap,
-    CurrentTransformer: currentTransformerConditionMap,
-    PowerCable: powerCableConditionMap,
-    Reactor: reactorConditionMap,
-    RotatingMachine: rotatingMachineConditionMap,
-    Capacitor: capacitorConditionMap,
-    VoltageTransformer: voltageTransformerConditionMap,
-    SurgeArrester: surgeArresterConditionMap,
-    Bushing: bushingConditionMap
+  Transformer: transformerConditionMap,
+  CircuitBreaker: circuitBreakerConditionMap,
+  Disconnector: disconnectorConditionMap,
+  CurrentTransformer: currentTransformerConditionMap,
+  PowerCable: powerCableConditionMap,
+  Reactor: reactorConditionMap,
+  RotatingMachine: rotatingMachineConditionMap,
+  Capacitor: capacitorConditionMap,
+  VoltageTransformer: voltageTransformerConditionMap,
+  SurgeArrester: surgeArresterConditionMap,
+  Bushing: bushingConditionMap
 }
 
 export default testConditionMap

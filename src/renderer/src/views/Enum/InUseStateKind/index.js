@@ -1,5 +1,5 @@
 export const InUseStateKind = {
-    inUse: 'inUse',
-    notReadyForUse: 'notReadyForUse',
-    readyForUse: 'readyForUse',
+  inUse: 'inUse',
+  notReadyForUse: 'notReadyForUse',
+  readyForUse: 'readyForUse'
 }

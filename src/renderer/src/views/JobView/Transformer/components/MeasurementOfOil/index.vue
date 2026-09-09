@@ -1,82 +1,122 @@
 <template>
-    <div>
-        <!-- Cấu hình -->
-        <el-row class="mgb-10">
-            <el-col>
-                <el-button class="btn-action" size="small" type="success" @click="openAssessmentDialog = true">
-                    <i class="fa-solid fa-screwdriver-wrench"></i> Assessment settings
-                </el-button>
-                <el-button class="btn-action" size="small" type="success" @click="openConditionIndicatorDialog = true">
-                    <i class="fa-solid fa-hammer"></i> Condition indicatior settings
-                </el-button>
-            </el-col>
-        </el-row>
+  <div>
+    <!-- Cấu hình -->
+    <el-row class="mgb-10">
+      <el-col>
+        <el-button
+          class="btn-action"
+          size="small"
+          type="success"
+          @click="openAssessmentDialog = true"
+        >
+          <i class="fa-solid fa-screwdriver-wrench"></i> Assessment settings
+        </el-button>
+        <el-button
+          class="btn-action"
+          size="small"
+          type="success"
+          @click="openConditionIndicatorDialog = true"
+        >
+          <i class="fa-solid fa-hammer"></i> Condition indicatior settings
+        </el-button>
+      </el-col>
+    </el-row>
 
-        <!-- Tính toán đánh giá -->
-        <el-row class="mgb-10">
-            <el-col>
-                <el-button size="small" type="primary" class="btn-action" @click="calculator"> <i
-                        class="fas fa-circle-play"></i> Assess results </el-button>
-                <el-button size="small" type="primary" class="btn-action" @click="clear"> <i class="fas fa-xmark"></i>
-                    Clear all </el-button>
-            </el-col>
-        </el-row>
+    <!-- Tính toán đánh giá -->
+    <el-row class="mgb-10">
+      <el-col>
+        <el-button size="small" type="primary" class="btn-action" @click="calculator">
+          <i class="fas fa-circle-play"></i> Assess results
+        </el-button>
+        <el-button size="small" type="primary" class="btn-action" @click="clear">
+          <i class="fas fa-xmark"></i> Clear all
+        </el-button>
+      </el-col>
+    </el-row>
 
-        <table style="width: 100% ; font-size: 12px;" class="mgb-10 table-strip-input-data">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Electrode gap spacing (mm)</th>
-                    <th>Result (kV)</th>
-                    <th class="assessment-col">Assessment</th>
-                    <th class="condition-indicator-col">Condition indicator</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item, index) in testData.table.table1" :key="index">
-                    <td>
-                        <el-select size="small" allow-create filterable :reserve-keyword="false"
-                            v-model="item.type.value" placeholder="Select insulation type" class="w-100">
-                            <el-option label="Askarel" value="Askarel"></el-option>
-                            <el-option label="Dry type" value="Dry type"></el-option>
-                            <el-option label="Gas" value="Gas"></el-option>
-                            <el-option label="Natural ester" value="Natural ester"></el-option>
-                            <el-option label="Mineral oil" value="Mineral oil"></el-option>
-                            <el-option label="Silicon" value="Silicon"></el-option>
-                        </el-select>
-                    </td>
-                    <td>
-                        <el-input size="small" type="text" number="positive" v-model="item.electrode_gap_spacing.value"> </el-input>
-                    </td>
-                    <td>
-                        <el-input size="small" type="text" number="positive" v-model="item.result.value"> </el-input>
-                    </td>
-                    <td>
-                        <el-select class="assessment" size="small" v-model="item.assessment.value">
-                            <el-option value="Pass"><i class="fa-solid fa-square-check pass"></i> Pass</el-option>
-                            <el-option value="Fail"><i class="fa-solid fa-xmark fail"></i> Fail</el-option>
-                        </el-select>
-                        <span v-if="item.assessment.value === 'Pass'"
-                            class="fa-solid fa-square-check pass icon-status"></span>
-                        <span v-else-if="item.assessment.value === 'Fail'"
-                            class="fa-solid fa-xmark fail icon-status"></span>
-                    </td>
-                    <td>
-                        <el-select :class="nameColor(item.condition_indicator.value)" id="condition" type="text"
-                            size="small" v-model="item.condition_indicator.value">
-                            <el-option value="Good">Good</el-option>
-                            <el-option value="Fair">Fair</el-option>
-                            <el-option value="Poor">Poor</el-option>
-                            <el-option value="Bad">Bad</el-option>
-                        </el-select>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <table style="width: 100%; font-size: 12px" class="mgb-10 table-strip-input-data">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Electrode gap spacing (mm)</th>
+          <th>Result (kV)</th>
+          <th class="assessment-col">Assessment</th>
+          <th class="condition-indicator-col">Condition indicator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in testData.table.table1" :key="index">
+          <td>
+            <el-select
+              size="small"
+              allow-create
+              filterable
+              :reserve-keyword="false"
+              v-model="item.type.value"
+              placeholder="Select insulation type"
+              class="w-100"
+            >
+              <el-option label="Askarel" value="Askarel"></el-option>
+              <el-option label="Dry type" value="Dry type"></el-option>
+              <el-option label="Gas" value="Gas"></el-option>
+              <el-option label="Natural ester" value="Natural ester"></el-option>
+              <el-option label="Mineral oil" value="Mineral oil"></el-option>
+              <el-option label="Silicon" value="Silicon"></el-option>
+            </el-select>
+          </td>
+          <td>
+            <el-input
+              size="small"
+              type="text"
+              number="positive"
+              v-model="item.electrode_gap_spacing.value"
+            >
+            </el-input>
+          </td>
+          <td>
+            <el-input size="small" type="text" number="positive" v-model="item.result.value">
+            </el-input>
+          </td>
+          <td>
+            <el-select class="assessment" size="small" v-model="item.assessment.value">
+              <el-option value="Pass"><i class="fa-solid fa-square-check pass"></i> Pass</el-option>
+              <el-option value="Fail"><i class="fa-solid fa-xmark fail"></i> Fail</el-option>
+            </el-select>
+            <span
+              v-if="item.assessment.value === 'Pass'"
+              class="fa-solid fa-square-check pass icon-status"
+            ></span>
+            <span
+              v-else-if="item.assessment.value === 'Fail'"
+              class="fa-solid fa-xmark fail icon-status"
+            ></span>
+          </td>
+          <td>
+            <el-select
+              :class="nameColor(item.condition_indicator.value)"
+              id="condition"
+              type="text"
+              size="small"
+              v-model="item.condition_indicator.value"
+            >
+              <el-option value="Good">Good</el-option>
+              <el-option value="Fair">Fair</el-option>
+              <el-option value="Poor">Poor</el-option>
+              <el-option value="Bad">Bad</el-option>
+            </el-select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-        <!-- Assessment settings -->
-        <el-dialog append-to-body title="Assessment settings" v-model="openAssessmentDialog" width="600px">
-            <!-- <el-form size="small" label-position="left" label-width="140px">
+    <!-- Assessment settings -->
+    <el-dialog
+      append-to-body
+      title="Assessment settings"
+      v-model="openAssessmentDialog"
+      width="600px"
+    >
+      <!-- <el-form size="small" label-position="left" label-width="140px">
                 <el-form-item label="Option">
                     <el-select class="w-100" placeholder="please select" v-model="assessmentSetting.option.value">
                         <el-option label="Based on IEC" value="IEC"></el-option>
@@ -135,12 +175,16 @@
                     </tr>
                 </tbody>
             </table> -->
-        </el-dialog>
+    </el-dialog>
 
-        <!-- Condition indicator settings -->
-        <el-dialog append-to-body title="Condition indicator settings" v-model="openConditionIndicatorDialog"
-            width="600px">
-            <!-- <table class="table-strip-input-data">
+    <!-- Condition indicator settings -->
+    <el-dialog
+      append-to-body
+      title="Condition indicator settings"
+      v-model="openConditionIndicatorDialog"
+      width="600px"
+    >
+      <!-- <table class="table-strip-input-data">
                 <thead>
                     <tr>
                         <th>Result</th>
@@ -183,116 +227,116 @@
                     </tr>
                 </tbody>
             </table> -->
-        </el-dialog>
-    </div>
+    </el-dialog>
+  </div>
 </template>
 <script>
 import TransformerTestMap from '@/config/test-definitions/Transformer'
 import * as common from '../../../Common/index'
 export default {
-    name: "MeasurementOfOil",
-    data() {
-        return {
-            openAssessmentDialog: false,
-            openConditionIndicatorDialog: false
-        }
-    },
-    props: {
-        data: {
-            type: Object,
-            require: true
-        }
-    },
-    computed: {
-        testData() {
-            return this.data
-        },
-        rowData() {
-            return common.buildEmptyTestRow(TransformerTestMap['MeasurementOfOil'].columns)
-        },
-        assessmentSetting() {
-            return this.data.assessment_setting
-        },
-        conditionIndicatorSetting() {
-            return this.data.condition_indicator_setting
-        }
-    },
-    methods: {
-        calculator() {
-            // if (this.assessmentSetting.option === 'IEC' && this.assessmentSetting.data.iec.voltage === '') {
-            //     this.$message.warning('IEC standard has no value')
-            // } else if (this.assessmentSetting.option === 'IEEE' && this.assessmentSetting.data.ieee.voltage === '') {
-            //     this.$message.warning('IEC standard has no value')
-            // } else if (this.assessmentSetting.option === 'Custom' && this.assessmentSetting.data.custom.voltage === '') {
-            //     this.$message.warning('IEC standard has no value')
-            // } else if (this.testData.result !== '') {
-            //     this.testData.assessment = 'Fail'
-            //     switch (this.assessmentSetting.option) {
-            //         case 'IEC':
-            //             if (parseFloat(this.testData.result) >= parseFloat(this.assessmentSetting.data.iec.voltage)) {
-            //                 this.testData.assessment = 'Pass'
-            //             }
-            //             break
-            //         case 'IEEE':
-            //             if (parseFloat(this.testData.result) >= parseFloat(this.assessmentSetting.data.ieee.voltage)) {
-            //                 this.testData.assessment = 'Pass'
-            //             }
-            //             break
-
-            //         case 'Custom':
-            //             if (parseFloat(this.testData.result) >= parseFloat(this.assessmentSetting.data.custom.voltage)) {
-            //                 this.testData.assessment = 'Pass'
-            //             }
-            //             break
-            //     }
-            // }
-
-            this.$message.success('Calculating successfully')
-        },
-        clear() {
-            this.testData.table.table1.forEach(row => {
-                Object.keys(row).forEach(key => {
-                    if (key === "mrid") return;
-                    if (row[key] && typeof row[key] === "object" && "value" in row[key]) {
-                        row[key].value = ""
-                    }
-                })
-            })
-        },
-        nameColor(data) {
-            if (data === this.$constant.GOOD) {
-                return 'Good'
-            } else if (data === this.$constant.FAIR) {
-                return 'Fair'
-            } else if (data === this.$constant.POOR) {
-                return 'Poor'
-            } else if (data === this.$constant.BAD) {
-                return 'Bad'
-            } else {
-                return;
-            }
-        }
+  name: 'MeasurementOfOil',
+  data() {
+    return {
+      openAssessmentDialog: false,
+      openConditionIndicatorDialog: false
     }
+  },
+  props: {
+    data: {
+      type: Object,
+      require: true
+    }
+  },
+  computed: {
+    testData() {
+      return this.data
+    },
+    rowData() {
+      return common.buildEmptyTestRow(TransformerTestMap['MeasurementOfOil'].columns)
+    },
+    assessmentSetting() {
+      return this.data.assessment_setting
+    },
+    conditionIndicatorSetting() {
+      return this.data.condition_indicator_setting
+    }
+  },
+  methods: {
+    calculator() {
+      // if (this.assessmentSetting.option === 'IEC' && this.assessmentSetting.data.iec.voltage === '') {
+      //     this.$message.warning('IEC standard has no value')
+      // } else if (this.assessmentSetting.option === 'IEEE' && this.assessmentSetting.data.ieee.voltage === '') {
+      //     this.$message.warning('IEC standard has no value')
+      // } else if (this.assessmentSetting.option === 'Custom' && this.assessmentSetting.data.custom.voltage === '') {
+      //     this.$message.warning('IEC standard has no value')
+      // } else if (this.testData.result !== '') {
+      //     this.testData.assessment = 'Fail'
+      //     switch (this.assessmentSetting.option) {
+      //         case 'IEC':
+      //             if (parseFloat(this.testData.result) >= parseFloat(this.assessmentSetting.data.iec.voltage)) {
+      //                 this.testData.assessment = 'Pass'
+      //             }
+      //             break
+      //         case 'IEEE':
+      //             if (parseFloat(this.testData.result) >= parseFloat(this.assessmentSetting.data.ieee.voltage)) {
+      //                 this.testData.assessment = 'Pass'
+      //             }
+      //             break
+
+      //         case 'Custom':
+      //             if (parseFloat(this.testData.result) >= parseFloat(this.assessmentSetting.data.custom.voltage)) {
+      //                 this.testData.assessment = 'Pass'
+      //             }
+      //             break
+      //     }
+      // }
+
+      this.$message.success('Calculating successfully')
+    },
+    clear() {
+      this.testData.table.table1.forEach((row) => {
+        Object.keys(row).forEach((key) => {
+          if (key === 'mrid') return
+          if (row[key] && typeof row[key] === 'object' && 'value' in row[key]) {
+            row[key].value = ''
+          }
+        })
+      })
+    },
+    nameColor(data) {
+      if (data === this.$constant.GOOD) {
+        return 'Good'
+      } else if (data === this.$constant.FAIR) {
+        return 'Fair'
+      } else if (data === this.$constant.POOR) {
+        return 'Poor'
+      } else if (data === this.$constant.BAD) {
+        return 'Bad'
+      } else {
+        return
+      }
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
 .w-100px {
-    width: 100px;
+  width: 100px;
 }
 
 .Good {
-    background: #00CC00;
+  background: #00cc00;
 }
 
 .Fair {
-    background: #FFFF00;
+  background: #ffff00;
 }
 
 .Poor {
-    background: #FFC000;
+  background: #ffc000;
 }
 
 .Bad {
-    background: #FF0000;
+  background: #ff0000;
 }
 </style>

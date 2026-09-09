@@ -9,37 +9,68 @@
 
       <contextMenu ref="contextSubstation" @show-addSubs="$emit('show-addSubs', $event)"></contextMenu>
     </div> -->
-<contextMenu ref="contextSubstation" @show-addSubs="$emit('show-addSubs', $event)"></contextMenu>
+    <contextMenu
+      ref="contextSubstation"
+      @show-addSubs="$emit('show-addSubs', $event)"
+    ></contextMenu>
 
-    <div class="child-nav" >
+    <div class="child-nav">
       <ul>
-        <TreeNode v-for="item in organisationClientList" :key="getItemUniqueKey(item)" :node="item" :selectedNodes="selectedNodes"
+        <TreeNode
+          v-for="item in organisationClientList"
+          :key="getItemUniqueKey(item)"
+          :node="item"
+          :selectedNodes="selectedNodes"
+          :draggableNodes="true"
           @update:selectedNodes="$emit('update:selectedNodes', $event)"
-          @double-click-node="$emit('double-click-node', $event)" @fetch-children="$emit('fetch-children', $event)"
-          @show-properties="$emit('show-properties', $event)" @update-selection="$emit('update-selection', $event)"
-          @clear-selection="$emit('clear-selection', $event)" @open-context-menu="openContextMenuClient">
+          @double-click-node="$emit('double-click-node', $event)"
+          @fetch-children="$emit('fetch-children', $event)"
+          @show-properties="$emit('show-properties', $event)"
+          @update-selection="$emit('update-selection', $event)"
+          @clear-selection="$emit('clear-selection', $event)"
+          @open-context-menu="openContextMenuClient"
+        >
         </TreeNode>
       </ul>
 
-      <contextMenu ref="contextMenuClient" @delete-data="$emit('delete-data', $event)"
-      @show-zero-diagram="$emit('show-zero-diagram', $event)"
+      <contextMenu
+        ref="contextMenuClient"
+        side="client"
+        @delete-data="$emit('delete-data', $event)"
+        @show-zero-diagram="$emit('show-zero-diagram', $event)"
         @show-addSubsInTree="$emit('show-addSubsInTree', $event)"
         @show-addOrganisation="$emit('show-addOrganisation', $event)"
         @show-addVoltageLevel="$emit('show-addVoltageLevel', $event)"
-        @show-addTransformer="$emit('show-addTransformer', $event)" @show-addJob="$emit('show-addJob', $event)"
+        @show-addTransformer="$emit('show-addTransformer', $event)"
+        @show-addJob="$emit('show-addJob', $event)"
         @show-addBushing="$emit('show-addBushing', $event)"
         @show-addSurgeArrester="$emit('show-addSurgeArrester', $event)"
-        @show-addCircuit="$emit('show-addCircuit', $event)" @show-addVt="$emit('show-addVt', $event)"
-        @show-addCt="$emit('show-addCt', $event)" @show-addPowerCable="$emit('show-addPowerCable', $event)"
+        @show-addCircuit="$emit('show-addCircuit', $event)"
+        @show-addVt="$emit('show-addVt', $event)"
+        @show-addCt="$emit('show-addCt', $event)"
+        @show-addPowerCable="$emit('show-addPowerCable', $event)"
         @show-addDisconnector="$emit('show-addDisconnector', $event)"
-        @show-addCapacitor="$emit('show-addCapacitor', $event)" @show-addReactor="$emit('show-addReactor', $event)"
-        @show-addRotatingMachine="$emit('show-addRotatingMachine', $event)" @show-addBay="$emit('show-addBay', $event)"
-        @export-json="$emit('export-json', $event)" @export-json-cim="$emit('export-json-cim', $event)"
-        @export-xml="$emit('export-xml', $event)" @export-excel="$emit('export-excel', $event)"
-        @export-word="$emit('export-word', $event)" @export-pdf="$emit('export-pdf', $event)"
-        @duplicate-node="$emit('duplicate-node', $event)" @move-node="$emit('move-node', $event)"
-        @import-json="$emit('import-json', $event)" @import-json-cim="$emit('import-json-cim', $event)"
-        @show-data="$emit('show-data', $event)" @refresh-node="$emit('refresh-node', $event)">
+        @show-addCapacitor="$emit('show-addCapacitor', $event)"
+        @show-addReactor="$emit('show-addReactor', $event)"
+        @show-addRotatingMachine="$emit('show-addRotatingMachine', $event)"
+        @show-addBay="$emit('show-addBay', $event)"
+        @export-json="$emit('export-json', $event)"
+        @export-json-cim="$emit('export-json-cim', $event)"
+        @export-xml="$emit('export-xml', $event)"
+        @export-excel="$emit('export-excel', $event)"
+        @export-word="$emit('export-word', $event)"
+        @export-pdf="$emit('export-pdf', $event)"
+        @duplicate-node="$emit('duplicate-node', $event)"
+        @move-node="$emit('move-node', $event)"
+        @import-json="$emit('import-json', $event)"
+        @import-json-cim="$emit('import-json-cim', $event)"
+        @download="$emit('download', $event)"
+        @upload="$emit('upload', $event)"
+        @fmeca="$emit('fmeca', $event)"
+        @show-equipment="$emit('show-equipment', $event)"
+        @show-data="$emit('show-data', $event)"
+        @refresh-node="$emit('refresh-node', $event)"
+      >
       </contextMenu>
     </div>
   </div>
@@ -50,7 +81,7 @@ import contextMenu from '@/views/Common/ContextMenu.vue'
 import TreeNode from '@/views/Common/TreeNode.vue'
 
 export default {
-  name: "ClientTreePanel",
+  name: 'ClientTreePanel',
   components: {
     TreeNode,
     contextMenu
@@ -68,12 +99,12 @@ export default {
   },
   methods: {
     getItemUniqueKey(item) {
-    if (!item.mrid) return Math.random().toString(36).substr(2, 9)
-    if (item.mode === 'asset') {
+      if (!item.mrid) return Math.random().toString(36).substr(2, 9)
+      if (item.mode === 'asset') {
         return `${item.mrid}_${item.asset}`
-    }
-    return `${item.mrid}_${item.mode}`
-},
+      }
+      return `${item.mrid}_${item.mode}`
+    },
     async openContextMenuClient(event, node) {
       const menu = this.$refs.contextMenuClient.$el
       const menuHeight = menu.offsetHeight || 320 // fallback nếu chưa render
@@ -107,10 +138,10 @@ export default {
       this.$refs.contextSubstation.openContextMenuSubstation(event, this.$constant.ROOT)
     },
     triggerClickLocation() {
-      this.$emit('showLocationRoot');
+      this.$emit('showLocationRoot')
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -125,11 +156,13 @@ export default {
 
 .sidebar ul {
   list-style: none;
-  padding-left: 20px;
+  padding-left: 8px;
+  padding-right: 4px;
+  margin: 4px 0;
 }
 
 .sidebar li {
-  margin: 5px 0;
+  margin: 0;
   cursor: pointer;
 }
 
@@ -187,12 +220,14 @@ export default {
 
 .child-nav {
   overflow-y: hidden;
-  height: calc(100% - 80px);
+  overflow-x: hidden;
+  height: 100%;
   box-sizing: border-box;
 }
 
 .child-nav:hover {
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .title-node {

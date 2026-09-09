@@ -1,10 +1,10 @@
 class KiloActivePower {
-    constructor() {
-        this.mRID = null // Unique identifier for the kilo active power value
-                this.multiplier = null;
-                this.unit = null;
-                this.value = null; // e.g., 0.75 for 75%
-    }
+  constructor() {
+    this.mRID = null // Unique identifier for the kilo active power value
+    this.multiplier = null
+    this.unit = null
+    this.value = null // e.g., 0.75 for 75%
+  }
 }
 
-export default KiloActivePower;
+export default KiloActivePower

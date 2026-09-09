@@ -32,3 +32,4 @@ $ npm run build:mac
 # For Linux
 $ npm run build:linux
 ```
+opencode -s ses_f9b2b78b0ffe8G0RcMxZ6L94mx

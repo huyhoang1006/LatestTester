@@ -12,6 +12,9 @@ import * as common from './utils/common'
 import constant from './utils/constant'
 import client from './utils/client'
 import uuid from './utils/uuid'
+import CustomInput from './views/Common/CustomInput.vue'
+import AssessmentResultLabel from './views/JobView/Common/AssessmentResultLabel.vue'
+import radioClearable from './directives/radioClearable.js'
 
 import './assets/main.css'
 import './assets/style.css'
@@ -25,11 +28,11 @@ console.log('[Main] App instance created')
 console.log('[Main] electronAPI available:', typeof window.electronAPI !== 'undefined')
 
 if (typeof window.electronAPI === 'undefined') {
-    console.error('[Main] FATAL: electronAPI not available! Preload script may have failed to load.')
+  console.error('[Main] FATAL: electronAPI not available! Preload script may have failed to load.')
 }
 
 app.config.errorHandler = (err, _instance, info) => {
-    console.error('[Vue Error]', err, info)
+  console.error('[Vue Error]', err, info)
 }
 
 helper.initApp()
@@ -37,6 +40,11 @@ helper.initApp()
 app.use(store)
 app.use(ElementPlus)
 app.use(router)
+
+// Override ElInput global Component để hỗ trợ number/text filtering (CustomInput)
+app.component('ElInput', CustomInput)
+app.component('AssessmentResultLabel', AssessmentResultLabel)
+app.directive('radio-clearable', radioClearable)
 
 console.log('[Main] Plugins registered (ElementPlus before router)')
 
@@ -51,11 +59,11 @@ app.config.globalProperties.$message = ElMessage
 app.config.globalProperties.$notify = ElNotification
 app.config.globalProperties.$loading = ElLoading.service
 app.config.globalProperties.$confirm = (message: string, title?: string, options?: object) =>
-    ElMessageBox.confirm(message, title || 'Warning', options)
+  ElMessageBox.confirm(message, title || 'Warning', options)
 app.config.globalProperties.$alert = (message: string, title?: string, options?: object) =>
-    ElMessageBox.alert(message, title || 'Alert', options)
+  ElMessageBox.alert(message, title || 'Alert', options)
 app.config.globalProperties.$prompt = (message: string, title?: string, options?: object) =>
-    ElMessageBox.prompt(message, title || 'Prompt', options)
+  ElMessageBox.prompt(message, title || 'Prompt', options)
 
 app.config.globalProperties.$userStore = () => store
 app.config.globalProperties.$userId = () => store.state.user?.user_id || store.state.user?.id

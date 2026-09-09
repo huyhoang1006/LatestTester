@@ -11,55 +11,55 @@ import * as VoltageTransformerMapping from '@/views/Mapping/VoltageTransformer/i
 import * as CurrentTransformerMapping from '@/views/Mapping/CurrentTransformer/index'
 import * as ReactorMapping from '@/views/Mapping/Reactor/index'
 import * as BushingMapping from '@/views/Mapping/Bushing/index'
-import * as rotatingMachineMapping from "@/views/Mapping/RotatingMachine/index"
+import * as rotatingMachineMapping from '@/views/Mapping/RotatingMachine/index'
 import * as VoltageLevelMapping from '@/views/Mapping/VoltageLevel/index'
 import { exportNodeToJSON as exportNodeToJSONUtil } from '@/function/entity/export/index'
 
 export default {
-    methods: {
-        async handleExportJSONFromContext(node) {
-            await this.exportSingleNodeToJSON(node, 'dto')
-        },
-        async exportSingleNodeToJSON(node, type) {
-            if (!node) {
-                this.$message.warning('No node selected to export')
-                return
-            }
+  methods: {
+    async handleExportJSONFromContext(node) {
+      await this.exportSingleNodeToJSON(node, 'dto')
+    },
+    async exportSingleNodeToJSON(node, type) {
+      if (!node) {
+        this.$message.warning('No node selected to export')
+        return
+      }
 
-            const dependencies = {
-                electronAPI: window.electronAPI,
-                mappings: {
-                    SubstationMapping,
-                    OrganisationMapping,
-                    SurgeArresterMapping,
-                    PowerCableMapping,
-                    DisconnectorMapping,
-                    rotatingMachineMapping,
-                    CapacitorMapping,
-                    VoltageTransformerMapping,
-                    CurrentTransformerMapping,
-                    TransformerMapping,
-                    BreakerMapping,
-                    ReactorMapping,
-                    BushingMapping,
-                    VoltageLevelMapping
-                },
-                userId: this.$userId(),
-                messageHandler: this.$message,
-                loadingHandler: {
-                    start: () => {
-                        const { close } = startLoading(this, {
-                            action: 'export',
-                            customText: 'Preparing export data...',
-                            type: 'default'
-                        });
-                        return close;
-                    }
-                }
-            }
-
-            // Truyền trực tiếp node, không dùng selectedNodes
-            await exportNodeToJSONUtil(node, type, dependencies)
+      const dependencies = {
+        electronAPI: window.electronAPI,
+        mappings: {
+          SubstationMapping,
+          OrganisationMapping,
+          SurgeArresterMapping,
+          PowerCableMapping,
+          DisconnectorMapping,
+          rotatingMachineMapping,
+          CapacitorMapping,
+          VoltageTransformerMapping,
+          CurrentTransformerMapping,
+          TransformerMapping,
+          BreakerMapping,
+          ReactorMapping,
+          BushingMapping,
+          VoltageLevelMapping
         },
+        userId: this.$userId(),
+        messageHandler: this.$message,
+        loadingHandler: {
+          start: () => {
+            const { close } = startLoading(this, {
+              action: 'export',
+              customText: 'Preparing export data...',
+              type: 'default'
+            })
+            return close
+          }
+        }
+      }
+
+      // Truyền trực tiếp node, không dùng selectedNodes
+      await exportNodeToJSONUtil(node, type, dependencies)
     }
+  }
 }

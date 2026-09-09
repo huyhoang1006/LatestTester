@@ -1,37 +1,42 @@
 import db from '../../datacontext/index'
 
 export const getOldCableInfoById = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        db.get(
-            `SELECT * FROM old_cable_info WHERE mrid=?`,
-            [mrid],
-            (err: any, row: any) => {
-                if (err) return reject({ success: false, err, message: 'Get oldCableInfo by id failed' })
-                if (!row) return resolve({ success: false, data: null, message: 'OldCableInfo not found' })
-                return resolve({ success: true, data: row, message: 'Get oldCableInfo by id completed' })
-            }
-        )
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT * FROM old_cable_info WHERE mrid=?`, [mrid], (err: any, row: any) => {
+      if (err) return reject({ success: false, err, message: 'Get oldCableInfo by id failed' })
+      if (!row) return resolve({ success: false, data: null, message: 'OldCableInfo not found' })
+      return resolve({ success: true, data: row, message: 'Get oldCableInfo by id completed' })
     })
+  })
 }
 
 export const getOldCableInfoByCableInfoId = async (cableInfoId: string) => {
-    return new Promise((resolve, reject) => {
-        db.get(
-            `SELECT * FROM old_cable_info WHERE cable_info_id=?`,
-            [cableInfoId],
-            (err: any, row: any) => {
-                if (err) return reject({ success: false, err, message: 'Get oldCableInfo by cable_info_id failed' })
-                if (!row) return resolve({ success: false, data: null, message: 'OldCableInfo not found' })
-                return resolve({ success: true, data: row, message: 'Get oldCableInfo by cable_info_id completed' })
-            }
-        )
-    })
+  return new Promise((resolve, reject) => {
+    db.get(
+      `SELECT * FROM old_cable_info WHERE cable_info_id=?`,
+      [cableInfoId],
+      (err: any, row: any) => {
+        if (err)
+          return reject({
+            success: false,
+            err,
+            message: 'Get oldCableInfo by cable_info_id failed'
+          })
+        if (!row) return resolve({ success: false, data: null, message: 'OldCableInfo not found' })
+        return resolve({
+          success: true,
+          data: row,
+          message: 'Get oldCableInfo by cable_info_id completed'
+        })
+      }
+    )
+  })
 }
 
 export const insertOldCableInfoTransaction = async (info: any, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `INSERT INTO old_cable_info(
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `INSERT INTO old_cable_info(
                 mrid, rated_u, max_u, rated_frequency, short_circuit_current, rated_duration_short_circuit,
                 installation_method, bonding_type, install_location, length, conductor_size, conductor_class,
                 conductor_type, nominal_conductor_diameter, conductor_shield_thickness, diameter_over_shield,
@@ -93,70 +98,70 @@ export const insertOldCableInfoTransaction = async (info: any, dbsql: any) => {
                 sheath_type = excluded.sheath_type,
                 diameter_over_armour = excluded.diameter_over_armour
             `,
-            [
-                info.mrid,
-                info.rated_u,
-                info.max_u,
-                info.rated_frequency,
-                info.short_circuit_current,
-                info.rated_duration_short_circuit,
-                info.installation_method,
-                info.bonding_type,
-                info.install_location,
-                info.length,
-                info.conductor_size,
-                info.conductor_class,
-                info.conductor_type,
-                info.nominal_conductor_diameter,
-                info.conductor_shield_thickness,
-                info.diameter_over_shield,
-                info.sheath_multicore,
-                info.sheath_contruction,
-                info.sheath_thickness,
-                info.diameter_over_sheath,
-                info.insulation_max_operating_temp,
-                info.screen_material,
-                info.screen_thickness,
-                info.armour_bedding_material,
-                info.armour_bedding_thickness,
-                info.diameter_bedding_over_armour,
-                info.sheath_reinforcing_material,
-                info.sheath_reinforcing_thickness,
-                info.diameter_over_sheath_reinforcing,
-                info.sheath_reinforcing_width,
-                info.sheath_reinforcing_length_lay,
-                info.sheath_reinforcing_no_tape,
-                info.armour_material,
-                info.armour_thickness,
-                info.armour_layer_tape,
-                info.armour_cross_sectional_area_tap,
-                info.jacket_thickness,
-                info.concentric_thickness,
-                info.concentric_contruction,
-                info.concentric_material,
-                info.concentric_length_lay,
-                info.concentric_area,
-                info.concentric_no_of_wires,
-                info.cable_info_id,
-                info.phase_count,
-                info.core_count,
-                info.sheath_type,
-                info.diameter_over_armour
-            ],
-            function (err: any) {
-                if (err) {
-                    return reject({ success: false, err, message: 'Insert oldCableInfo failed' })
-                }
-                return resolve({ success: true, data: info, message: 'Insert oldCableInfo completed' })
-            }
-        )
-    })
+      [
+        info.mrid,
+        info.rated_u,
+        info.max_u,
+        info.rated_frequency,
+        info.short_circuit_current,
+        info.rated_duration_short_circuit,
+        info.installation_method,
+        info.bonding_type,
+        info.install_location,
+        info.length,
+        info.conductor_size,
+        info.conductor_class,
+        info.conductor_type,
+        info.nominal_conductor_diameter,
+        info.conductor_shield_thickness,
+        info.diameter_over_shield,
+        info.sheath_multicore,
+        info.sheath_contruction,
+        info.sheath_thickness,
+        info.diameter_over_sheath,
+        info.insulation_max_operating_temp,
+        info.screen_material,
+        info.screen_thickness,
+        info.armour_bedding_material,
+        info.armour_bedding_thickness,
+        info.diameter_bedding_over_armour,
+        info.sheath_reinforcing_material,
+        info.sheath_reinforcing_thickness,
+        info.diameter_over_sheath_reinforcing,
+        info.sheath_reinforcing_width,
+        info.sheath_reinforcing_length_lay,
+        info.sheath_reinforcing_no_tape,
+        info.armour_material,
+        info.armour_thickness,
+        info.armour_layer_tape,
+        info.armour_cross_sectional_area_tap,
+        info.jacket_thickness,
+        info.concentric_thickness,
+        info.concentric_contruction,
+        info.concentric_material,
+        info.concentric_length_lay,
+        info.concentric_area,
+        info.concentric_no_of_wires,
+        info.cable_info_id,
+        info.phase_count,
+        info.core_count,
+        info.sheath_type,
+        info.diameter_over_armour
+      ],
+      function (err: any) {
+        if (err) {
+          return reject({ success: false, err, message: 'Insert oldCableInfo failed' })
+        }
+        return resolve({ success: true, data: info, message: 'Insert oldCableInfo completed' })
+      }
+    )
+  })
 }
 
 export const updateOldCableInfoTransaction = async (mrid: string, info: any, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `UPDATE old_cable_info SET
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `UPDATE old_cable_info SET
                 rated_u = ?,
                 max_u = ?,
                 rated_frequency = ?,
@@ -205,73 +210,73 @@ export const updateOldCableInfoTransaction = async (mrid: string, info: any, dbs
                 sheath_type = ?,
                 diameter_over_armour = ?
             WHERE mrid = ?`,
-            [
-                info.rated_u,
-                info.max_u,
-                info.rated_frequency,
-                info.short_circuit_current,
-                info.rated_duration_short_circuit,
-                info.installation_method,
-                info.bonding_type,
-                info.install_location,
-                info.length,
-                info.conductor_size,
-                info.conductor_class,
-                info.conductor_type,
-                info.nominal_conductor_diameter,
-                info.conductor_shield_thickness,
-                info.diameter_over_shield,
-                info.sheath_multicore,
-                info.sheath_contruction,
-                info.sheath_thickness,
-                info.diameter_over_sheath,
-                info.insulation_max_operating_temp,
-                info.screen_material,
-                info.screen_thickness,
-                info.armour_bedding_material,
-                info.armour_bedding_thickness,
-                info.diameter_bedding_over_armour,
-                info.sheath_reinforcing_material,
-                info.sheath_reinforcing_thickness,
-                info.diameter_over_sheath_reinforcing,
-                info.sheath_reinforcing_width,
-                info.sheath_reinforcing_length_lay,
-                info.sheath_reinforcing_no_tape,
-                info.armour_material,
-                info.armour_thickness,
-                info.armour_layer_tape,
-                info.armour_cross_sectional_area_tap,
-                info.jacket_thickness,
-                info.concentric_thickness,
-                info.concentric_contruction,
-                info.concentric_material,
-                info.concentric_length_lay,
-                info.concentric_area,
-                info.concentric_no_of_wires,
-                info.cable_info_id,
-                info.phase_count,
-                info.core_count,
-                info.sheath_type,
-                info.diameter_over_armour,
-                mrid
-            ],
-            function (err: any) {
-                if (err) {
-                    return reject({ success: false, err, message: 'Update oldCableInfo failed' })
-                }
-                return resolve({ success: true, data: info, message: 'Update oldCableInfo completed' })
-            }
-        )
-    })
+      [
+        info.rated_u,
+        info.max_u,
+        info.rated_frequency,
+        info.short_circuit_current,
+        info.rated_duration_short_circuit,
+        info.installation_method,
+        info.bonding_type,
+        info.install_location,
+        info.length,
+        info.conductor_size,
+        info.conductor_class,
+        info.conductor_type,
+        info.nominal_conductor_diameter,
+        info.conductor_shield_thickness,
+        info.diameter_over_shield,
+        info.sheath_multicore,
+        info.sheath_contruction,
+        info.sheath_thickness,
+        info.diameter_over_sheath,
+        info.insulation_max_operating_temp,
+        info.screen_material,
+        info.screen_thickness,
+        info.armour_bedding_material,
+        info.armour_bedding_thickness,
+        info.diameter_bedding_over_armour,
+        info.sheath_reinforcing_material,
+        info.sheath_reinforcing_thickness,
+        info.diameter_over_sheath_reinforcing,
+        info.sheath_reinforcing_width,
+        info.sheath_reinforcing_length_lay,
+        info.sheath_reinforcing_no_tape,
+        info.armour_material,
+        info.armour_thickness,
+        info.armour_layer_tape,
+        info.armour_cross_sectional_area_tap,
+        info.jacket_thickness,
+        info.concentric_thickness,
+        info.concentric_contruction,
+        info.concentric_material,
+        info.concentric_length_lay,
+        info.concentric_area,
+        info.concentric_no_of_wires,
+        info.cable_info_id,
+        info.phase_count,
+        info.core_count,
+        info.sheath_type,
+        info.diameter_over_armour,
+        mrid
+      ],
+      function (err: any) {
+        if (err) {
+          return reject({ success: false, err, message: 'Update oldCableInfo failed' })
+        }
+        return resolve({ success: true, data: info, message: 'Update oldCableInfo completed' })
+      }
+    )
+  })
 }
 
 export const deleteOldCableInfoTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run("DELETE FROM old_cable_info WHERE mrid=?", [mrid], function (err: any) {
-            if (err) {
-                return reject({ success: false, err, message: 'Delete oldCableInfo failed' })
-            }
-            return resolve({ success: true, data: mrid, message: 'Delete oldCableInfo completed' })
-        })
+  return new Promise((resolve, reject) => {
+    dbsql.run('DELETE FROM old_cable_info WHERE mrid=?', [mrid], function (err: any) {
+      if (err) {
+        return reject({ success: false, err, message: 'Delete oldCableInfo failed' })
+      }
+      return resolve({ success: true, data: mrid, message: 'Delete oldCableInfo completed' })
     })
+  })
 }

@@ -1,7 +1,7 @@
-import ConnectivityNodeContainer from "../ConnectivityNodeContainer"
+import ConnectivityNodeContainer from '../ConnectivityNodeContainer'
 class EquipmentContainer extends ConnectivityNodeContainer {
-    constructor() {
-        super()
-    }
+  constructor() {
+    super()
+  }
 }
 export default EquipmentContainer

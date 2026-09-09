@@ -17,23 +17,45 @@ import * as jobEntityFunc from './job/index'
 import * as powerCableEntityFunc from './powerCable/index'
 import * as voltageTransformerEntityFunc from './VoltageTransformer/index'
 import * as bushingEntityFunc from './Bushing/index'
-import * as disconnectorEntityFunc from "./disconnector/index"
-import * as rotatingMachineEntityFunc from "./rotatingMachine/index"
-import * as capacitorEntityFunc from "./capacitor/index"
-import * as breakerEntityFunc from "./breaker/index"
-import * as currentTransformerEntityFunc from "./currentTransformer/index"
-import * as reactorEntityFunc from "./reactor/index"
-import * as assetPsrFunc from "./assetPsr/index"
-import * as notificationEntityFunc from "./notification/index"
-import * as updateEntityFunc from "./update/index"
-import * as entitySnapshotFunc from "./entitySnapshot/index"
+import * as disconnectorEntityFunc from './disconnector/index'
+import * as rotatingMachineEntityFunc from './rotatingMachine/index'
+import * as capacitorEntityFunc from './capacitor/index'
+import * as breakerEntityFunc from './breaker/index'
+import * as currentTransformerEntityFunc from './currentTransformer/index'
+import * as reactorEntityFunc from './reactor/index'
+import * as assetPsrFunc from './assetPsr/index'
+import * as notificationEntityFunc from './notification/index'
+import * as updateEntityFunc from './update/index'
+import * as entitySnapshotFunc from './entitySnapshot/index'
 
 export {
-    attachmentFunc, fileFunc, organisationLocationFunc, personSubstationFunc,
-    userFunc, userIdentifiedObjectFunc, substationEntityFunc, organisationPersonFunc,
-    organisationPsrFunc, geoMapFunc, parentOrganizationEntityFunc, voltageLevelEntityFunc,
-    bayEntityFunc, surgeArresterEntityFunc, transformerEntityFunc, jobEntityFunc, powerCableEntityFunc,
-    capacitorEntityFunc, breakerEntityFunc, updateEntityFunc,
-    voltageTransformerEntityFunc, bushingEntityFunc, disconnectorEntityFunc, rotatingMachineEntityFunc, currentTransformerEntityFunc, reactorEntityFunc, assetPsrFunc, notificationEntityFunc,
-    entitySnapshotFunc
+  attachmentFunc,
+  fileFunc,
+  organisationLocationFunc,
+  personSubstationFunc,
+  userFunc,
+  userIdentifiedObjectFunc,
+  substationEntityFunc,
+  organisationPersonFunc,
+  organisationPsrFunc,
+  geoMapFunc,
+  parentOrganizationEntityFunc,
+  voltageLevelEntityFunc,
+  bayEntityFunc,
+  surgeArresterEntityFunc,
+  transformerEntityFunc,
+  jobEntityFunc,
+  powerCableEntityFunc,
+  capacitorEntityFunc,
+  breakerEntityFunc,
+  updateEntityFunc,
+  voltageTransformerEntityFunc,
+  bushingEntityFunc,
+  disconnectorEntityFunc,
+  rotatingMachineEntityFunc,
+  currentTransformerEntityFunc,
+  reactorEntityFunc,
+  assetPsrFunc,
+  notificationEntityFunc,
+  entitySnapshotFunc
 }

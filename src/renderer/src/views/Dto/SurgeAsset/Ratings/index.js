@@ -1,8 +1,8 @@
 class RatingsDto {
-    constructor() {
-        this.unitStack = '';
-        this.tableRating = [];
-    }
+  constructor() {
+    this.unitStack = ''
+    this.tableRating = []
+  }
 }
 
-export default RatingsDto;
+export default RatingsDto

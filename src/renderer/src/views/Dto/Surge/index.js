@@ -1,6 +1,6 @@
 class SurgeArresterDto {
-    constructor() {
-        this.data = []
-    }
+  constructor() {
+    this.data = []
+  }
 }
-export default SurgeArresterDto;
+export default SurgeArresterDto

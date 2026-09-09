@@ -1,349 +1,414 @@
 import db from '../../datacontext/index'
 import path from 'path'
 import * as attachmentContext from '../../attachmentcontext/index'
-import { uploadAttachmentTransaction, backupAllFilesInDir, deleteBackupFiles, restoreFiles, syncFilesWithDeletion, getAttachmentByForeignIdAndType, deleteAttachmentByIdTransaction, deleteDirectory } from '@/function/entity/attachment'
-import { insertVoltageTransaction, getVoltageByIds, deleteVoltageByIdTransaction } from '@/function/cim/voltage';
-import { insertCurrentFlowTransaction, getCurrentFlowByIds, deleteCurrentFlowByIdTransaction } from '@/function/cim/currentFlow';
-import { insertLifecycleDateTransaction, getLifecycleDateById, deleteLifecycleDateByIdTransaction } from '@/function/cim/lifecycleDate';
-import { insertProductAssetModelTransaction, getProductAssetModelById, deleteProductAssetModelByIdTransaction } from '@/function/cim/productAssetModel';
-import { insertAssetPsrTransaction, getAssetPsrByAssetIdAndPsrId, deleteAssetPsrTransaction } from '@/function/entity/assetPsr'
-import { insertFrequencyTransaction, getFrequencyByIds, deleteFrequencyByIdTransaction } from '@/function/cim/frequency';
-import { insertAssetTransaction, getAssetById, deleteAssetByIdTransaction } from '@/function/cim/asset';
-import { insertReactorInfoTransaction, getReactorInfoById, deleteReactorInfoTransaction } from '@/function/cim/reactorInfo';
-import ReactorEntity from '@/views/Flatten/Reactor';
-import { insertReactivePowerTransaction, getReactivePowerByIds, deleteReactivePowerByIdTransaction } from '@/function/cim/reactivePower';
-import { insertMassTransaction, getMassById, deleteMassByIdTransaction } from '@/function/cim/mass';
-import { insertInductanceTransaction, getInductanceById, deleteInductanceByIdTransaction } from '@/function/cim/inductance';
+import {
+  uploadAttachmentTransaction,
+  backupAllFilesInDir,
+  deleteBackupFiles,
+  restoreFiles,
+  syncFilesWithDeletion,
+  getAttachmentByForeignIdAndType,
+  deleteAttachmentByIdTransaction,
+  deleteDirectory
+} from '@/function/entity/attachment'
+import {
+  insertVoltageTransaction,
+  getVoltageByIds,
+  deleteVoltageByIdTransaction
+} from '@/function/cim/voltage'
+import {
+  insertCurrentFlowTransaction,
+  getCurrentFlowByIds,
+  deleteCurrentFlowByIdTransaction
+} from '@/function/cim/currentFlow'
+import {
+  insertLifecycleDateTransaction,
+  getLifecycleDateById,
+  deleteLifecycleDateByIdTransaction
+} from '@/function/cim/lifecycleDate'
+import {
+  insertProductAssetModelTransaction,
+  getProductAssetModelById,
+  deleteProductAssetModelByIdTransaction
+} from '@/function/cim/productAssetModel'
+import {
+  insertAssetPsrTransaction,
+  getAssetPsrByAssetIdAndPsrId,
+  deleteAssetPsrTransaction
+} from '@/function/entity/assetPsr'
+import {
+  insertFrequencyTransaction,
+  getFrequencyByIds,
+  deleteFrequencyByIdTransaction
+} from '@/function/cim/frequency'
+import {
+  insertAssetTransaction,
+  getAssetById,
+  deleteAssetByIdTransaction
+} from '@/function/cim/asset'
+import {
+  insertReactorInfoTransaction,
+  getReactorInfoById,
+  deleteReactorInfoTransaction
+} from '@/function/cim/reactorInfo'
+import ReactorEntity from '@/views/Flatten/Reactor'
+import {
+  insertReactivePowerTransaction,
+  getReactivePowerByIds,
+  deleteReactivePowerByIdTransaction
+} from '@/function/cim/reactivePower'
+import { insertMassTransaction, getMassById, deleteMassByIdTransaction } from '@/function/cim/mass'
+import {
+  insertInductanceTransaction,
+  getInductanceById,
+  deleteInductanceByIdTransaction
+} from '@/function/cim/inductance'
 
 export const insertReactorEntity: any = async (_old_entity: any, entity: any) => {
-    try {
-        if (entity.asset.mrid === null || entity.asset.mrid === '') {
-            return {
-                success: false,
-                error: new Error("MRID is required for Reactor Entity"),
-                message: '',
-            };
-        } else {
-            backupAllFilesInDir(null, null, entity.asset.mrid);
-            const syncResult = syncFilesWithDeletion(JSON.parse(entity.attachment.path), null, entity.asset.mrid);
+  try {
+    if (entity.asset.mrid === null || entity.asset.mrid === '') {
+      return {
+        success: false,
+        error: new Error('MRID is required for Reactor Entity'),
+        message: ''
+      }
+    } else {
+      backupAllFilesInDir(null, null, entity.asset.mrid)
+      const syncResult = syncFilesWithDeletion(
+        JSON.parse(entity.attachment.path),
+        null,
+        entity.asset.mrid
+      )
 
-            if (!syncResult.success) {
-                restoreFiles(null, null, entity.asset.mrid);
-                deleteBackupFiles(null, entity.asset.mrid);
-                return {
-                    success: false,
-                    error: new Error("MRID is required for Rotating Machine Entity"),
-                    message: '',
-                };
-            }
-            await runAsync('BEGIN TRANSACTION');
-
-            for (const currentFlow of entity.currentFlow) {
-                if (currentFlow.mrid) {
-                    await insertCurrentFlowTransaction(currentFlow, db);
-                }
-            }
-
-            for (const frequency of entity.frequency) {
-                if (frequency.mrid) {
-                    await insertFrequencyTransaction(frequency, db);
-                }
-            }
-
-            for (const voltage of entity.voltage) {
-                if (voltage.mrid) {
-                    await insertVoltageTransaction(voltage, db);
-                }
-            }
-
-            for (const reactivePower of entity.reactivePower) {
-                if (reactivePower.mrid) {
-                    await insertReactivePowerTransaction(reactivePower, db);
-                }
-            }
-
-            for (const inductance of entity.inductance) {
-                if (inductance.mrid) {
-                    await insertInductanceTransaction(inductance, db);
-                }
-            }
-
-            for (const mass of entity.mass) {
-                if (mass.mrid) {
-                    await insertMassTransaction(mass, db);
-                }
-            }
-
-            await insertReactorInfoTransaction(entity.reactor, db);
-
-            await insertLifecycleDateTransaction(entity.lifecycleDate, db);
-            await insertProductAssetModelTransaction(entity.productAssetModel, db);
-
-            const assetResult: any = await insertAssetTransaction(entity.asset, db);
-            if (!assetResult.success) {
-                throw new Error(assetResult.message || 'Insert asset failed');
-            }
-
-            if (entity.assetPsr && entity.assetPsr.mrid) {
-                await insertAssetPsrTransaction(entity.assetPsr, db);
-            }
-
-            if (entity.attachment.id && Array.isArray(JSON.parse(entity.attachment.path))) {
-                const pathData = JSON.parse(entity.attachment.path);
-                const newPath: any[] = [];
-                for (let i = 0; i < pathData.length; i++) {
-                    const namefile = path.basename(pathData[i].path);
-                    pathData[i].path = path.join(attachmentContext.getAttachmentDir(), entity.asset.mrid, namefile);
-                    newPath.push(pathData[i]);
-                }
-                entity.attachment.path = JSON.stringify(newPath);
-                await uploadAttachmentTransaction(entity.attachment, db);
-            }
-
-            await runAsync('COMMIT');
-            deleteBackupFiles(null, entity.asset.mrid);
-            return { success: true, data: entity, message: ' Reactor entity inserted successfully' };
+      if (!syncResult.success) {
+        restoreFiles(null, null, entity.asset.mrid)
+        deleteBackupFiles(null, entity.asset.mrid)
+        return {
+          success: false,
+          error: new Error('MRID is required for Rotating Machine Entity'),
+          message: ''
         }
-    } catch (error: any) {
-        restoreFiles(null, null, entity.asset.mrid);
-        deleteBackupFiles(null, entity.asset.mrid);
-        console.error('Error saving Reactor entity:', error);
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            entity: JSON.stringify(entity, null, 2)
-        });
-        await runAsync('ROLLBACK');
-        return { success: false, error, message: `Error saving Reactor entity: ${error.message || 'Unknown error'}` };
+      }
+      await runAsync('BEGIN TRANSACTION')
+
+      for (const currentFlow of entity.currentFlow) {
+        if (currentFlow.mrid) {
+          await insertCurrentFlowTransaction(currentFlow, db)
+        }
+      }
+
+      for (const frequency of entity.frequency) {
+        if (frequency.mrid) {
+          await insertFrequencyTransaction(frequency, db)
+        }
+      }
+
+      for (const voltage of entity.voltage) {
+        if (voltage.mrid) {
+          await insertVoltageTransaction(voltage, db)
+        }
+      }
+
+      for (const reactivePower of entity.reactivePower) {
+        if (reactivePower.mrid) {
+          await insertReactivePowerTransaction(reactivePower, db)
+        }
+      }
+
+      for (const inductance of entity.inductance) {
+        if (inductance.mrid) {
+          await insertInductanceTransaction(inductance, db)
+        }
+      }
+
+      for (const mass of entity.mass) {
+        if (mass.mrid) {
+          await insertMassTransaction(mass, db)
+        }
+      }
+
+      await insertReactorInfoTransaction(entity.reactor, db)
+
+      await insertLifecycleDateTransaction(entity.lifecycleDate, db)
+      await insertProductAssetModelTransaction(entity.productAssetModel, db)
+
+      const assetResult: any = await insertAssetTransaction(entity.asset, db)
+      if (!assetResult.success) {
+        throw new Error(assetResult.message || 'Insert asset failed')
+      }
+
+      if (entity.assetPsr && entity.assetPsr.mrid) {
+        await insertAssetPsrTransaction(entity.assetPsr, db)
+      }
+
+      if (entity.attachment.id && Array.isArray(JSON.parse(entity.attachment.path))) {
+        const pathData = JSON.parse(entity.attachment.path)
+        const newPath: any[] = []
+        for (let i = 0; i < pathData.length; i++) {
+          const namefile = path.basename(pathData[i].path)
+          pathData[i].path = path.join(
+            attachmentContext.getAttachmentDir(),
+            entity.asset.mrid,
+            namefile
+          )
+          newPath.push(pathData[i])
+        }
+        entity.attachment.path = JSON.stringify(newPath)
+        await uploadAttachmentTransaction(entity.attachment, db)
+      }
+
+      await runAsync('COMMIT')
+      deleteBackupFiles(null, entity.asset.mrid)
+      return { success: true, data: entity, message: ' Reactor entity inserted successfully' }
     }
+  } catch (error: any) {
+    restoreFiles(null, null, entity.asset.mrid)
+    deleteBackupFiles(null, entity.asset.mrid)
+    console.error('Error saving Reactor entity:', error)
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      entity: JSON.stringify(entity, null, 2)
+    })
+    await runAsync('ROLLBACK')
+    return {
+      success: false,
+      error,
+      message: `Error saving Reactor entity: ${error.message || 'Unknown error'}`
+    }
+  }
 }
 
 export const getReactorEntity: any = async (id: string, psrId: string) => {
-    try {
-        if (id == null || id === '') {
-            return { success: false, error: new Error('Invalid ID') };
-        } else {
-            const entity = new ReactorEntity()
-            const dataReactor: any = await getAssetById(id);
-            if (dataReactor.success) {
-                entity.asset = dataReactor.data
+  try {
+    if (id == null || id === '') {
+      return { success: false, error: new Error('Invalid ID') }
+    } else {
+      const entity = new ReactorEntity()
+      const dataReactor: any = await getAssetById(id)
+      if (dataReactor.success) {
+        entity.asset = dataReactor.data
 
-                const dataProductAssetModel: any = await getProductAssetModelById(entity.asset.product_asset_model);
-                if (dataProductAssetModel.success) {
-                    entity.productAssetModel = dataProductAssetModel.data;
-                }
-
-                const dataAssetPsr: any = await getAssetPsrByAssetIdAndPsrId(entity.asset.mrid, psrId);
-                if (dataAssetPsr.success) {
-                    entity.assetPsr = dataAssetPsr.data;
-                }
-
-                const dataAttachment: any = await getAttachmentByForeignIdAndType(entity.asset.mrid, 'asset');
-                if (dataAttachment.success) {
-                    entity.attachment = dataAttachment.data;
-                }
-
-                const dataReactorInfo: any = await getReactorInfoById(entity.asset.asset_info);
-                if (dataReactorInfo.success) {
-                    entity.reactor = dataReactorInfo.data;
-                }
-
-                const dataLifecycleDate: any = await getLifecycleDateById(entity.asset.lifecycle_date);
-                if (dataLifecycleDate.success) {
-                    entity.lifecycleDate = dataLifecycleDate.data;
-                }
-
-                const reactor_arr: any = {
-                    voltage: ['rated_voltage'],
-                    currentFlow: ['rated_current'],
-                    frequency: ['rated_frequency'],
-                    reactivePower: ['rated_power'],
-                    inductance: ['inductance'],
-                    mass: ['weight_total'],
-                }
-
-                let voltage: any[] = [];
-                let currentFlow: any[] = [];
-                let frequency: any[] = [];
-                let reactivePower: any[] = [];
-                let mass: any[] = [];
-                let inductance: any[] = [];
-
-                for (const key in reactor_arr) {
-                    for (const item of reactor_arr[key]) {
-                        if (entity.reactor && entity.reactor[item]) {
-                            switch (key) {
-                                case 'voltage':
-                                    voltage.push(entity.reactor[item]);
-                                    break;
-                                case 'currentFlow':
-                                    currentFlow.push(entity.reactor[item]);
-                                    break;
-                                case 'frequency':
-                                    frequency.push(entity.reactor[item]);
-                                    break;
-                                case 'reactivePower':
-                                    reactivePower.push(entity.reactor[item]);
-                                    break;
-                                case 'inductance':
-                                    inductance.push(entity.reactor[item]);
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                if (entity.productAssetModel && entity.productAssetModel.weight_total) {
-                    mass.push(entity.productAssetModel.weight_total);
-                }
-
-                if (voltage.length > 0) {
-                    const dataVoltage: any = await getVoltageByIds(voltage);
-                    if (dataVoltage.success) {
-                        entity.voltage = dataVoltage.data;
-                    }
-                }
-
-                if (currentFlow.length > 0) {
-                    const dataCurrentFlow: any = await getCurrentFlowByIds(currentFlow);
-                    if (dataCurrentFlow.success) {
-                        entity.currentFlow = dataCurrentFlow.data;
-                    }
-                }
-
-                if (frequency.length > 0) {
-                    const dataFrequency: any = await getFrequencyByIds(frequency);
-                    if (dataFrequency.success) {
-                        entity.frequency = dataFrequency.data;
-                    }
-                }
-
-                if (reactivePower.length > 0) {
-                    const dataReactivePower: any = await getReactivePowerByIds(reactivePower);
-                    if (dataReactivePower.success) {
-                        entity.reactivePower = dataReactivePower.data;
-                    }
-                }
-
-                if (mass.length > 0) {
-                    const massData: any[] = [];
-                    for (const massId of mass) {
-                        const dataMass: any = await getMassById(massId);
-                        if (dataMass.success) {
-                            massData.push(dataMass.data);
-                        }
-                    }
-                    entity.mass = massData;
-                }
-
-                if (inductance.length > 0) {
-                    const inductanceData: any[] = [];
-                    for (const inductanceId of inductance) {
-                        const dataInductance: any = await getInductanceById(inductanceId);
-                        if (dataInductance.success) {
-                            inductanceData.push(dataInductance.data);
-                        }
-                    }
-                    entity.inductance = inductanceData;
-                }
-
-                return {
-                    success: true,
-                    data: entity,
-                    message: 'Reactor entity retrieved successfully'
-                }
-            } else {
-                return { success: false, error: dataReactor.error, message: dataReactor.message };
-            }
+        const dataProductAssetModel: any = await getProductAssetModelById(
+          entity.asset.product_asset_model
+        )
+        if (dataProductAssetModel.success) {
+          entity.productAssetModel = dataProductAssetModel.data
         }
-    } catch (error: any) {
-        console.error("Error retrieving Reactor entity by ID:", error);
-        return { success: false, error, message: 'Error retrieving Reactor entity by ID' };
+
+        const dataAssetPsr: any = await getAssetPsrByAssetIdAndPsrId(entity.asset.mrid, psrId)
+        if (dataAssetPsr.success) {
+          entity.assetPsr = dataAssetPsr.data
+        }
+
+        const dataAttachment: any = await getAttachmentByForeignIdAndType(
+          entity.asset.mrid,
+          'asset'
+        )
+        if (dataAttachment.success) {
+          entity.attachment = dataAttachment.data
+        }
+
+        const dataReactorInfo: any = await getReactorInfoById(entity.asset.asset_info)
+        if (dataReactorInfo.success) {
+          entity.reactor = dataReactorInfo.data
+        }
+
+        const dataLifecycleDate: any = await getLifecycleDateById(entity.asset.lifecycle_date)
+        if (dataLifecycleDate.success) {
+          entity.lifecycleDate = dataLifecycleDate.data
+        }
+
+        const reactor_arr: any = {
+          voltage: ['rated_voltage'],
+          currentFlow: ['rated_current'],
+          frequency: ['rated_frequency'],
+          reactivePower: ['rated_power'],
+          inductance: ['inductance'],
+          mass: ['weight_total']
+        }
+
+        let voltage: any[] = []
+        let currentFlow: any[] = []
+        let frequency: any[] = []
+        let reactivePower: any[] = []
+        let mass: any[] = []
+        let inductance: any[] = []
+
+        for (const key in reactor_arr) {
+          for (const item of reactor_arr[key]) {
+            if (entity.reactor && entity.reactor[item]) {
+              switch (key) {
+                case 'voltage':
+                  voltage.push(entity.reactor[item])
+                  break
+                case 'currentFlow':
+                  currentFlow.push(entity.reactor[item])
+                  break
+                case 'frequency':
+                  frequency.push(entity.reactor[item])
+                  break
+                case 'reactivePower':
+                  reactivePower.push(entity.reactor[item])
+                  break
+                case 'inductance':
+                  inductance.push(entity.reactor[item])
+                  break
+              }
+            }
+          }
+        }
+
+        if (entity.productAssetModel && entity.productAssetModel.weight_total) {
+          mass.push(entity.productAssetModel.weight_total)
+        }
+
+        if (voltage.length > 0) {
+          const dataVoltage: any = await getVoltageByIds(voltage)
+          if (dataVoltage.success) {
+            entity.voltage = dataVoltage.data
+          }
+        }
+
+        if (currentFlow.length > 0) {
+          const dataCurrentFlow: any = await getCurrentFlowByIds(currentFlow)
+          if (dataCurrentFlow.success) {
+            entity.currentFlow = dataCurrentFlow.data
+          }
+        }
+
+        if (frequency.length > 0) {
+          const dataFrequency: any = await getFrequencyByIds(frequency)
+          if (dataFrequency.success) {
+            entity.frequency = dataFrequency.data
+          }
+        }
+
+        if (reactivePower.length > 0) {
+          const dataReactivePower: any = await getReactivePowerByIds(reactivePower)
+          if (dataReactivePower.success) {
+            entity.reactivePower = dataReactivePower.data
+          }
+        }
+
+        if (mass.length > 0) {
+          const massData: any[] = []
+          for (const massId of mass) {
+            const dataMass: any = await getMassById(massId)
+            if (dataMass.success) {
+              massData.push(dataMass.data)
+            }
+          }
+          entity.mass = massData
+        }
+
+        if (inductance.length > 0) {
+          const inductanceData: any[] = []
+          for (const inductanceId of inductance) {
+            const dataInductance: any = await getInductanceById(inductanceId)
+            if (dataInductance.success) {
+              inductanceData.push(dataInductance.data)
+            }
+          }
+          entity.inductance = inductanceData
+        }
+
+        return {
+          success: true,
+          data: entity,
+          message: 'Reactor entity retrieved successfully'
+        }
+      } else {
+        return { success: false, error: dataReactor.error, message: dataReactor.message }
+      }
     }
-};
+  } catch (error: any) {
+    console.error('Error retrieving Reactor entity by ID:', error)
+    return { success: false, error, message: 'Error retrieving Reactor entity by ID' }
+  }
+}
 
 export const deleteReactorEntity: any = async (entity: any) => {
-    try {
-        await runAsync('BEGIN TRANSACTION');
+  try {
+    await runAsync('BEGIN TRANSACTION')
 
-        if (entity.attachment && entity.attachment.id) {
-            await deleteAttachmentByIdTransaction(entity.attachment.id, db);
-            if (entity.asset && entity.asset.mrid) {
-                const dirPath = path.join(attachmentContext.getAttachmentDir(), entity.asset.mrid);
-                await deleteDirectory(dirPath);
-            }
-        }
-
-        if (entity.assetPsr && entity.assetPsr.mrid) {
-            await deleteAssetPsrTransaction(entity.assetPsr.mrid, db);
-        }
-
-        if (entity.asset && entity.asset.mrid) {
-            await deleteAssetByIdTransaction(entity.asset.mrid, db);
-        }
-
-        if (entity.productAssetModel && entity.productAssetModel.mrid) {
-            await deleteProductAssetModelByIdTransaction(entity.productAssetModel.mrid, db);
-        }
-
-        if (entity.lifecycleDate && entity.lifecycleDate.mrid) {
-            await deleteLifecycleDateByIdTransaction(entity.lifecycleDate.mrid, db);
-        }
-
-        if (entity.reactor && entity.reactor.mrid) {
-            await deleteReactorInfoTransaction(entity.reactor.mrid, db);
-        }
-
-        for (const mass of entity.mass || []) {
-            if (mass.mrid) {
-                await deleteMassByIdTransaction(mass.mrid, db);
-            }
-        }
-
-        for (const power of entity.reactivePower || []) {
-            if (power.mrid) {
-                await deleteReactivePowerByIdTransaction(power.mrid, db);
-            }
-        }
-
-        for (const volt of entity.voltage || []) {
-            if (volt.mrid) {
-                await deleteVoltageByIdTransaction(volt.mrid, db);
-            }
-        }
-
-        for (const freq of entity.frequency || []) {
-            if (freq.mrid) {
-                await deleteFrequencyByIdTransaction(freq.mrid, db);
-            }
-        }
-
-        for (const currentFlow of entity.currentFlow || []) {
-            if (currentFlow.mrid) {
-                await deleteCurrentFlowByIdTransaction(currentFlow.mrid, db);
-            }
-        }
-
-        for (const inductance of entity.inductance || []) {
-            if (inductance.mrid) {
-                await deleteInductanceByIdTransaction(inductance.mrid, db);
-            }
-        }
-        await runAsync('COMMIT');
-        return { success: true, message: 'Reactor entity deleted successfully' };
-    } catch (error: any) {
-        await runAsync('ROLLBACK');
-        console.error('Error deleting Reactor entity:', error);
-        return { success: false, error, message: 'Error deleting Reactor entity' };
+    if (entity.attachment && entity.attachment.id) {
+      await deleteAttachmentByIdTransaction(entity.attachment.id, db)
+      if (entity.asset && entity.asset.mrid) {
+        const dirPath = path.join(attachmentContext.getAttachmentDir(), entity.asset.mrid)
+        await deleteDirectory(dirPath)
+      }
     }
-};
 
+    if (entity.assetPsr && entity.assetPsr.mrid) {
+      await deleteAssetPsrTransaction(entity.assetPsr.mrid, db)
+    }
+
+    if (entity.asset && entity.asset.mrid) {
+      await deleteAssetByIdTransaction(entity.asset.mrid, db)
+    }
+
+    if (entity.productAssetModel && entity.productAssetModel.mrid) {
+      await deleteProductAssetModelByIdTransaction(entity.productAssetModel.mrid, db)
+    }
+
+    if (entity.lifecycleDate && entity.lifecycleDate.mrid) {
+      await deleteLifecycleDateByIdTransaction(entity.lifecycleDate.mrid, db)
+    }
+
+    if (entity.reactor && entity.reactor.mrid) {
+      await deleteReactorInfoTransaction(entity.reactor.mrid, db)
+    }
+
+    for (const mass of entity.mass || []) {
+      if (mass.mrid) {
+        await deleteMassByIdTransaction(mass.mrid, db)
+      }
+    }
+
+    for (const power of entity.reactivePower || []) {
+      if (power.mrid) {
+        await deleteReactivePowerByIdTransaction(power.mrid, db)
+      }
+    }
+
+    for (const volt of entity.voltage || []) {
+      if (volt.mrid) {
+        await deleteVoltageByIdTransaction(volt.mrid, db)
+      }
+    }
+
+    for (const freq of entity.frequency || []) {
+      if (freq.mrid) {
+        await deleteFrequencyByIdTransaction(freq.mrid, db)
+      }
+    }
+
+    for (const currentFlow of entity.currentFlow || []) {
+      if (currentFlow.mrid) {
+        await deleteCurrentFlowByIdTransaction(currentFlow.mrid, db)
+      }
+    }
+
+    for (const inductance of entity.inductance || []) {
+      if (inductance.mrid) {
+        await deleteInductanceByIdTransaction(inductance.mrid, db)
+      }
+    }
+    await runAsync('COMMIT')
+    return { success: true, message: 'Reactor entity deleted successfully' }
+  } catch (error: any) {
+    await runAsync('ROLLBACK')
+    console.error('Error deleting Reactor entity:', error)
+    return { success: false, error, message: 'Error deleting Reactor entity' }
+  }
+}
 
 const runAsync: any = (sql: string, params: any[] = []) => {
-    return new Promise((resolve, reject) => {
-        db.run(sql, params, function (err: any) {
-            if (err) reject(err);
-            else resolve(undefined);
-        });
-    });
-};
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function (err: any) {
+      if (err) reject(err)
+      else resolve(undefined)
+    })
+  })
+}

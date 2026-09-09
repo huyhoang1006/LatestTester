@@ -1,40 +1,40 @@
-import Attachment from "@/views/Flatten/Attachment"
+import Attachment from '@/views/Flatten/Attachment'
 
 class OrganisationDto {
-    constructor() {
-        this.name = ''
-        this.street = ''
-        this.address = '' // Alias cho street để dễ sử dụng
-        this.ward_or_commune = ''
-        this.district_or_town = ''
-        this.city = ''
-        this.state_or_province = ''
-        this.postal_code = '' // Thêm postal code
-        this.tax_code = ''
-        this.country = ''
-        this.phoneNumber = ''
-        this.email = ''
-        this.fax = ''
-        this.comment = ''
-        this.positionPoints = {
-            x: [],
-            y: [],
-            z: []
-        }
-        this.attachment = new Attachment()
-        this.telephoneNumberId = ''
-        this.attachmentId = ''
-        this.streetDetailId = ''
-        this.streetAddressId = ''
-        this.userId = ''
-        this.userName = ''
-        this.organisationId = ''
-        this.aliasName = ''
-        this.electronicAddressId = ''
-        this.townDetailId = ''
-        this.configurationEvent = []
-        this.parentId = ''
+  constructor() {
+    this.name = ''
+    this.street = ''
+    this.address = '' // Alias cho street để dễ sử dụng
+    this.ward_or_commune = ''
+    this.district_or_town = ''
+    this.city = ''
+    this.state_or_province = ''
+    this.postal_code = '' // Thêm postal code
+    this.tax_code = ''
+    this.country = ''
+    this.phoneNumber = ''
+    this.email = ''
+    this.fax = ''
+    this.comment = ''
+    this.positionPoints = {
+      x: [],
+      y: [],
+      z: []
     }
+    this.attachment = new Attachment()
+    this.telephoneNumberId = ''
+    this.attachmentId = ''
+    this.streetDetailId = ''
+    this.streetAddressId = ''
+    this.userId = ''
+    this.userName = ''
+    this.organisationId = ''
+    this.aliasName = ''
+    this.electronicAddressId = ''
+    this.townDetailId = ''
+    this.configurationEvent = []
+    this.parentId = ''
+  }
 }
 
 export default OrganisationDto

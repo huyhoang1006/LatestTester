@@ -1,12 +1,9 @@
-
-import CoreDto from "./CoreDto";
+import CoreDto from './CoreDto'
 class CTConfigurationDto {
-    constructor() {
-        this.cores = '1';
-        this.dataCT = [
-            new CoreDto()
-        ];
-    }
+  constructor() {
+    this.cores = '1'
+    this.dataCT = [new CoreDto()]
+  }
 }
 
-export default CTConfigurationDto;
+export default CTConfigurationDto

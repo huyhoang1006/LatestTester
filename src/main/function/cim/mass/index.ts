@@ -1,124 +1,143 @@
 import db from '../../datacontext/index'
 
 export const getMassById = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        db.get('SELECT * FROM mass WHERE mrid=?', [mrid], (err: Error | null, row: unknown) => {
-            if (err) return reject({ success: false, err: err, message: 'Get mass by id failed' })
-            if (!row) return resolve({ success: false, data: null, message: 'Mass not found' })
-            return resolve({ success: true, data: row, message: 'Get mass by id completed' })
-        })
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM mass WHERE mrid=?', [mrid], (err: Error | null, row: unknown) => {
+      if (err) return reject({ success: false, err: err, message: 'Get mass by id failed' })
+      if (!row) return resolve({ success: false, data: null, message: 'Mass not found' })
+      return resolve({ success: true, data: row, message: 'Get mass by id completed' })
     })
+  })
 }
 
 export const getMassByIds = async (mrids: string[]) => {
-    return new Promise((resolve, reject) => {
-        if (!mrids || mrids.length === 0) {
-            return resolve({ success: false, data: [], message: 'No mrids provided' })
-        }
+  return new Promise((resolve, reject) => {
+    if (!mrids || mrids.length === 0) {
+      return resolve({ success: false, data: [], message: 'No mrids provided' })
+    }
 
-        const placeholders = mrids.map(() => '?').join(',')
+    const placeholders = mrids.map(() => '?').join(',')
 
-        db.all(
-            `SELECT * FROM mass WHERE mrid IN (${placeholders})`,
-            mrids,
-            (err: Error | null, rows: unknown[]) => {
-                if (err) return reject({ success: false, err: err, message: 'Get mass by ids failed' })
-                if (!rows || rows.length === 0) return resolve({ success: false, data: [], message: 'Mass not found' })
-                return resolve({ success: true, data: rows, message: 'Get mass by ids completed' })
-            }
-        )
-    })
+    db.all(
+      `SELECT * FROM mass WHERE mrid IN (${placeholders})`,
+      mrids,
+      (err: Error | null, rows: unknown[]) => {
+        if (err) return reject({ success: false, err: err, message: 'Get mass by ids failed' })
+        if (!rows || rows.length === 0)
+          return resolve({ success: false, data: [], message: 'Mass not found' })
+        return resolve({ success: true, data: rows, message: 'Get mass by ids completed' })
+      }
+    )
+  })
 }
 
-export const insertMass = async (mass: { mrid: string; multiplier: string | null; unit: string | null; value: number | null }) => {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `INSERT INTO mass(mrid, multiplier, unit, value)
+export const insertMass = async (mass: {
+  mrid: string
+  multiplier: string | null
+  unit: string | null
+  value: number | null
+}) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO mass(mrid, multiplier, unit, value)
              VALUES (?, ?, ?, ?)
              ON CONFLICT(mrid) DO UPDATE SET
                 multiplier = excluded.multiplier,
                 unit = excluded.unit,
                 value = excluded.value`,
-            [mass.mrid, mass.multiplier, mass.unit, mass.value],
-            function (this: { lastID: number; changes: number }, err: Error | null) {
-                if (err) return reject({ success: false, err, message: 'Insert mass failed' })
-                return resolve({ success: true, data: mass, message: 'Insert mass completed' })
-            }
-        )
-    })
+      [mass.mrid, mass.multiplier, mass.unit, mass.value],
+      function (this: { lastID: number; changes: number }, err: Error | null) {
+        if (err) return reject({ success: false, err, message: 'Insert mass failed' })
+        return resolve({ success: true, data: mass, message: 'Insert mass completed' })
+      }
+    )
+  })
 }
 
 export const insertMassTransaction = async (
-    mass: { mrid: string; multiplier: string | null; unit: string | null; value: number | null },
-    dbsql: typeof db
+  mass: { mrid: string; multiplier: string | null; unit: string | null; value: number | null },
+  dbsql: typeof db
 ) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `INSERT INTO mass(mrid, multiplier, unit, value)
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `INSERT INTO mass(mrid, multiplier, unit, value)
              VALUES (?, ?, ?, ?)
              ON CONFLICT(mrid) DO UPDATE SET
                 multiplier = excluded.multiplier,
                 unit = excluded.unit,
                 value = excluded.value`,
-            [mass.mrid, mass.multiplier, mass.unit, mass.value],
-            function (this: { lastID: number; changes: number }, err: Error | null) {
-                if (err) return reject({ success: false, err, message: 'Insert mass failed' })
-                return resolve({ success: true, data: mass, message: 'Insert mass completed' })
-            }
-        )
-    })
+      [mass.mrid, mass.multiplier, mass.unit, mass.value],
+      function (this: { lastID: number; changes: number }, err: Error | null) {
+        if (err) return reject({ success: false, err, message: 'Insert mass failed' })
+        return resolve({ success: true, data: mass, message: 'Insert mass completed' })
+      }
+    )
+  })
 }
 
-export const updateMassById = async (mrid: string, mass: { multiplier: string | null; unit: string | null; value: number | null }) => {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `UPDATE mass
+export const updateMassById = async (
+  mrid: string,
+  mass: { multiplier: string | null; unit: string | null; value: number | null }
+) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `UPDATE mass
              SET multiplier = ?, unit = ?, value = ?
              WHERE mrid = ?`,
-            [mass.multiplier, mass.unit, mass.value, mrid],
-            function (this: { lastID: number; changes: number }, err: Error | null) {
-                if (err) return reject({ success: false, err, message: 'Update mass failed' })
-                return resolve({ success: true, data: mass, message: 'Update mass completed' })
-            }
-        )
-    })
+      [mass.multiplier, mass.unit, mass.value, mrid],
+      function (this: { lastID: number; changes: number }, err: Error | null) {
+        if (err) return reject({ success: false, err, message: 'Update mass failed' })
+        return resolve({ success: true, data: mass, message: 'Update mass completed' })
+      }
+    )
+  })
 }
 
 export const updateMassByIdTransaction = async (
-    mrid: string,
-    mass: { multiplier: string | null; unit: string | null; value: number | null },
-    dbsql: typeof db
+  mrid: string,
+  mass: { multiplier: string | null; unit: string | null; value: number | null },
+  dbsql: typeof db
 ) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `UPDATE mass
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `UPDATE mass
              SET multiplier = ?, unit = ?, value = ?
              WHERE mrid = ?`,
-            [mass.multiplier, mass.unit, mass.value, mrid],
-            function (this: { lastID: number; changes: number }, err: Error | null) {
-                if (err) return reject({ success: false, err, message: 'Update mass failed' })
-                return resolve({ success: true, data: mass, message: 'Update mass completed' })
-            }
-        )
-    })
+      [mass.multiplier, mass.unit, mass.value, mrid],
+      function (this: { lastID: number; changes: number }, err: Error | null) {
+        if (err) return reject({ success: false, err, message: 'Update mass failed' })
+        return resolve({ success: true, data: mass, message: 'Update mass completed' })
+      }
+    )
+  })
 }
 
 export const deleteMassById = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        db.run('DELETE FROM mass WHERE mrid=?', [mrid], function (this: { lastID: number; changes: number }, err: Error | null) {
-            if (err) return reject({ success: false, err, message: 'Delete mass failed' })
-            if (this.changes === 0) return resolve({ success: false, data: null, message: 'Mass not found' })
-            return resolve({ success: true, data: null, message: 'Delete mass completed' })
-        })
-    })
+  return new Promise((resolve, reject) => {
+    db.run(
+      'DELETE FROM mass WHERE mrid=?',
+      [mrid],
+      function (this: { lastID: number; changes: number }, err: Error | null) {
+        if (err) return reject({ success: false, err, message: 'Delete mass failed' })
+        if (this.changes === 0)
+          return resolve({ success: false, data: null, message: 'Mass not found' })
+        return resolve({ success: true, data: null, message: 'Delete mass completed' })
+      }
+    )
+  })
 }
 
 export const deleteMassByIdTransaction = async (mrid: string, dbsql: typeof db) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run('DELETE FROM mass WHERE mrid=?', [mrid], function (this: { lastID: number; changes: number }, err: Error | null) {
-            if (err) return reject({ success: false, err, message: 'Delete mass failed' })
-            if (this.changes === 0) return resolve({ success: false, data: null, message: 'Mass not found' })
-            return resolve({ success: true, data: null, message: 'Delete mass completed' })
-        })
-    })
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      'DELETE FROM mass WHERE mrid=?',
+      [mrid],
+      function (this: { lastID: number; changes: number }, err: Error | null) {
+        if (err) return reject({ success: false, err, message: 'Delete mass failed' })
+        if (this.changes === 0)
+          return resolve({ success: false, data: null, message: 'Mass not found' })
+        return resolve({ success: true, data: null, message: 'Delete mass completed' })
+      }
+    )
+  })
 }

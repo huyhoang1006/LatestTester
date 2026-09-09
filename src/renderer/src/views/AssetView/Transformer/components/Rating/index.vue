@@ -1,546 +1,690 @@
 <template>
-    <div id="ratings" class="mgy-5">
-        <el-row>
-            <el-col :span="24">
-                <div class="header-toggle pointer" @click="openRatings = !openRatings">
-                    <i v-if="openRatings" class="fa-solid fa-caret-up"></i>
-                    <i v-else class="fa-solid fa-caret-down"></i>
-                    Ratings
-                </div>
-            </el-col>
-        </el-row>
-        <div class="content-toggle" v-if="openRatings">
-            <!-- rated frequency -->
-            <el-row :gutter="20" class="content">
-                <el-col :xs="24" :md="16" class="col-content">
-                    <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
-                        <el-form-item label="Rated frequency" class="inline-two-input">
-                            <div class="rf-wrap">
-                                <el-select v-model="ratingsData.rated_frequency.value" placeholder="Select">
-                                    <el-option label="Custom" value="Custom"></el-option>
-                                    <el-option :label="'60' + unitSymbol.Hz" value="60"></el-option>
-                                    <el-option :label="'50' + unitSymbol.Hz" value="50"></el-option>
-                                    <el-option :label="'16.7' + unitSymbol.Hz" value="16.7"></el-option>
-                                </el-select>
-                                <el-input v-model="ratingsData.rated_frequency.custom_value" size="small" type="text"
-                                    number="positive" :disabled="ratingsData.rated_frequency.value !== 'Custom'">
-                                    <template #append>{{ unitSymbol.Hz }}</template>
-                                </el-input>
-                            </div>
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
-
-            <!-- voltage ratings -->
-            <el-row :gutter="20" class="content mgt-10">
-                <el-col :span="24" class="col-content">
-                    <span class="bolder">Voltage ratings</span>
-                    <el-divider></el-divider>
-                    <el-row :gutter="8">
-                        <el-col :xs="24" :md="12" :lg="12">
-                            <el-row :gutter="8">
-                                <el-col :span="12">
-                                    <el-button size="small" type="primary" class="btn-fluid" @click="addVoltageRating">
-                                        <i class="fas fa-plus"></i>
-                                        Add
-                                    </el-button>
-                                </el-col>
-                                <el-col :span="12">
-                                    <el-button size="small" type="primary" class="btn-fluid"
-                                        @click="removeAllVoltageRating">
-                                        <i class="fas fa-xmark"></i>
-                                        Remove all
-                                    </el-button>
-                                </el-col>
-                            </el-row>
-                        </el-col>
-                    </el-row>
-                    <div class="table-scroll mgt-5">
-                        <table class="table-strip-input-data fixed-table">
-                            <colgroup>
-                                <col style="width: 120px;" />
-                                <col style="width: 165px;" />
-                                <col style="width: 165px;" />
-                                <col style="width: 165px;" />
-                                <col style="width: 165px;" />
-                                <col style="width: 165px;" />
-                                <col style="width: 40px;" />
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th class="winding-col">Winding</th>
-                                    <th>Voltage L-L</th>
-                                    <th>Voltage L-N*</th>
-                                    <th>Insul. level L-L(BIL)</th>
-                                    <th>Insulation Class</th>
-                                    <th>Voltage regulation</th>
-                                    <th class="action-col" style="color: red;">
-                                        <el-button size="small" type="danger" class="w-100"
-                                            @click="removeAllVoltageRating">
-                                            <i class="fas fa-trash"></i>
-                                        </el-button>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in ratingsData.voltage_ratings" :key="index">
-                                    <td>
-                                        <el-select size="small" v-model="item.winding">
-                                            <el-option label="Prim" value="Prim"></el-option>
-                                            <el-option label="Sec" value="Sec"></el-option>
-                                            <el-option v-if="properties.type === $constant.THREE_WINDING" label="Tert"
-                                                value="Tert"></el-option>
-                                        </el-select>
-                                    </td>
-                                    <td>
-                                        <el-input size="small" type="text" number="positive"
-                                            v-model="item.voltage_ll.value">
-                                            <el-select size="small" class="select-in-input"
-                                                v-model="item.voltage_ll.unit" slot="append">
-                                                <el-option :label="unitMultiplier.k + unitSymbol.V"
-                                                    :value="unitMultiplier.k + '|' + unitSymbol.V"></el-option>
-                                                <el-option :label="unitSymbol.V" :value="unitSymbol.V"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </td>
-                                    <td>
-                                        <el-input size="small" type="text" number="positive"
-                                            v-model="item.voltage_ln.value">
-                                            <el-select size="small" class="select-in-input"
-                                                v-model="item.voltage_ln.unit" slot="append">
-                                                <el-option :label="unitMultiplier.k + unitSymbol.V"
-                                                    :value="unitMultiplier.k + '|' + unitSymbol.V"></el-option>
-                                                <el-option :label="unitSymbol.V" :value="unitSymbol.V"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </td>
-                                    <td>
-                                        <el-input size="small" type="text" number="positive"
-                                            v-model="item.insul_level_ll.value">
-                                            <el-select size="small" class="select-in-input"
-                                                v-model="item.insul_level_ll.unit" slot="append">
-                                                <el-option :label="unitMultiplier.k + unitSymbol.V"
-                                                    :value="unitMultiplier.k + '|' + unitSymbol.V"></el-option>
-                                                <el-option :label="unitSymbol.V" :value="unitSymbol.V"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </td>
-                                    <td>
-                                        <el-input size="small" v-model="item.insulation_class"></el-input>
-                                    </td>
-                                    <td>
-                                        <el-input size="small" v-model="item.voltage_regulation"></el-input>
-                                    </td>
-                                    <td>
-                                        <el-button size="small" type="danger" class="w-100"
-                                            @click="deleteVoltageRating(index)">
-                                            <i class="fas fa-trash"></i>
-                                        </el-button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </el-col>
-            </el-row>
-
-            <!-- power ratings -->
-            <el-row :gutter="20" class="content mgt-10">
-                <el-col :span="24" class="col-content">
-                    <span class="bolder">Power ratings</span>
-                    <el-divider></el-divider>
-                    <el-row :gutter="8">
-                        <el-col :xs="24" :md="12">
-                            <el-row :gutter="8">
-                                <el-col :span="12">
-                                    <el-button size="small" type="primary" class="btn-fluid" @click="addPowerRating">
-                                        <i class="fas fa-plus"></i>
-                                        Add
-                                    </el-button>
-                                </el-col>
-                                <el-col :span="12">
-                                    <el-button size="small" type="primary" class="btn-fluid"
-                                        @click="removeAllPowerRating">
-                                        <i class="fas fa-xmark"></i>
-                                        Remove all
-                                    </el-button>
-                                </el-col>
-                            </el-row>
-                        </el-col>
-                    </el-row>
-                </el-col>
-                <el-col>
-                    <div class="table-scroll mgt-5">
-                        <table class="table-strip-input-data fixed-table">
-                            <colgroup>
-                                <col style="width: 165px" />
-                                <col style="width: 165px" />
-                                <col style="width: 165px" />
-                                <col style="width: 40px" />
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Rated power</th>
-                                    <th>Cooling class</th>
-                                    <th>Temp. rise wind.</th>
-                                    <th class="action-col">
-                                        <el-button size="small" type="danger" class="w-100"
-                                            @click="removeAllPowerRating">
-                                            <i class="fas fa-trash"></i>
-                                        </el-button>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in ratingsData.power_ratings" :key="index">
-                                    <td>
-                                        <el-input size="small" type="text" number="positive"
-                                            v-model="item.rated_power.value">
-                                            <el-select size="small" class="select-in-input"
-                                                v-model="item.rated_power.unit" slot="append">
-                                                <el-option :label="unitMultiplier.M + unitSymbol.VA"
-                                                    :value="unitMultiplier.M + '|' + unitSymbol.VA"></el-option>
-                                                <el-option :label="unitMultiplier.k + unitSymbol.VA"
-                                                    :value="unitMultiplier.k + '|' + unitSymbol.VA"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </td>
-                                    <td>
-                                        <el-select size="small" v-model="item.cooling_class">
-                                            <el-option label="ONAN" value="ONAN"></el-option>
-                                            <el-option label="ONAF" value="ONAF"></el-option>
-                                            <el-option label="OFAF" value="OFAF"></el-option>
-                                            <el-option label="OFWF" value="OFWF"></el-option>
-                                            <el-option label="ODAF" value="ODAF"></el-option>
-                                            <el-option label="ODWF" value="ODWF"></el-option>
-                                            <el-option label="OA" value="OA"></el-option>
-                                            <el-option label="FA" value="FA"></el-option>
-                                            <el-option label="FOA" value="FOA"></el-option>
-                                            <el-option label="FOW" value="FOW"></el-option>
-                                            <el-option label="OW" value="OW"></el-option>
-                                            <el-option label="ON" value="ON"></el-option>
-                                            <el-option label="OF" value="OF"></el-option>
-                                            <el-option label="AN" value="AN"></el-option>
-                                            <el-option label="AF" value="AF"></el-option>
-                                        </el-select>
-                                    </td>
-                                    <td>
-                                        <el-input size="small" type="text" number="positive"
-                                            v-model="item.temp_rise_wind.value">
-                                            <template #append>{{ unitSymbol.degC }}</template>
-                                        </el-input>
-                                    </td>
-                                    <td>
-                                        <el-button size="small" type="danger" class="w-100"
-                                            @click="deletePowerRating(index)">
-                                            <i class="fas fa-trash"></i>
-                                        </el-button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </el-col>
-            </el-row>
-
-            <!-- current ratings -->
-            <el-row :gutter="20" class="content mgt-10">
-                <el-col :span="24" class="col-content">
-                    <span class="bolder">Current ratings at rated power</span>
-                    <el-divider></el-divider>
-                </el-col>
-                <el-col>
-                    <div class="table-scroll">
-                        <table class="table-strip-input-data fixed-table">
-                            <colgroup>
-                                <col style="width: 165px" />
-                                <col style="width: 165px" />
-                                <col v-if="properties.type === $constant.THREE_WINDING" style="width: 165px" />
-                                <col style="width: 165px" />
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th>Prim</th>
-                                    <th>Sec</th>
-                                    <th v-if="properties.type === $constant.THREE_WINDING">Tert</th>
-                                    <th>Rated power</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in ratingsData.current_ratings" :key="index">
-                                    <td>
-                                        <el-input size="small" type="text" number="positive"
-                                            v-model="item.prim.data.value">
-                                            <el-select size="small" class="select-in-input" v-model="item.prim.data.unit"
-                                                slot="append">
-                                                <el-option :label="unitSymbol.A" :value="unitSymbol.A"></el-option>
-                                                <el-option :label="unitMultiplier.k + unitSymbol.A"
-                                                    :value="unitMultiplier.k + '|' + unitSymbol.A"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </td>
-                                    <td>
-                                        <el-input size="small" type="text" number="positive"
-                                            v-model="item.sec.data.value">
-                                            <el-select size="small" class="select-in-input" v-model="item.sec.data.unit"
-                                                slot="append">
-                                                <el-option :label="unitSymbol.A" :value="unitSymbol.A"></el-option>
-                                                <el-option :label="unitMultiplier.k + unitSymbol.A"
-                                                    :value="unitMultiplier.k + '|' + unitSymbol.A"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </td>
-                                    <td v-if="properties.type === $constant.THREE_WINDING">
-                                        <el-input size="small" type="text" number="positive"
-                                            v-model="item.tert.data.value">
-                                            <el-select size="small" class="select-in-input" v-model="item.tert.data.unit"
-                                                slot="append">
-                                                <el-option :label="unitSymbol.A" :value="unitSymbol.A"></el-option>
-                                                <el-option :label="unitMultiplier.k + unitSymbol.A"
-                                                    :value="unitMultiplier.k + '|' + unitSymbol.A"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </td>
-                                    <td>
-                                        <el-input size="small" type="text" number="positive"
-                                            :value="ratingsData.power_ratings[index].rated_power.value"
-                                            :disabled="true">
-                                            <el-select size="small" class="select-in-input"
-                                                v-model="ratingsData.power_ratings[index].rated_power.unit"
-                                                :disabled="true" slot="append">
-                                                <el-option :label="unitMultiplier.M + unitSymbol.VA"
-                                                    :value="unitMultiplier.M + '|' + unitSymbol.VA"></el-option>
-                                                <el-option :label="unitMultiplier.k + unitSymbol.VA"
-                                                    :value="unitMultiplier.k + '|' + unitSymbol.VA"></el-option>
-                                            </el-select>
-                                        </el-input>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </el-col>
-            </el-row>
-
-            <!-- short-circuit -->
-            <el-row :gutter="20" class="content mgt-10">
-                <el-col :span="24" class="col-content">
-                    <span class="bolder">Short-circuit rating</span>
-                    <el-divider></el-divider>
-                </el-col>
-                <el-col :xs="24" :md="16" class="col-content">
-                    <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
-                        <el-form-item label="Max short-circuit current" class="inline-two-input">
-                            <div class="rf-wrap">
-                                <el-input type="text" number="positive" v-model="ratingsData.short_circuit.ka.value">
-                                    <el-select size="small" class="select-in-input"
-                                        v-model="ratingsData.short_circuit.ka.unit" slot="append">
-                                        <el-option :label="unitMultiplier.k + unitSymbol.A"
-                                            :value="unitMultiplier.k + '|' + unitSymbol.A"></el-option>
-                                        <el-option :label="unitSymbol.A" :value="unitSymbol.A"></el-option>
-                                    </el-select>
-                                </el-input>
-                                <el-input type="text" number="positive" v-model="ratingsData.short_circuit.s.value">
-                                    <template #append>{{ ratingsData.short_circuit.s.unit }}</template>
-                                </el-input>
-                            </div>
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
+  <div id="ratings" class="mgy-5">
+    <el-row>
+      <el-col :span="24">
+        <div class="header-toggle pointer" @click="openRatings = !openRatings">
+          <i v-if="openRatings" class="fa-solid fa-caret-up"></i>
+          <i v-else class="fa-solid fa-caret-down"></i>
+          Ratings
         </div>
+      </el-col>
+    </el-row>
+    <div class="content-toggle" v-if="openRatings">
+      <!-- rated frequency -->
+      <el-row :gutter="20" class="content">
+        <el-col :xs="24" :md="16" class="col-content">
+          <el-form
+            :inline-message="true"
+            :label-width="labelWidth"
+            size="small"
+            label-position="left"
+          >
+            <el-form-item label="Rated frequency" class="inline-two-input">
+              <div class="rf-wrap">
+                <el-select v-model="ratingsData.rated_frequency.value" placeholder="Select">
+                  <el-option label="Custom" value="Custom"></el-option>
+                  <el-option :label="'60' + unitSymbol.Hz" value="60"></el-option>
+                  <el-option :label="'50' + unitSymbol.Hz" value="50"></el-option>
+                  <el-option :label="'16.7' + unitSymbol.Hz" value="16.7"></el-option>
+                </el-select>
+                <el-input
+                  v-model="ratingsData.rated_frequency.custom_value"
+                  size="small"
+                  type="text"
+                  number="positive"
+                  :disabled="ratingsData.rated_frequency.value !== 'Custom'"
+                >
+                  <template #append>{{ unitSymbol.Hz }}</template>
+                </el-input>
+              </div>
+            </el-form-item>
+          </el-form>
+        </el-col>
+      </el-row>
+
+      <!-- voltage ratings -->
+      <el-row :gutter="20" class="content mgt-10">
+        <el-col :span="24" class="col-content">
+          <span class="bolder">Voltage ratings</span>
+          <el-divider></el-divider>
+          <el-row :gutter="8">
+            <el-col :xs="24" :md="12" :lg="12">
+              <el-row :gutter="8">
+                <el-col :span="12">
+                  <el-button
+                    size="small"
+                    type="primary"
+                    class="btn-fluid"
+                    @click="addVoltageRating"
+                  >
+                    <i class="fas fa-plus"></i>
+                    Add
+                  </el-button>
+                </el-col>
+                <el-col :span="12">
+                  <el-button size="small" class="btn-fluid" @click="removeAllVoltageRating">
+                    <i class="fas fa-xmark"></i>
+                    Remove all
+                  </el-button>
+                </el-col>
+              </el-row>
+            </el-col>
+          </el-row>
+          <div class="table-scroll mgt-5">
+            <table class="table-strip-input-data fixed-table">
+              <colgroup>
+                <col style="width: 120px" />
+                <col style="width: 165px" />
+                <col style="width: 165px" />
+                <col style="width: 165px" />
+                <col style="width: 165px" />
+                <col style="width: 165px" />
+                <col style="width: 40px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="winding-col">Winding</th>
+                  <th>Voltage L-L</th>
+                  <th>Voltage L-N*</th>
+                  <th>Insul. level L-L(BIL)</th>
+                  <th>Insulation Class</th>
+                  <th>Voltage regulation</th>
+                  <th class="action-col" style="color: red">
+                    <el-button
+                      size="small"
+                      type="danger"
+                      class="w-100"
+                      @click="removeAllVoltageRating"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </el-button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in ratingsData.voltage_ratings" :key="index">
+                  <td>
+                    <el-select size="small" v-model="item.winding">
+                      <el-option label="Prim" value="Prim"></el-option>
+                      <el-option label="Sec" value="Sec"></el-option>
+                      <el-option
+                        v-if="properties.type === $constant.THREE_WINDING"
+                        label="Tert"
+                        value="Tert"
+                      ></el-option>
+                    </el-select>
+                  </td>
+                  <td>
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      v-model="item.voltage_ll.value"
+                    >
+                      <template #append>
+                        <el-select
+                          size="small"
+                          class="select-in-input"
+                          v-model="item.voltage_ll.unit"
+                        >
+                          <el-option
+                            :label="unitMultiplier.k + unitSymbol.V"
+                            :value="unitMultiplier.k + '|' + unitSymbol.V"
+                          ></el-option>
+                          <el-option :label="unitSymbol.V" :value="unitSymbol.V"></el-option>
+                        </el-select>
+                      </template>
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      v-model="item.voltage_ln.value"
+                    >
+                      <template #append>
+                        <el-select
+                          size="small"
+                          class="select-in-input"
+                          v-model="item.voltage_ln.unit"
+                        >
+                          <el-option
+                            :label="unitMultiplier.k + unitSymbol.V"
+                            :value="unitMultiplier.k + '|' + unitSymbol.V"
+                          ></el-option>
+                          <el-option :label="unitSymbol.V" :value="unitSymbol.V"></el-option>
+                        </el-select>
+                      </template>
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      v-model="item.insul_level_ll.value"
+                    >
+                      <template #append>
+                        <el-select
+                          size="small"
+                          class="select-in-input"
+                          v-model="item.insul_level_ll.unit"
+                        >
+                          <el-option
+                            :label="unitMultiplier.k + unitSymbol.V"
+                            :value="unitMultiplier.k + '|' + unitSymbol.V"
+                          ></el-option>
+                          <el-option :label="unitSymbol.V" :value="unitSymbol.V"></el-option>
+                        </el-select>
+                      </template>
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-input size="small" v-model="item.insulation_class"></el-input>
+                  </td>
+                  <td>
+                    <el-input size="small" v-model="item.voltage_regulation"></el-input>
+                  </td>
+                  <td>
+                    <el-button
+                      size="small"
+                      type="danger"
+                      class="w-100"
+                      @click="deleteVoltageRating(index)"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </el-button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </el-col>
+      </el-row>
+
+      <!-- power ratings -->
+      <el-row :gutter="20" class="content mgt-10">
+        <el-col :span="24" class="col-content">
+          <span class="bolder">Power ratings</span>
+          <el-divider></el-divider>
+          <el-row :gutter="8">
+            <el-col :xs="24" :md="12">
+              <el-row :gutter="8">
+                <el-col :span="12">
+                  <el-button size="small" type="primary" class="btn-fluid" @click="addPowerRating">
+                    <i class="fas fa-plus"></i>
+                    Add
+                  </el-button>
+                </el-col>
+                <el-col :span="12">
+                  <el-button size="small" class="btn-fluid" @click="removeAllPowerRating">
+                    <i class="fas fa-xmark"></i>
+                    Remove all
+                  </el-button>
+                </el-col>
+              </el-row>
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-col>
+          <div class="table-scroll mgt-5">
+            <table class="table-strip-input-data fixed-table">
+              <colgroup>
+                <col style="width: 165px" />
+                <col style="width: 165px" />
+                <col style="width: 165px" />
+                <col style="width: 40px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Rated power</th>
+                  <th>Cooling class</th>
+                  <th>Temp. rise wind.</th>
+                  <th class="action-col">
+                    <el-button
+                      size="small"
+                      type="danger"
+                      class="w-100"
+                      @click="removeAllPowerRating"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </el-button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in ratingsData.power_ratings" :key="index">
+                  <td>
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      v-model="item.rated_power.value"
+                    >
+                      <template #append>
+                        <el-select
+                          size="small"
+                          class="select-in-input"
+                          v-model="item.rated_power.unit"
+                        >
+                          <el-option
+                            :label="unitMultiplier.M + unitSymbol.VA"
+                            :value="unitMultiplier.M + '|' + unitSymbol.VA"
+                          ></el-option>
+                          <el-option
+                            :label="unitMultiplier.k + unitSymbol.VA"
+                            :value="unitMultiplier.k + '|' + unitSymbol.VA"
+                          ></el-option>
+                        </el-select>
+                      </template>
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-select size="small" v-model="item.cooling_class">
+                      <el-option label="ONAN" value="ONAN"></el-option>
+                      <el-option label="ONAF" value="ONAF"></el-option>
+                      <el-option label="OFAF" value="OFAF"></el-option>
+                      <el-option label="OFWF" value="OFWF"></el-option>
+                      <el-option label="ODAF" value="ODAF"></el-option>
+                      <el-option label="ODWF" value="ODWF"></el-option>
+                      <el-option label="OA" value="OA"></el-option>
+                      <el-option label="FA" value="FA"></el-option>
+                      <el-option label="FOA" value="FOA"></el-option>
+                      <el-option label="FOW" value="FOW"></el-option>
+                      <el-option label="OW" value="OW"></el-option>
+                      <el-option label="ON" value="ON"></el-option>
+                      <el-option label="OF" value="OF"></el-option>
+                      <el-option label="AN" value="AN"></el-option>
+                      <el-option label="AF" value="AF"></el-option>
+                    </el-select>
+                  </td>
+                  <td>
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      v-model="item.temp_rise_wind.value"
+                    >
+                      <template #append>{{ unitSymbol.degC }}</template>
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-button
+                      size="small"
+                      type="danger"
+                      class="w-100"
+                      @click="deletePowerRating(index)"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </el-button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </el-col>
+      </el-row>
+
+      <!-- current ratings -->
+      <el-row :gutter="20" class="content mgt-10">
+        <el-col :span="24" class="col-content">
+          <span class="bolder">Current ratings at rated power</span>
+          <el-divider></el-divider>
+        </el-col>
+        <el-col>
+          <div class="table-scroll">
+            <table class="table-strip-input-data fixed-table">
+              <colgroup>
+                <col style="width: 165px" />
+                <col style="width: 165px" />
+                <col v-if="properties.type === $constant.THREE_WINDING" style="width: 165px" />
+                <col style="width: 165px" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Prim</th>
+                  <th>Sec</th>
+                  <th v-if="properties.type === $constant.THREE_WINDING">Tert</th>
+                  <th>Rated power</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in ratingsData.current_ratings" :key="index">
+                  <td>
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      v-model="item.prim.data.value"
+                    >
+                      <template #append>
+                        <el-select
+                          size="small"
+                          class="select-in-input"
+                          v-model="item.prim.data.unit"
+                        >
+                          <el-option :label="unitSymbol.A" :value="unitSymbol.A"></el-option>
+                          <el-option
+                            :label="unitMultiplier.k + unitSymbol.A"
+                            :value="unitMultiplier.k + '|' + unitSymbol.A"
+                          ></el-option>
+                        </el-select>
+                      </template>
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      v-model="item.sec.data.value"
+                    >
+                      <template #append>
+                        <el-select
+                          size="small"
+                          class="select-in-input"
+                          v-model="item.sec.data.unit"
+                        >
+                          <el-option :label="unitSymbol.A" :value="unitSymbol.A"></el-option>
+                          <el-option
+                            :label="unitMultiplier.k + unitSymbol.A"
+                            :value="unitMultiplier.k + '|' + unitSymbol.A"
+                          ></el-option>
+                        </el-select>
+                      </template>
+                    </el-input>
+                  </td>
+                  <td v-if="properties.type === $constant.THREE_WINDING">
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      v-model="item.tert.data.value"
+                    >
+                      <template #append>
+                        <el-select
+                          size="small"
+                          class="select-in-input"
+                          v-model="item.tert.data.unit"
+                        >
+                          <el-option :label="unitSymbol.A" :value="unitSymbol.A"></el-option>
+                          <el-option
+                            :label="unitMultiplier.k + unitSymbol.A"
+                            :value="unitMultiplier.k + '|' + unitSymbol.A"
+                          ></el-option>
+                        </el-select>
+                      </template>
+                    </el-input>
+                  </td>
+                  <td>
+                    <el-input
+                      size="small"
+                      type="text"
+                      number="positive"
+                      :value="ratingsData.power_ratings[index].rated_power.value"
+                      :disabled="true"
+                    >
+                      <template #append>
+                        <el-select
+                          size="small"
+                          class="select-in-input"
+                          v-model="ratingsData.power_ratings[index].rated_power.unit"
+                          :disabled="true"
+                        >
+                          <el-option
+                            :label="unitMultiplier.M + unitSymbol.VA"
+                            :value="unitMultiplier.M + '|' + unitSymbol.VA"
+                          ></el-option>
+                          <el-option
+                            :label="unitMultiplier.k + unitSymbol.VA"
+                            :value="unitMultiplier.k + '|' + unitSymbol.VA"
+                          ></el-option>
+                        </el-select>
+                      </template>
+                    </el-input>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </el-col>
+      </el-row>
+
+      <!-- short-circuit -->
+      <el-row :gutter="20" class="content mgt-10">
+        <el-col :span="24" class="col-content">
+          <span class="bolder">Short-circuit rating</span>
+          <el-divider></el-divider>
+        </el-col>
+        <el-col :xs="24" :md="16" class="col-content">
+          <el-form
+            :inline-message="true"
+            :label-width="labelWidth"
+            size="small"
+            label-position="left"
+          >
+            <el-form-item label="Max short-circuit current" class="inline-two-input">
+              <div class="rf-wrap">
+                <el-input
+                  type="text"
+                  number="positive"
+                  v-model="ratingsData.short_circuit.ka.value"
+                >
+                  <template #append>
+                    <el-select
+                      size="small"
+                      class="select-in-input"
+                      v-model="ratingsData.short_circuit.ka.unit"
+                    >
+                      <el-option
+                        :label="unitMultiplier.k + unitSymbol.A"
+                        :value="unitMultiplier.k + '|' + unitSymbol.A"
+                      ></el-option>
+                      <el-option :label="unitSymbol.A" :value="unitSymbol.A"></el-option>
+                    </el-select>
+                  </template>
+                </el-input>
+                <el-input type="text" number="positive" v-model="ratingsData.short_circuit.s.value">
+                  <template #append>{{ ratingsData.short_circuit.s.unit }}</template>
+                </el-input>
+              </div>
+            </el-form-item>
+          </el-form>
+        </el-col>
+      </el-row>
     </div>
+  </div>
 </template>
 
 <script>
 import { UnitSymbol } from '@/views/Enum/UnitSymbol'
 import { UnitMultiplier } from '@/views/Enum/UnitMultiplier'
 export default {
-    name: 'Rating',
-    props: {
-        data: {
-            type: Object,
-            required: true,
-            default() {
-                return {
-                    rated_frequency: {
-                        value: '',
-                        unit: 'Hz'
-                    },
-                    rated_frequency_custom: '',
-                    voltage_ratings: [],
-                    power_ratings: [],
-                    current_ratings: [],
-                    short_circuit: {
-                        ka: {
-                            value: '',
-                            unit: 'k|A'
-                        },
-                        s: {
-                            value: '',
-                            unit: 's'
-                        }
-                    }
-                }
-            }
-        },
-        properties: {
-            type: Object,
-            required: true,
-            default() {
-                return {
-                    mrid: '',
-                    kind: 'Transformer',
-                    type: 'Two-winding',
-                    serial_no: '',
-                    manufacturer: '',
-                    manufacturer_type: '',
-                    manufacturing_year: '',
-                    country_of_origin: '',
-                    apparatus_id: '',
-                    comment: ''
-                }
-            }
-        }
-    },
-    data() {
+  name: 'Rating',
+  props: {
+    data: {
+      type: Object,
+      required: true,
+      default() {
         return {
-            unitSymbol: UnitSymbol,
-            unitMultiplier: UnitMultiplier,
-            openRatings: true,
-            labelWidth: `${150}px`
-        }
-    },
-    computed: {
-        ratingsData: function () {
-            return this.data
-        },
-        assetType: function () {
-            return this.properties.type
-        }
-    },
-    watch: {
-        assetType() {
-            if (this.assetType === "Auto w/ tert") {
-                if (this.ratingsData.voltage_ratings.length <= 3 && this.ratingsData.voltage_ratings.length > 0) {
-                    this.ratingsData.voltage_ratings.forEach((element, index) => {
-                        element.winding = arr[index]
-                    });
-                }
-                else {
-                    while (this.ratingsData.voltage_ratings.length > 3) {
-                        this.ratingsData.voltage_ratings.pop()
-                    }
-                    this.ratingsData.voltage_ratings.forEach((element, index) => {
-                        element.winding = arr[index]
-                    });
-                }
+          rated_frequency: {
+            value: '',
+            unit: 'Hz'
+          },
+          rated_frequency_custom: '',
+          voltage_ratings: [],
+          power_ratings: [],
+          current_ratings: [],
+          short_circuit: {
+            ka: {
+              value: '',
+              unit: 'k|A'
+            },
+            s: {
+              value: '',
+              unit: 's'
             }
-            else if (this.assetType === "Auto w/o tert") {
-                if (this.ratingsData.voltage_ratings.length <= 2 && this.ratingsData.voltage_ratings.length > 0) {
-                    this.ratingsData.voltage_ratings.forEach((element, index) => {
-                        element.winding = arr[index]
-                    });
-                }
-                else {
-                    while (this.ratingsData.voltage_ratings.length > 2) {
-                        this.ratingsData.voltage_ratings.pop()
-                    }
-                    this.ratingsData.voltage_ratings.forEach((element, index) => {
-                        element.winding = arr[index]
-                    });
-                }
-            }
-        },
-
-
-    },
-
-    mounted() { },
-    methods: {
-        addVoltageRating() {
-            this.ratingsData.voltage_ratings.push({
-                mrid: '',
-                winding: this.$constant.PRIM,
-                voltage_ll: {
-                    mrid: '',
-                    value: '',
-                    unit: 'k|V'
-                },
-                voltage_ln: {
-                    mrid: '',
-                    value: '',
-                    unit: 'k|V'
-                },
-                insul_level_ll: {
-                    mrid: '',
-                    value: '',
-                    unit: 'k|V'
-                },
-                voltage_regulation: '',
-                insulation_class: ''
-            })
-        },
-        deleteVoltageRating(index) {
-            this.ratingsData.voltage_ratings.splice(index, 1)
-        },
-        removeAllVoltageRating() {
-            this.ratingsData.voltage_ratings = []
-        },
-        addPowerRating() {
-            this.ratingsData.power_ratings.push({
-                mrid: '',
-                rated_power: {
-                    mrid: '',
-                    value: '',
-                    unit: 'MVA'
-                },
-                cooling_class: '',
-                temp_rise_wind: {
-                    mrid: '',
-                    value: '',
-                    unit: '°C'
-                }
-            })
-            this.ratingsData.current_ratings.push({
-                mrid: '',
-                prim: {
-                    mrid: '',
-                    data: {
-                        mrid: '',
-                        value: '',
-                        unit: 'A'
-                    },
-                },
-                sec: {
-                    mrid: '',
-                    data: {
-                        mrid: '',
-                        value: '',
-                        unit: 'A'
-                    },
-                },
-                tert: {
-                    mrid: '',
-                    data: {
-                        mrid: '',
-                        value: '',
-                        unit: 'A'
-                    },
-                }
-            })
-        },
-        deletePowerRating(index) {
-            this.ratingsData.power_ratings.splice(index, 1)
-            this.ratingsData.current_ratings.splice(index, 1)
-        },
-        removeAllPowerRating() {
-            this.ratingsData.power_ratings = []
-            this.ratingsData.current_ratings = []
+          }
         }
+      }
+    },
+    properties: {
+      type: Object,
+      required: true,
+      default() {
+        return {
+          mrid: '',
+          kind: 'Transformer',
+          type: 'Two-winding',
+          serial_no: '',
+          manufacturer: '',
+          manufacturer_type: '',
+          manufacturing_year: '',
+          country_of_origin: '',
+          apparatus_id: '',
+          comment: ''
+        }
+      }
     }
+  },
+  data() {
+    return {
+      unitSymbol: UnitSymbol,
+      unitMultiplier: UnitMultiplier,
+      openRatings: true,
+      labelWidth: `${150}px`
+    }
+  },
+  computed: {
+    ratingsData: function () {
+      return this.data
+    },
+    assetType: function () {
+      return this.properties.type
+    }
+  },
+  watch: {
+    assetType() {
+      if (this.assetType === 'Auto w/ tert') {
+        if (
+          this.ratingsData.voltage_ratings.length <= 3 &&
+          this.ratingsData.voltage_ratings.length > 0
+        ) {
+          this.ratingsData.voltage_ratings.forEach((element, index) => {
+            element.winding = arr[index]
+          })
+        } else {
+          while (this.ratingsData.voltage_ratings.length > 3) {
+            this.ratingsData.voltage_ratings.pop()
+          }
+          this.ratingsData.voltage_ratings.forEach((element, index) => {
+            element.winding = arr[index]
+          })
+        }
+      } else if (this.assetType === 'Auto w/o tert') {
+        if (
+          this.ratingsData.voltage_ratings.length <= 2 &&
+          this.ratingsData.voltage_ratings.length > 0
+        ) {
+          this.ratingsData.voltage_ratings.forEach((element, index) => {
+            element.winding = arr[index]
+          })
+        } else {
+          while (this.ratingsData.voltage_ratings.length > 2) {
+            this.ratingsData.voltage_ratings.pop()
+          }
+          this.ratingsData.voltage_ratings.forEach((element, index) => {
+            element.winding = arr[index]
+          })
+        }
+      }
+    }
+  },
 
+  mounted() {},
+  methods: {
+    addVoltageRating() {
+      this.ratingsData.voltage_ratings.push({
+        mrid: '',
+        winding: this.$constant.PRIM,
+        voltage_ll: {
+          mrid: '',
+          value: '',
+          unit: 'k|V'
+        },
+        voltage_ln: {
+          mrid: '',
+          value: '',
+          unit: 'k|V'
+        },
+        insul_level_ll: {
+          mrid: '',
+          value: '',
+          unit: 'k|V'
+        },
+        voltage_regulation: '',
+        insulation_class: ''
+      })
+    },
+    deleteVoltageRating(index) {
+      this.ratingsData.voltage_ratings.splice(index, 1)
+    },
+    removeAllVoltageRating() {
+      this.ratingsData.voltage_ratings = []
+    },
+    addPowerRating() {
+      this.ratingsData.power_ratings.push({
+        mrid: '',
+        rated_power: {
+          mrid: '',
+          value: '',
+          unit: 'MVA'
+        },
+        cooling_class: '',
+        temp_rise_wind: {
+          mrid: '',
+          value: '',
+          unit: '°C'
+        }
+      })
+      this.ratingsData.current_ratings.push({
+        mrid: '',
+        prim: {
+          mrid: '',
+          data: {
+            mrid: '',
+            value: '',
+            unit: 'A'
+          }
+        },
+        sec: {
+          mrid: '',
+          data: {
+            mrid: '',
+            value: '',
+            unit: 'A'
+          }
+        },
+        tert: {
+          mrid: '',
+          data: {
+            mrid: '',
+            value: '',
+            unit: 'A'
+          }
+        }
+      })
+    },
+    deletePowerRating(index) {
+      this.ratingsData.power_ratings.splice(index, 1)
+      this.ratingsData.current_ratings.splice(index, 1)
+    },
+    removeAllPowerRating() {
+      this.ratingsData.power_ratings = []
+      this.ratingsData.current_ratings = []
+    }
+  }
 }
 
 const arr = ['Prim', 'Sec', 'Tert']
@@ -548,87 +692,87 @@ const arr = ['Prim', 'Sec', 'Tert']
 
 <style lang="scss" scoped>
 .bolder {
-    font-size: 12px !important;
+  font-size: 12px !important;
 }
 
 :deep(.table-scroll) {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 :deep(.table-scroll::-webkit-scrollbar) {
-    height: 5px;
+  height: 5px;
 }
 
 :deep(.table-scroll::-webkit-scrollbar-track) {
-    background: transparent;
+  background: transparent;
 }
 
 :deep(.table-scroll::-webkit-scrollbar-thumb) {
-    background-color: rgba(120, 120, 120, 0.6);
-    border-radius: 6px;
+  background-color: rgba(120, 120, 120, 0.6);
+  border-radius: 6px;
 }
 
 :deep(.table-scroll::-webkit-scrollbar-thumb:hover) {
-    background-color: rgba(120, 120, 120, 0.85);
+  background-color: rgba(120, 120, 120, 0.85);
 }
 
 :deep(.fixed-table) {
-    width: max-content;
-    table-layout: fixed;
+  width: max-content;
+  table-layout: fixed;
 }
 
 :deep(.fixed-table th),
 :deep(.fixed-table td) {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 :deep(.table-strip-input-data) {
-    font-size: 12px !important;
+  font-size: 12px !important;
 }
 
 :deep(.inline-two-input .rf-wrap) {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 :deep(.inline-two-input .el-select),
 :deep(.inline-two-input .el-input) {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 :deep(.btn-fluid) {
-    width: 100%;
-    min-width: 0 !important;
-    padding-left: 8px;
-    padding-right: 8px;
-    box-sizing: border-box;
+  width: auto;
+  min-width: 72px;
+  padding-left: 8px;
+  padding-right: 8px;
+  box-sizing: border-box;
 }
 
 @media (max-width: 767px) {
-    :deep(.inline-two-input) {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  :deep(.inline-two-input) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    :deep(.inline-two-input .el-form-item__label) {
-        width: auto !important;
-        margin-left: 0 !important;
-        padding-bottom: 0;
-        text-align: left;
-    }
+  :deep(.inline-two-input .el-form-item__label) {
+    width: auto !important;
+    margin-left: 0 !important;
+    padding-bottom: 0;
+    text-align: left;
+  }
 
-    :deep(.inline-two-input .el-form-item__content) {
-        width: 100%;
-        margin-left: 0 !important;
-    }
+  :deep(.inline-two-input .el-form-item__content) {
+    width: 100%;
+    margin-left: 0 !important;
+  }
 
-    :deep(.inline-two-input .el-select),
-    :deep(.inline-two-input .el-input) {
-        width: 100%;
-    }
+  :deep(.inline-two-input .el-select),
+  :deep(.inline-two-input .el-input) {
+    width: 100%;
+  }
 }
 </style>

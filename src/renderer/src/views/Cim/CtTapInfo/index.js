@@ -24,22 +24,21 @@
  */
 
 class CtTapInfo {
-    constructor() {
-        this.mrid = null;
-        this.tap_name = null;
-        this.ipn = null;
-        this.isn = null;
-        this.in_use = null;
-        this.rated_burden = null;
-        this.burden = null;
-        this.extended_burden = null;
-        this.burden_power_factor = null;
-        this.operating_burden = null;
-        this.operating_burden_power_factor = null;
-        this.ct_core_info_id = null;
-        this.type = null;
-    }
-
+  constructor() {
+    this.mrid = null
+    this.tap_name = null
+    this.ipn = null
+    this.isn = null
+    this.in_use = null
+    this.rated_burden = null
+    this.burden = null
+    this.extended_burden = null
+    this.burden_power_factor = null
+    this.operating_burden = null
+    this.operating_burden_power_factor = null
+    this.ct_core_info_id = null
+    this.type = null
+  }
 }
 
-export default CtTapInfo;
+export default CtTapInfo

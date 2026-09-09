@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: tester-app
+appId: com.at.digitaltester
+productName: ATDigitalTester
 directories:
   buildResources: build
 files:

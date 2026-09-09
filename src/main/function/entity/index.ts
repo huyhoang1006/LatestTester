@@ -27,35 +27,51 @@ import * as assetPsrFunc from './assetPsr/index'
 import * as notificationEntityFunc from './notification/index'
 import * as updateEntityFunc from './update/index'
 import * as entitySnapshotFunc from './entitySnapshot/index'
+import { templateFunc } from './template/index'
+import { mRIDCheckFunc } from './mRIDCheck/index'
+import * as onlineMonitoringFunc from './onlineMonitoring/index'
+import * as testingEquipmentEntityFunc from './testingEquipment/index'
+import * as syncStateFunc from './syncState/index'
+import * as compareTestFunc from './compareTest/index'
+import * as auditLogFunc from './auditLog/index'
+import * as assetAuditFunc from './assetAudit/index'
 
 export {
-    attachmentFunc,
-    fileFunc,
-    organisationLocationFunc,
-    personSubstationFunc,
-    userFunc,
-    userIdentifiedObjectFunc,
-    substationEntityFunc,
-    organisationPersonFunc,
-    organisationPsrFunc,
-    geoMapFunc,
-    parentOrganizationEntityFunc,
-    voltageLevelEntityFunc,
-    bayEntityFunc,
-    surgeArresterEntityFunc,
-    transformerEntityFunc,
-    jobEntityFunc,
-    powerCableEntityFunc,
-    capacitorEntityFunc,
-    breakerEntityFunc,
-    updateEntityFunc,
-    voltageTransformerEntityFunc,
-    bushingEntityFunc,
-    disconnectorEntityFunc,
-    rotatingMachineEntityFunc,
-    currentTransformerEntityFunc,
-    reactorEntityFunc,
-    assetPsrFunc,
-    notificationEntityFunc,
-    entitySnapshotFunc
+  attachmentFunc,
+  fileFunc,
+  organisationLocationFunc,
+  personSubstationFunc,
+  userFunc,
+  userIdentifiedObjectFunc,
+  substationEntityFunc,
+  organisationPersonFunc,
+  organisationPsrFunc,
+  geoMapFunc,
+  parentOrganizationEntityFunc,
+  voltageLevelEntityFunc,
+  bayEntityFunc,
+  surgeArresterEntityFunc,
+  transformerEntityFunc,
+  jobEntityFunc,
+  powerCableEntityFunc,
+  capacitorEntityFunc,
+  breakerEntityFunc,
+  updateEntityFunc,
+  voltageTransformerEntityFunc,
+  bushingEntityFunc,
+  disconnectorEntityFunc,
+  rotatingMachineEntityFunc,
+  currentTransformerEntityFunc,
+  reactorEntityFunc,
+  assetPsrFunc,
+  notificationEntityFunc,
+  entitySnapshotFunc,
+  templateFunc,
+  mRIDCheckFunc,
+  onlineMonitoringFunc,
+  testingEquipmentEntityFunc,
+  syncStateFunc,
+  compareTestFunc,
+  auditLogFunc,
+  assetAuditFunc
 }

@@ -2,41 +2,40 @@ import db from '../../datacontext/index'
 import * as measurementValueFunc from '../measurementValue/index'
 
 export const getDiscreteValueById = async (mrid: string) => {
-    try {
-        const measurementValue: any = await measurementValueFunc.getMeasurementValueById(mrid)
-        if (!measurementValue.success) {
-            return { success: false, data: null, message: 'MeasurementValue not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get(
-                `SELECT * FROM discrete_value WHERE mrid=?`,
-                [mrid],
-                (err: any, row: any) => {
-                    if (err) return reject({ success: false, err, message: 'Get discreteValue by id failed' })
-                    if (!row) return resolve({ success: false, data: null, message: 'DiscreteValue not found' })
-                    return resolve({ success: true, data: { ...measurementValue.data, ...row }, message: 'Get discreteValue by id completed' })
-                }
-            )
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get discreteValue by id failed' }
+  try {
+    const measurementValue: any = await measurementValueFunc.getMeasurementValueById(mrid)
+    if (!measurementValue.success) {
+      return { success: false, data: null, message: 'MeasurementValue not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM discrete_value WHERE mrid=?`, [mrid], (err: any, row: any) => {
+        if (err) return reject({ success: false, err, message: 'Get discreteValue by id failed' })
+        if (!row) return resolve({ success: false, data: null, message: 'DiscreteValue not found' })
+        return resolve({
+          success: true,
+          data: { ...measurementValue.data, ...row },
+          message: 'Get discreteValue by id completed'
+        })
+      })
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get discreteValue by id failed' }
+  }
 }
 
 export const getDiscreteValueByTestDataSetMrids = async (mrids: string[]) => {
-    return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
+    if (!mrids || mrids.length === 0) {
+      return resolve({
+        success: true,
+        data: [],
+        message: 'Get discreteValue by testDataSet mrids completed'
+      })
+    }
 
-        if (!mrids || mrids.length === 0) {
-            return resolve({
-                success: true,
-                data: [],
-                message: 'Get discreteValue by testDataSet mrids completed'
-            });
-        }
+    const placeholders = mrids.map(() => '?').join(',')
 
-        const placeholders = mrids.map(() => '?').join(',');
-
-        const sql = `
+    const sql = `
             SELECT 
                 dv.*, 
                 mv.*, 
@@ -71,98 +70,116 @@ export const getDiscreteValueByTestDataSetMrids = async (mrids: string[]) => {
                 ON io.mrid = mv.mrid
 
             WHERE pdmv.procedure_dataset_id IN (${placeholders})
-        `;
+        `
 
-        db.all(sql, mrids, (err: any, rows: any) => {
-            if (err) {
-                return reject({
-                    success: false,
-                    err,
-                    message: 'Get discreteValue by testDataSet mrids failed'
-                });
-            }
+    db.all(sql, mrids, (err: any, rows: any) => {
+      if (err) {
+        return reject({
+          success: false,
+          err,
+          message: 'Get discreteValue by testDataSet mrids failed'
+        })
+      }
 
-            return resolve({
-                success: true,
-                data: rows,
-                message: 'Get discreteValue by testDataSet mrids completed'
-            });
-        });
-    });
-};
-
-
+      return resolve({
+        success: true,
+        data: rows,
+        message: 'Get discreteValue by testDataSet mrids completed'
+      })
+    })
+  })
+}
 
 export const insertDiscreteValueTransaction = async (discreteValue: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const mvResult: any = await measurementValueFunc.insertMeasurementValueTransaction(discreteValue, dbsql)
-            if (!mvResult.success) {
-                return reject({ success: false, message: 'Insert measurementValue failed', err: mvResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO discrete_value(
+  return new Promise(async (resolve, reject) => {
+    try {
+      const mvResult: any = await measurementValueFunc.insertMeasurementValueTransaction(
+        discreteValue,
+        dbsql
+      )
+      if (!mvResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert measurementValue failed',
+          err: mvResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO discrete_value(
                     mrid, value, discrete
                 ) VALUES (?, ?, ?)
                 ON CONFLICT(mrid) DO UPDATE SET
                     value = excluded.value,
                     discrete = excluded.discrete
                 `,
-                [
-                    discreteValue.mrid,
-                    discreteValue.value,
-                    discreteValue.discrete
-                ],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Insert discreteValue failed' })
-                    return resolve({ success: true, data: discreteValue, message: 'Insert discreteValue completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Insert discreteValue failed' })
+        [discreteValue.mrid, discreteValue.value, discreteValue.discrete],
+        function (err: any) {
+          if (err) return reject({ success: false, err, message: 'Insert discreteValue failed' })
+          return resolve({
+            success: true,
+            data: discreteValue,
+            message: 'Insert discreteValue completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Insert discreteValue failed' })
+    }
+  })
 }
 
-export const updateDiscreteValueByIdTransaction = async (mrid: string, discreteValue: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const mvResult: any = await measurementValueFunc.updateMeasurementValueByIdTransaction(mrid, discreteValue, dbsql)
-            if (!mvResult.success) {
-                return reject({ success: false, message: 'Update measurementValue failed', err: mvResult.err })
-            }
-            dbsql.run(
-                `UPDATE discrete_value SET
+export const updateDiscreteValueByIdTransaction = async (
+  mrid: string,
+  discreteValue: any,
+  dbsql: any
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const mvResult: any = await measurementValueFunc.updateMeasurementValueByIdTransaction(
+        mrid,
+        discreteValue,
+        dbsql
+      )
+      if (!mvResult.success) {
+        return reject({
+          success: false,
+          message: 'Update measurementValue failed',
+          err: mvResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE discrete_value SET
                     value = ?,
                     discrete = ?
                 WHERE mrid = ?`,
-                [
-                    discreteValue.value,
-                    discreteValue.discrete,
-                    mrid
-                ],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Update discreteValue failed' })
-                    return resolve({ success: true, data: discreteValue, message: 'Update discreteValue completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Update discreteValue failed' })
+        [discreteValue.value, discreteValue.discrete, mrid],
+        function (err: any) {
+          if (err) return reject({ success: false, err, message: 'Update discreteValue failed' })
+          return resolve({
+            success: true,
+            data: discreteValue,
+            message: 'Update discreteValue completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Update discreteValue failed' })
+    }
+  })
 }
 
 export const deleteDiscreteValueByIdTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            dbsql.run("DELETE FROM discrete_value WHERE mrid=?", [mrid], function (this: any, err: any) {
-                if (err) return reject({ success: false, err, message: 'Delete discreteValue failed' })
-                if (this.changes === 0) return resolve({ success: false, data: null, message: 'DiscreteValue not found' })
-                measurementValueFunc.deleteMeasurementValueByIdTransaction(mrid, dbsql)
-                return resolve({ success: true, data: null, message: 'Delete discreteValue completed' })
-            })
-        } catch (err) {
-            return reject({ success: false, err, message: 'Delete discreteValue failed' })
-        }
-    })
+  return new Promise(async (resolve, reject) => {
+    try {
+      dbsql.run('DELETE FROM discrete_value WHERE mrid=?', [mrid], function (this: any, err: any) {
+        if (err) return reject({ success: false, err, message: 'Delete discreteValue failed' })
+        if (this.changes === 0)
+          return resolve({ success: false, data: null, message: 'DiscreteValue not found' })
+        measurementValueFunc.deleteMeasurementValueByIdTransaction(mrid, dbsql)
+        return resolve({ success: true, data: null, message: 'Delete discreteValue completed' })
+      })
+    } catch (err) {
+      return reject({ success: false, err, message: 'Delete discreteValue failed' })
+    }
+  })
 }

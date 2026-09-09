@@ -1,5 +1,5 @@
-import CurrentFlow from "../CurrentFlow";
-import Voltage from "../Voltage";
+import CurrentFlow from '../CurrentFlow'
+import Voltage from '../Voltage'
 /**
  * CREATE TABLE "current_transformer_info" (
 	"mrid"	TEXT NOT NULL,
@@ -36,25 +36,25 @@ import Voltage from "../Voltage";
 );
  */
 class CurrentTransformerInfo {
-    constructor() {
-        this.mRID = null;
-                this.accuracyClass = null;
-                this.accuracyLimit = null;
-                this.coreCount = null;
-                this.ctClass = null;
-                this.kneePointCurrent = new CurrentFlow();
-                this.kneePointVoltage = new Voltage();
-                this.maxRatio = null;
-                this.nominalRatio = null;
-                this.primaryFlsRating = null;
-                this.primaryRatio = null;
-                this.ratedCurrent = new CurrentFlow();
-                this.secondaryFlsRating = null;
-                this.secondaryRatio = null;
-                this.tertiaryFlsRating = null;
-                this.tertiaryRatio = null;
-                this.usage = null;
-    }
+  constructor() {
+    this.mRID = null
+    this.accuracyClass = null
+    this.accuracyLimit = null
+    this.coreCount = null
+    this.ctClass = null
+    this.kneePointCurrent = new CurrentFlow()
+    this.kneePointVoltage = new Voltage()
+    this.maxRatio = null
+    this.nominalRatio = null
+    this.primaryFlsRating = null
+    this.primaryRatio = null
+    this.ratedCurrent = new CurrentFlow()
+    this.secondaryFlsRating = null
+    this.secondaryRatio = null
+    this.tertiaryFlsRating = null
+    this.tertiaryRatio = null
+    this.usage = null
+  }
 }
 
-export default CurrentTransformerInfo;
+export default CurrentTransformerInfo

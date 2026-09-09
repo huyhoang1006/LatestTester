@@ -1,151 +1,157 @@
 <template>
-    <div id="windows" :class="{ 'logged-in': user }">
-        <TopBar id="top-bar"></TopBar>
-        <section id="main-windows">
-            <router-view ref="mainWindows"></router-view>
-        </section>
-        <div v-if="user" id="out-line">
-            <div @click="retweet" class="retweet">
-                <i class="fa-solid fa-retweet"></i>
-                <span>{{ serverSign ? 's' : 'c' }}</span>
-            </div>
-            <div class="outline-right">
-                <i @click="showLog" class="fa-solid fa-circle-chevron-up"></i>
-            </div>
-        </div>
+  <div id="windows" :class="{ 'logged-in': user }">
+    <TopBar id="top-bar"></TopBar>
+    <section id="main-windows">
+      <router-view ref="mainWindows"></router-view>
+    </section>
+    <div v-if="user" id="out-line">
+      <div @click="retweet" class="retweet">
+        <i class="fa-solid fa-retweet"></i>
+        <span>{{ serverSign ? 's' : 'c' }}</span>
+      </div>
+      <div class="outline-right">
+        <i @click="showLog" class="fa-solid fa-circle-chevron-up"></i>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
- import TopBar from '@/components/TopBar/index.vue'
+import TopBar from '@/components/TopBar/index.vue'
 
- export default {
-     components: { TopBar },
-     computed: {
-         user() {
-             return this.$user()
-         }
-     },
-    data() {
-        return {
-            serverSign: false,
-        }
-    },
-    methods: {
-        showLog() {
-            window.dispatchEvent(new CustomEvent('tree:showLog', { detail: { target: this.serverSign ? 'server' : 'client' } }))
-        },
-        retweet() {
-            this.serverSign = !this.serverSign
-            window.dispatchEvent(new CustomEvent('tree:serverSwap', { detail: { serverSign: this.serverSign } }))
-        }
+export default {
+  components: { TopBar },
+  computed: {
+    user() {
+      return this.$user()
     }
+  },
+  data() {
+    return {
+      serverSign: false
+    }
+  },
+  methods: {
+    showLog() {
+      window.dispatchEvent(
+        new CustomEvent('tree:showLog', {
+          detail: { target: this.serverSign ? 'server' : 'client' }
+        })
+      )
+    },
+    retweet() {
+      this.serverSign = !this.serverSign
+      window.dispatchEvent(
+        new CustomEvent('tree:serverSwap', { detail: { serverSign: this.serverSign } })
+      )
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 #windows {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 #windows:not(.logged-in) {
-    display: block;
+  display: block;
 }
 
 #windows:not(.logged-in) #top-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 100;
-    background-color: transparent;
-    border-bottom: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background-color: transparent;
+  border-bottom: none;
 }
 
 #windows:not(.logged-in) #main-windows {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 
 #windows.logged-in {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 #windows.logged-in #top-bar {
-    flex: 0 0 48px;
-    z-index: 10;
-    width: 100%;
+  flex: 0 0 48px;
+  z-index: 10;
+  width: 100%;
 }
 
 #windows.logged-in #main-windows {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
-    position: relative;
-    width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+  width: 100%;
 }
 
 #windows.logged-in #out-line {
-    flex: 0 0 20px;
-    background-color: #012596;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    overflow: hidden;
+  flex: 0 0 20px;
+  background-color: #012596;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
 }
 
 .retweet {
-    width: 40px;
-    height: 100%;
-    background-color: #088f8f;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    color: white;
-    cursor: pointer;
-    font-size: 12px;
-    line-height: 1;
+  width: 40px;
+  height: 100%;
+  background-color: #088f8f;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
 }
 
 .retweet i {
-    font-size: 12px;
-    display: flex;
-    align-items: center;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
 }
 
 .retweet span {
-    display: inline-block;
-    padding-bottom: 3px;
+  display: inline-block;
+  padding-bottom: 3px;
 }
 
 .outline-right {
-    margin-left: auto;
-    padding-right: 10px;
-    height: 100%;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    cursor: pointer;
+  margin-left: auto;
+  padding-right: 10px;
+  height: 100%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: pointer;
 }
 
 .outline-right i {
-    font-size: 12px;
-    line-height: 1;
-    display: flex;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
 }
 </style>

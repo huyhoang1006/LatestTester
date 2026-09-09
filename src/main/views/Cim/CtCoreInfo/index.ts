@@ -37,68 +37,68 @@
  */
 
 class CtCoreInfo {
-    alf: any
-    common_tap: any
-    core_application: any
-    core_class: any
-    core_index: any
-    current_transformer_info_id: any
-    duty: any
-    e1: any
-    ek: any
-    ex: any
-    fs: any
-    iai: any
-    ie: any
-    ie1: any
-    ik: any
-    ik1: any
-    k: any
-    kssc: any
-    ktd: any
-    kx: any
-    mrid: any
-    ratio_error: any
-    tap_count: any
-    tp: any
-    ts: any
-    val: any
-    vb: any
-    vk: any
-    vk1: any
-    winding_resistance: any
-    constructor() {
-        this.mrid = null;
-        this.tap_count = null;
-        this.common_tap = null;
-        this.core_application = null;
-        this.core_class = null;
-        this.fs = null;
-        this.alf = null;
-        this.winding_resistance = null;
-        this.ts = null;
-        this.ek = null;
-        this.e1 = null;
-        this.ie = null;
-        this.ie1 = null;
-        this.kssc = null;
-        this.val = null;
-        this.tp = null;
-        this.iai = null;
-        this.k = null;
-        this.ktd = null;
-        this.duty = null;
-        this.kx = null;
-        this.current_transformer_info_id = null;
-        this.ex = null;
-        this.vb = null;
-        this.vk = null;
-        this.vk1 = null;
-        this.ik = null;
-        this.ik1 = null;
-        this.ratio_error = null;
-        this.core_index = null;
-    }
+  alf: any
+  common_tap: any
+  core_application: any
+  core_class: any
+  core_index: any
+  current_transformer_info_id: any
+  duty: any
+  e1: any
+  ek: any
+  ex: any
+  fs: any
+  iai: any
+  ie: any
+  ie1: any
+  ik: any
+  ik1: any
+  k: any
+  kssc: any
+  ktd: any
+  kx: any
+  mrid: any
+  ratio_error: any
+  tap_count: any
+  tp: any
+  ts: any
+  val: any
+  vb: any
+  vk: any
+  vk1: any
+  winding_resistance: any
+  constructor() {
+    this.mrid = null
+    this.tap_count = null
+    this.common_tap = null
+    this.core_application = null
+    this.core_class = null
+    this.fs = null
+    this.alf = null
+    this.winding_resistance = null
+    this.ts = null
+    this.ek = null
+    this.e1 = null
+    this.ie = null
+    this.ie1 = null
+    this.kssc = null
+    this.val = null
+    this.tp = null
+    this.iai = null
+    this.k = null
+    this.ktd = null
+    this.duty = null
+    this.kx = null
+    this.current_transformer_info_id = null
+    this.ex = null
+    this.vb = null
+    this.vk = null
+    this.vk1 = null
+    this.ik = null
+    this.ik1 = null
+    this.ratio_error = null
+    this.core_index = null
+  }
 }
 
-export default CtCoreInfo;
+export default CtCoreInfo

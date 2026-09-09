@@ -2,34 +2,55 @@ import db from '../../datacontext/index'
 import * as OperatingMechanismInfoFunc from '../operatingMechanismInfo/index'
 
 export const getOldOperatingMechanismInfoById = async (mrid: string) => {
-    try {
-        const parentRes: any = await OperatingMechanismInfoFunc.getOperatingMechanismInfoById(mrid)
-        if (!parentRes.success) return { success: false, data: null, message: 'OperatingMechanismInfo not found' }
+  try {
+    const parentRes: any = await OperatingMechanismInfoFunc.getOperatingMechanismInfoById(mrid)
+    if (!parentRes.success)
+      return { success: false, data: null, message: 'OperatingMechanismInfo not found' }
 
-        return new Promise((resolve, reject) => {
-            db.get(
-                `SELECT * FROM old_operating_mechanism_info WHERE mrid = ?`,
-                [mrid],
-                (err: any, row: any) => {
-                    if (err) return reject({ success: false, err, message: 'Get oldOperatingMechanismInfo by id failed' })
-                    if (!row) return resolve({ success: false, data: null, message: 'OldOperatingMechanismInfo not found' })
-                    return resolve({ success: true, data: { ...parentRes.data, ...row }, message: 'Get oldOperatingMechanismInfo by id completed' })
-                }
-            )
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get oldOperatingMechanismInfo by id failed' }
-    }
+    return new Promise((resolve, reject) => {
+      db.get(
+        `SELECT * FROM old_operating_mechanism_info WHERE mrid = ?`,
+        [mrid],
+        (err: any, row: any) => {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Get oldOperatingMechanismInfo by id failed'
+            })
+          if (!row)
+            return resolve({
+              success: false,
+              data: null,
+              message: 'OldOperatingMechanismInfo not found'
+            })
+          return resolve({
+            success: true,
+            data: { ...parentRes.data, ...row },
+            message: 'Get oldOperatingMechanismInfo by id completed'
+          })
+        }
+      )
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get oldOperatingMechanismInfo by id failed' }
+  }
 }
 
 export const insertOldOperatingMechanismInfoTransaction = async (info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const parentRes: any = await OperatingMechanismInfoFunc.insertOperatingMechanismInfoTransaction(info, dbsql)
-            if (!parentRes.success) return reject({ success: false, message: 'Insert OperatingMechanismInfo failed', err: parentRes.err })
+  return new Promise(async (resolve, reject) => {
+    try {
+      const parentRes: any =
+        await OperatingMechanismInfoFunc.insertOperatingMechanismInfoTransaction(info, dbsql)
+      if (!parentRes.success)
+        return reject({
+          success: false,
+          message: 'Insert OperatingMechanismInfo failed',
+          err: parentRes.err
+        })
 
-            dbsql.run(
-                `INSERT INTO old_operating_mechanism_info(
+      dbsql.run(
+        `INSERT INTO old_operating_mechanism_info(
                     mrid,
                     rated_motor_current,
                     rated_motor_voltage,
@@ -54,38 +75,61 @@ export const insertOldOperatingMechanismInfoTransaction = async (info: any, dbsq
                     rated_operating_pressure = excluded.rated_operating_pressure,
                     rated_operating_pressure_temperature = excluded.rated_operating_pressure_temperature
                 `,
-                [
-                    info.mrid,
-                    info.rated_motor_current,
-                    info.rated_motor_voltage,
-                    info.motor_power_type,
-                    info.rated_motor_frequency,
-                    info.rated_auxiliary_circuit_current,
-                    info.rated_auxiliary_circuit_voltage,
-                    info.auxiliary_circuit_power_type,
-                    info.rated_auxiliary_circuit_frequency,
-                    info.rated_operating_pressure,
-                    info.rated_operating_pressure_temperature
-                ],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Insert oldOperatingMechanismInfo failed' })
-                    return resolve({ success: true, data: info, message: 'Insert oldOperatingMechanismInfo completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Insert oldOperatingMechanismInfo transaction failed' })
+        [
+          info.mrid,
+          info.rated_motor_current,
+          info.rated_motor_voltage,
+          info.motor_power_type,
+          info.rated_motor_frequency,
+          info.rated_auxiliary_circuit_current,
+          info.rated_auxiliary_circuit_voltage,
+          info.auxiliary_circuit_power_type,
+          info.rated_auxiliary_circuit_frequency,
+          info.rated_operating_pressure,
+          info.rated_operating_pressure_temperature
+        ],
+        function (err: any) {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Insert oldOperatingMechanismInfo failed'
+            })
+          return resolve({
+            success: true,
+            data: info,
+            message: 'Insert oldOperatingMechanismInfo completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({
+        success: false,
+        err,
+        message: 'Insert oldOperatingMechanismInfo transaction failed'
+      })
+    }
+  })
 }
 
-export const updateOldOperatingMechanismInfoTransaction = async (mrid: string, info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const parentRes: any = await OperatingMechanismInfoFunc.updateOperatingMechanismInfoTransaction(mrid, info, dbsql)
-            if (!parentRes.success) return reject({ success: false, message: 'Update OperatingMechanismInfo failed', err: parentRes.err })
+export const updateOldOperatingMechanismInfoTransaction = async (
+  mrid: string,
+  info: any,
+  dbsql: any
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const parentRes: any =
+        await OperatingMechanismInfoFunc.updateOperatingMechanismInfoTransaction(mrid, info, dbsql)
+      if (!parentRes.success)
+        return reject({
+          success: false,
+          message: 'Update OperatingMechanismInfo failed',
+          err: parentRes.err
+        })
 
-            dbsql.run(
-                `UPDATE old_operating_mechanism_info SET
+      dbsql.run(
+        `UPDATE old_operating_mechanism_info SET
                     rated_motor_current = ?,
                     rated_motor_voltage = ?,
                     motor_power_type = ?,
@@ -97,45 +141,86 @@ export const updateOldOperatingMechanismInfoTransaction = async (mrid: string, i
                     rated_operating_pressure = ?,
                     rated_operating_pressure_temperature = ?
                 WHERE mrid = ?`,
-                [
-                    info.rated_motor_current,
-                    info.rated_motor_voltage,
-                    info.motor_power_type,
-                    info.rated_motor_frequency,
-                    info.rated_auxiliary_circuit_current,
-                    info.rated_auxiliary_circuit_voltage,
-                    info.auxiliary_circuit_power_type,
-                    info.rated_auxiliary_circuit_frequency,
-                    info.rated_operating_pressure,
-                    info.rated_operating_pressure_temperature,
-                    mrid
-                ],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Update oldOperatingMechanismInfo failed' })
-                    return resolve({ success: true, data: info, message: 'Update oldOperatingMechanismInfo completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Update oldOperatingMechanismInfo transaction failed' })
+        [
+          info.rated_motor_current,
+          info.rated_motor_voltage,
+          info.motor_power_type,
+          info.rated_motor_frequency,
+          info.rated_auxiliary_circuit_current,
+          info.rated_auxiliary_circuit_voltage,
+          info.auxiliary_circuit_power_type,
+          info.rated_auxiliary_circuit_frequency,
+          info.rated_operating_pressure,
+          info.rated_operating_pressure_temperature,
+          mrid
+        ],
+        function (err: any) {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Update oldOperatingMechanismInfo failed'
+            })
+          return resolve({
+            success: true,
+            data: info,
+            message: 'Update oldOperatingMechanismInfo completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({
+        success: false,
+        err,
+        message: 'Update oldOperatingMechanismInfo transaction failed'
+      })
+    }
+  })
 }
 
 export const deleteOldOperatingMechanismInfoTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            dbsql.run("DELETE FROM old_operating_mechanism_info WHERE mrid = ?", [mrid], function (err: any) {
-                if (err) return reject({ success: false, err, message: 'Delete oldOperatingMechanismInfo failed' })
-
-                OperatingMechanismInfoFunc.deleteOperatingMechanismInfoTransaction(mrid, dbsql)
-                    .then((res: any) => {
-                        if (!res.success) return reject({ success: false, message: 'Delete OperatingMechanismInfo failed', err: res.err })
-                        return resolve({ success: true, data: mrid, message: 'Delete oldOperatingMechanismInfo completed' })
-                    })
-                    .catch((err2: any) => reject({ success: false, err: err2, message: 'Delete OperatingMechanismInfo transaction failed' }))
+  return new Promise(async (resolve, reject) => {
+    try {
+      dbsql.run(
+        'DELETE FROM old_operating_mechanism_info WHERE mrid = ?',
+        [mrid],
+        function (err: any) {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Delete oldOperatingMechanismInfo failed'
             })
-        } catch (err) {
-            return reject({ success: false, err, message: 'Delete oldOperatingMechanismInfo transaction failed' })
+
+          OperatingMechanismInfoFunc.deleteOperatingMechanismInfoTransaction(mrid, dbsql)
+            .then((res: any) => {
+              if (!res.success)
+                return reject({
+                  success: false,
+                  message: 'Delete OperatingMechanismInfo failed',
+                  err: res.err
+                })
+              return resolve({
+                success: true,
+                data: mrid,
+                message: 'Delete oldOperatingMechanismInfo completed'
+              })
+            })
+            .catch((err2: any) =>
+              reject({
+                success: false,
+                err: err2,
+                message: 'Delete OperatingMechanismInfo transaction failed'
+              })
+            )
         }
-    })
+      )
+    } catch (err) {
+      return reject({
+        success: false,
+        err,
+        message: 'Delete oldOperatingMechanismInfo transaction failed'
+      })
+    }
+  })
 }

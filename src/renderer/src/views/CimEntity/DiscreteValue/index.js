@@ -1,12 +1,12 @@
-import MeasurementValue from "../MeasurementValue";
-import Discrete from "../Discrete";
+import MeasurementValue from '../MeasurementValue'
+import Discrete from '../Discrete'
 
 class DiscreteValue extends MeasurementValue {
-    constructor() {
-        super();
-                this.value = null;
-                this.discrete = new Discrete();
-    }
+  constructor() {
+    super()
+    this.value = null
+    this.discrete = new Discrete()
+  }
 }
 
-export default DiscreteValue;
+export default DiscreteValue

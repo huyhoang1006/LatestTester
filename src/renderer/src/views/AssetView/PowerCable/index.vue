@@ -1,35 +1,54 @@
 <template>
-    <div id="asset">
-        <div style="min-height: 500px; display: flex; flex-direction: column;">
-            <el-row justify="center" class="top-switch">
-                <el-col :span="24">
-                    <el-row :gutter="8">
-                        <el-col :xs="12" :sm="12" :md="6">
-                            <el-button @click="switchData('powerCable')" size="small" class="switch-btn" type="primary"
-                                style="width: 100%">Power Cable</el-button>
-                        </el-col>
-                        <el-col :xs="12" :sm="12" :md="6">
-                            <el-button @click="switchData('assessories')" size="small" class="switch-btn" type="primary"
-                                style="width: 100%">Assessories</el-button>
-                        </el-col>
-                    </el-row>
-                </el-col>
-            </el-row>
-            <div style="flex: 1; display: flex; flex-direction: column; margin-top: 20px">
-                <div v-if="this.switch == 'powerCable'">
-                    <powerCableProperty :properties.sync="powerCable.properties"></powerCableProperty>
-                    <configs :layer.sync="powerCable.layersData" :ratings.sync="powerCable.ratingsData"
-                        :configs.sync="powerCable.configsData" :other="powerCable.othersData"
-                        :datas="powerCable.datasData">
-                    </configs>
-                </div>
-                <div v-else-if="this.switch == 'assessories'">
-                    <assessories :joint="powerCable.datasData.jointsData" :terminal="powerCable.datasData.terminalsData"
-                        :sheathLimit="powerCable.datasData.sheathLimitsData"></assessories>
-                </div>
-            </div>
+  <div id="asset">
+    <div style="min-height: 500px; display: flex; flex-direction: column">
+      <el-row justify="center" class="top-switch">
+        <el-col :span="24">
+          <el-row :gutter="8">
+            <el-col :xs="12" :sm="12" :md="6">
+              <el-button
+                @click="switchData('powerCable')"
+                size="small"
+                class="switch-btn"
+                type="primary"
+                style="width: 100%"
+                >Power Cable</el-button
+              >
+            </el-col>
+            <el-col :xs="12" :sm="12" :md="6">
+              <el-button
+                @click="switchData('assessories')"
+                size="small"
+                class="switch-btn"
+                type="primary"
+                style="width: 100%"
+                >Assessories</el-button
+              >
+            </el-col>
+          </el-row>
+        </el-col>
+      </el-row>
+      <div style="flex: 1; display: flex; flex-direction: column; margin-top: 20px">
+        <div v-if="this.switch == 'powerCable'">
+          <powerCableProperty v-model:properties="powerCable.properties"></powerCableProperty>
+          <configs
+            v-model:layer="powerCable.layersData"
+            v-model:ratings="powerCable.ratingsData"
+            v-model:configs="powerCable.configsData"
+            :other="powerCable.othersData"
+            :datas="powerCable.datasData"
+          >
+          </configs>
         </div>
+        <div v-else-if="this.switch == 'assessories'">
+          <assessories
+            :joint="powerCable.datasData.jointsData"
+            :terminal="powerCable.datasData.terminalsData"
+            :sheathLimit="powerCable.datasData.sheathLimitsData"
+          ></assessories>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -39,103 +58,101 @@ import mixin from './mixin'
 import assessories from './components/assessories.vue'
 
 export default {
-    name: 'powerCable',
-    props: {
-        parent: {
-            type: Object,
-            default: () => ({})
-        },
-        organisationId: {
-            type: String,
-            default: ''
-        },
+  name: 'powerCable',
+  props: {
+    parent: {
+      type: Object,
+      default: () => ({})
+    },
+    organisationId: {
+      type: String,
+      default: ''
+    },
 
-        locationId: {
-            type: String,
-            default: ''
-        },
-    },
-    components: {
-        powerCableProperty,
-        configs,
-        assessories,
-    },
-    data() {
-        return {
-            switch: 'powerCable',
-
-        }
-    },
-    computed: {
-        parentData() {
-            return this.parent
-        }
-    },
-    mixins: [mixin],
-    methods: {
-        async switchData(data) {
-            this.switch = data
-        },
-        updateAttachment(attachment) {
-            this.attachmentData = attachment
-        },
-        loadMapForView() { },
+    locationId: {
+      type: String,
+      default: ''
     }
+  },
+  components: {
+    powerCableProperty,
+    configs,
+    assessories
+  },
+  data() {
+    return {
+      switch: 'powerCable'
+    }
+  },
+  computed: {
+    parentData() {
+      return this.parent
+    }
+  },
+  mixins: [mixin],
+  methods: {
+    async switchData(data) {
+      this.switch = data
+    },
+    updateAttachment(attachment) {
+      this.attachmentData = attachment
+    },
+    loadMapForView() {}
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 #asset {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 table,
 td,
 th {
-    border: 1px solid;
-    font-size: 12px;
+  border: 1px solid;
+  font-size: 12px;
 }
 
 table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
 th,
 td {
-    padding: 0px 10px;
-    height: 30px;
+  padding: 0px 10px;
+  height: 30px;
 }
 
 :deep(.top-switch) {
-    :deep(.el-button) {
-        white-space: nowrap;
-        line-height: 1.4;
-        padding: 4px;
-        text-align: center;
-        text-overflow: ellipsis;
-        font-size: 12px;
-    }
+  :deep(.el-button) {
+    white-space: nowrap;
+    line-height: 1.4;
+    padding: 4px;
+    text-align: center;
+    text-overflow: ellipsis;
+    font-size: 12px;
+  }
 }
 
 :deep(.top-switch .switch-btn) {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 :deep(.el-form-item__label) {
-    font-size: 12px !important;
+  font-size: 12px !important;
 }
 
-:deep(.el-input__inner,
-:deep) .el-select .el-input__inner {
-    font-size: 12px !important;
+:deep(.el-input__inner, :deep) .el-select .el-input__inner {
+  font-size: 12px !important;
 }
 </style>

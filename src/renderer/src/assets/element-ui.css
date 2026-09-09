@@ -3,62 +3,62 @@
 :root {
     /* Primary Colors */
     --el-color-primary: #012596;
-    --el-color-primary-light-3: #3375b9;
-    --el-color-primary-light-5: #2a598a;
-    --el-color-primary-light-7: #213d5b;
-    --el-color-primary-light-8: #1d3043;
-    --el-color-primary-light-9: #18222b;
-    --el-color-primary-dark-2: #66b1ff;
+    --el-color-primary-light-3: #4d66b6;
+    --el-color-primary-light-5: #8092cb;
+    --el-color-primary-light-7: #b3bee0;
+    --el-color-primary-light-8: #ccd3ea;
+    --el-color-primary-light-9: #e6e9f5;
+    --el-color-primary-dark-2: #011e78;
     --el-color-primary-rgb: 1, 37, 150;
 
     /* Success Colors */
     --el-color-success: #007E33;
-    --el-color-success-light-3: #4e8e2f;
-    --el-color-success-light-5: #3e6b27;
-    --el-color-success-light-7: #2d481f;
-    --el-color-success-light-8: #25371c;
-    --el-color-success-light-9: #1c2518;
-    --el-color-success-dark-2: #85ce61;
+    --el-color-success-light-3: #4da570;
+    --el-color-success-light-5: #80bf99;
+    --el-color-success-light-7: #b3d8c2;
+    --el-color-success-light-8: #cce5d6;
+    --el-color-success-light-9: #e6f2eb;
+    --el-color-success-dark-2: #006529;
     --el-color-success-rgb: 0, 126, 51;
 
     /* Warning Colors */
     --el-color-warning: #FF8800;
-    --el-color-warning-light-3: #a77730;
-    --el-color-warning-light-5: #7d5b28;
-    --el-color-warning-light-7: #533f20;
-    --el-color-warning-light-8: #3e301c;
-    --el-color-warning-light-9: #292218;
-    --el-color-warning-dark-2: #ebb563;
+    --el-color-warning-light-3: #ffac4d;
+    --el-color-warning-light-5: #ffc480;
+    --el-color-warning-light-7: #ffdbb3;
+    --el-color-warning-light-8: #ffe7cc;
+    --el-color-warning-light-9: #fff3e6;
+    --el-color-warning-dark-2: #cc6d00;
     --el-color-warning-rgb: 255, 136, 0;
 
     /* Danger Colors */
     --el-color-danger: #CC0514;
-    --el-color-danger-light-3: #b25252;
-    --el-color-danger-light-5: #854040;
-    --el-color-danger-light-7: #582e2e;
-    --el-color-danger-light-8: #412626;
-    --el-color-danger-light-9: #2a1d1d;
-    --el-color-danger-dark-2: #f78989;
+    --el-color-danger-light-3: #db505b;
+    --el-color-danger-light-5: #e6828a;
+    --el-color-danger-light-7: #f0b4b9;
+    --el-color-danger-light-8: #f5cdd0;
+    --el-color-danger-light-9: #fae6e8;
+    --el-color-danger-dark-2: #a30410;
     --el-color-danger-rgb: 204, 5, 20;
 
     /* Error Colors (same as danger) */
     --el-color-error: #CC0514;
-    --el-color-error-light-3: #b25252;
-    --el-color-error-light-5: #854040;
-    --el-color-error-light-7: #582e2e;
-    --el-color-error-light-8: #412626;
-    --el-color-error-light-9: #2a1d1d;
-    --el-color-error-dark-2: #f78989;
+    --el-color-error-light-3: #db505b;
+    --el-color-error-light-5: #e6828a;
+    --el-color-error-light-7: #f0b4b9;
+    --el-color-error-light-8: #f5cdd0;
+    --el-color-error-light-9: #fae6e8;
+    --el-color-error-dark-2: #a30410;
     --el-color-error-rgb: 204, 5, 20;
 
     /* Info Colors */
     --el-color-info: #808080;
-    --el-color-info-light-3: #6b6d71;
-    --el-color-info-light-5: #525457;
-    --el-color-info-light-7: #393a3c;
-    --el-color-info-light-8: #2d2d2f;
-    --el-color-info-light-9: #202121;
-    --el-color-info-dark-2: #a6a9ad;
+    --el-color-info-light-3: #a6a6a6;
+    --el-color-info-light-5: #c0c0c0;
+    --el-color-info-light-7: #d9d9d9;
+    --el-color-info-light-8: #e6e6e6;
+    --el-color-info-light-9: #f2f2f2;
+    --el-color-info-dark-2: #666666;
     --el-color-info-rgb: 128, 128, 128;
 
     /* Basic Colors */
@@ -67,16 +67,16 @@
 
     /* Text Colors */
     --el-text-color-primary: #17202A;
-    --el-text-color-regular: #3d4a5c;
-    --el-text-color-secondary: #82848a;
-    --el-text-color-placeholder: #a8abb2;
+    --el-text-color-regular: #17202A;
+    --el-text-color-secondary: #17202A;
+    --el-text-color-placeholder: #c0c4cc;
     --el-text-color-disabled: #bfbfbf;
 
     /* Border Colors */
     --el-border-color-base: #808B96;
     --el-border-color-light: #ABB2B9;
     --el-border-color-lighter: #D5D8DC;
-    --el-border-color-extra-light: #E9EAF0;
+    --el-border-color-extra-light: #EAECEE;
     --el-border-color-dark: #4c4d4f;
     --el-border-color-darker: #363637;
 
@@ -185,7 +185,7 @@
 .el-form-item__label {
     font-size: 12px !important;
     line-height: 28px !important;
-    color: var(--el-text-color-regular) !important;
+    color: #303133 !important;
     padding: 0 12px 0 0 !important;
 }
 
@@ -196,68 +196,6 @@
 
 .el-form-item__label-wrap {
     line-height: 28px !important;
-}
-
-/* Form item with label on top */
-.form-item-top .el-form-item__label {
-    float: none !important;
-    width: 100% !important;
-    text-align: left !important;
-}
-
-.form-item-top .el-form-item__content {
-    width: 100% !important;
-    margin-left: 0 !important;
-    display: block !important;
-    min-height: 28px !important;
-}
-
-/* ============== Voltage Row ============== */
-.voltage-row {
-    width: 100% !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
-
-.voltage-row.el-row {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    row-gap: 8px !important;
-}
-
-.voltage-row .el-col {
-    min-width: 80px !important;
-    padding-left: 5px !important;
-    padding-right: 5px !important;
-    box-sizing: border-box !important;
-    flex: 0 0 auto !important;
-}
-
-.voltage-row .voltage-value-col {
-    flex: 1 1 auto !important;
-    min-width: 100px !important;
-}
-
-.voltage-row .el-col .el-select,
-.voltage-row .el-col .el-input {
-    width: 100% !important;
-    display: block !important;
-    min-width: 0 !important;
-}
-
-.voltage-row .el-col .el-select .el-input__wrapper,
-.voltage-row .el-col .el-input .el-input__wrapper {
-    width: 100% !important;
-    min-width: 0 !important;
-    padding: 0 8px !important;
-}
-
-.voltage-row .el-col .el-select .el-input__inner,
-.voltage-row .el-col .el-input .el-input__inner {
-    width: 100% !important;
-    min-width: 0 !important;
 }
 
 /* ============== Select Dropdown ============== */

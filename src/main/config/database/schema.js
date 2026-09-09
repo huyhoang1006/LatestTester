@@ -1,10 +1,17 @@
-export const INIT_SCHEMA =`
+export const INIT_SCHEMA = `
 CREATE TABLE IF NOT EXISTS "acceptance_test" (
 	"mrid"	TEXT NOT NULL,
 	"date_time"	TEXT,
 	"success"	TEXT,
 	"type"	TEXT,
 	PRIMARY KEY("mrid")
+);
+CREATE TABLE IF NOT EXISTS "accessory_testing_equipment" (
+    "equipment"  TEXT NOT NULL,
+    "accessory"  TEXT NOT NULL,
+    PRIMARY KEY("equipment","accessory"),
+    FOREIGN KEY("equipment") REFERENCES "testing_equipment"("mrid") ON DELETE CASCADE,
+    FOREIGN KEY("accessory") REFERENCES "testing_equipment"("mrid") ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS "active_power" (
 	"mrid"	TEXT NOT NULL,
@@ -388,6 +395,19 @@ CREATE TABLE IF NOT EXISTS "cable_info" (
 	FOREIGN KEY("diameter_over_screen") REFERENCES "length"("mrid"),
 	FOREIGN KEY("mrid") REFERENCES "wire_info"("mrid") on delete cascade,
 	FOREIGN KEY("nominal_temperature") REFERENCES "temperature"("mrid")
+);
+CREATE TABLE IF NOT EXISTS "calibration_record" (
+	"mrid"	TEXT NOT NULL,
+	"testing_equipment"	TEXT,
+	"calibration_date"	TEXT,
+	"due_date"	TEXT,
+	"interval_months"	INTEGER,
+	"provider"	TEXT,
+	"certificate_number"	TEXT,
+	"result"	TEXT,
+	"notes"	TEXT,
+	PRIMARY KEY("mrid"),
+	FOREIGN KEY("testing_equipment") REFERENCES "testing_equipment"("mrid") on delete cascade
 );
 CREATE TABLE IF NOT EXISTS "capacitance" (
 	"mrid"	TEXT NOT NULL,
@@ -2011,6 +2031,24 @@ CREATE TABLE IF NOT EXISTS "short_circuit_test_transformer_end_info" (
 	FOREIGN KEY("short_circuit_test_id") REFERENCES "short_circuit_test"("mrid") ON DELETE CASCADE,
 	FOREIGN KEY("transformer_end_info_id") REFERENCES "transformer_end_info"("mrid") ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS "software_license" (
+	"mrid"	TEXT NOT NULL,
+	"option_name"	TEXT,
+	"license_key"	TEXT,
+	"enabled"	TEXT,
+	"description"	TEXT,
+	"activation_date"	TEXT,
+	"expiry_date"	TEXT,
+	"seat_count"	TEXT,
+	PRIMARY KEY("mrid")
+);
+CREATE TABLE IF NOT EXISTS "software_license_testing_equipment" (
+	"software_license"	TEXT NOT NULL,
+	"testing_equipment"	TEXT NOT NULL,
+	PRIMARY KEY("software_license","testing_equipment"),
+	FOREIGN KEY("software_license") REFERENCES "software_license"("mrid") ON DELETE CASCADE,
+	FOREIGN KEY("testing_equipment") REFERENCES "testing_equipment"("mrid") ON DELETE CASCADE
+);
 CREATE TABLE IF NOT EXISTS "state_variable" (
 	"mrid"	TEXT NOT NULL,
 	PRIMARY KEY("mrid")
@@ -2293,11 +2331,11 @@ CREATE TABLE IF NOT EXISTS "testing_condition" (
 );
 CREATE TABLE IF NOT EXISTS "testing_equipment" (
 	"mrid"	TEXT NOT NULL,
-	"model"	TEXT,
-	"serial_number"	TEXT,
 	"work_id"	TEXT,
-	"calibration_date"	TEXT,
+	"asset_tag"	TEXT,
+	"is_accessory"	INTEGER,
 	PRIMARY KEY("mrid"),
+	FOREIGN KEY("mrid") REFERENCES "asset"("mrid") on delete cascade,
 	FOREIGN KEY("work_id") REFERENCES "work"("mrid")
 );
 CREATE TABLE IF NOT EXISTS "town_detail" (
@@ -2649,4 +2687,82 @@ CREATE UNIQUE INDEX IF NOT EXISTS "idx_org_ps_unique" ON "organisation_person" (
 	"organisation_id",
 	"person_id"
 );
-`;
+
+CREATE TABLE IF NOT EXISTS "assessment_group" (
+	"mrid"	TEXT NOT NULL,
+	"rule_id"	TEXT,
+	"parent_id"	TEXT,
+	"logic"	TEXT,
+	"is_default"	TEXT,
+	PRIMARY KEY("mrid"),
+	FOREIGN KEY("parent_id") REFERENCES "assessment_group"("mrid"),
+	FOREIGN KEY("rule_id") REFERENCES "assessment_rule"("mrid")
+);
+
+CREATE TABLE IF NOT EXISTS "assessment_rule" (
+	"mrid"	TEXT NOT NULL,
+	"standard_id"	TEXT,
+	"result"	TEXT,
+	"priority"	TEXT,
+	PRIMARY KEY("mrid"),
+	FOREIGN KEY("standard_id") REFERENCES "standard"("mrid")
+);
+
+CREATE TABLE IF NOT EXISTS "customized_standard" (
+	"mrid"	TEXT NOT NULL,
+	PRIMARY KEY("mrid"),
+	FOREIGN KEY("mrid") REFERENCES "standard"("mrid")
+);
+
+CREATE TABLE IF NOT EXISTS "standard" (
+	"mrid"	TEXT NOT NULL,
+	"name"	TEXT,
+	"code"	TEXT,
+	PRIMARY KEY("mrid")
+);
+
+CREATE TABLE IF NOT EXISTS "assessment" (
+	"mrid"	TEXT NOT NULL,
+	"group_id"	TEXT,
+	"measurement_id"	TEXT,
+	"operator"	TEXT,
+	"threshold"	TEXT,
+	PRIMARY KEY("mrid"),
+	FOREIGN KEY("group_id") REFERENCES "assessment_group"("mrid"),
+	FOREIGN KEY("measurement_id") REFERENCES "measurement"("mrid")
+);
+
+CREATE TABLE IF NOT EXISTS "condition_indicator" (
+	"mrid"	TEXT NOT NULL,
+	"data"	TEXT,
+	"procedure_id"	TEXT,
+	PRIMARY KEY("mrid"),
+	FOREIGN KEY("procedure_id") REFERENCES "procedure"("mrid")
+);
+
+CREATE TABLE IF NOT EXISTS "activity_record_ticket" (
+	"mrid"	TEXT NOT NULL,
+	"ticket_id"	TEXT,
+	"ticket_status"	TEXT,
+	"ticket_severity"	TEXT,
+	"repair_location"	TEXT,
+	"action_note"	TEXT,
+	"created_by"	INTEGER,
+	"updated_at"	TEXT,
+	PRIMARY KEY("mrid"),
+	FOREIGN KEY("mrid") REFERENCES "activity_record"("mrid") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "activity_record_ticket_component" (
+	"mrid"	TEXT NOT NULL,
+	"activity_record_ticket_id"	TEXT NOT NULL,
+	"component_name"	TEXT NOT NULL,
+	"sequence_number"	INTEGER,
+	"created_at"	TEXT,
+	PRIMARY KEY("mrid"),
+	FOREIGN KEY("activity_record_ticket_id") REFERENCES "activity_record_ticket"("mrid") ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "idx_activity_record_ticket_component_ticket"
+	ON "activity_record_ticket_component"("activity_record_ticket_id");
+`

@@ -1,8 +1,8 @@
-import Measurement from "@/views/Cim/Measurement";
+import Measurement from '@/views/Cim/Measurement'
 class StringMeasurement extends Measurement {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super()
+  }
 }
 
-export default StringMeasurement;
+export default StringMeasurement

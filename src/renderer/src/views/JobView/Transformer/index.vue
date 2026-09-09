@@ -1,52 +1,79 @@
 <template>
-    <div id="job">
-        <el-row :gutter="20" style="padding: 0">
-            <el-tabs type="card">
-                <!-- Overview -->
-                <el-tab-pane style="width: 100%;">
-                    <span slot="label"><i class="fa-solid fa-book"></i> Overview</span>
-                    <overview :data="transformerJobDto.properties" @update-attachment="updateAttachmentOverView"
-                        :attachment.sync="transformerJobDto.attachmentData" :locationData="locationData"
-                        :assetData="assetData" :productAssetModelData="productAssetModelData"
-                        :parentOrganization="parentOrganization"></overview>
-                </el-tab-pane>
+  <div id="job">
+    <el-row :gutter="20" style="padding: 0">
+      <el-tabs type="card">
+        <!-- Overview -->
+        <el-tab-pane style="width: 100%">
+          <template #label
+            ><span><i class="fa-solid fa-book"></i> Overview</span></template
+          >
+          <overview
+            :data="transformerJobDto.properties"
+            @update-attachment="updateAttachmentOverView"
+            v-model:attachment="transformerJobDto.attachmentData"
+            :locationData="locationData"
+            :assetData="assetData"
+            :productAssetModelData="productAssetModelData"
+            :parentOrganization="parentOrganization"
+          ></overview>
+        </el-tab-pane>
 
-                <!-- Select test -->
-                <el-tab-pane>
-                    <span slot="label"><i class="fa-solid fa-list-check"></i> Test settings</span>
-                    <select-test style="width: 100%;" :data="transformerJobDto.testList"
-                        :testTypeListData="testTypeListData" :assetData="assetData"
-                        :obj-active-name="objActiveName"></select-test>
-                </el-tab-pane>
+        <!-- Select test -->
+        <el-tab-pane>
+          <template #label
+            ><span><i class="fa-solid fa-list-check"></i> Test settings</span></template
+          >
+          <select-test
+            style="width: 100%"
+            :data="transformerJobDto.testList"
+            :testTypeListData="testTypeListData"
+            :assetData="assetData"
+            :obj-active-name="objActiveName"
+          ></select-test>
+        </el-tab-pane>
 
-                <!-- Testing equipment -->
-                <el-tab-pane>
-                    <span slot="label"><i class="fa-solid fa-list-check"></i> Testing equipment</span>
-                    <div>
-                        <testing-equipment :data="transformerJobDto.testingEquipmentData"
-                            :testTypeListData="testTypeListData"></testing-equipment>
-                    </div>
-                </el-tab-pane>
+        <!-- Testing equipment -->
+        <el-tab-pane>
+          <template #label
+            ><span><i class="fa-solid fa-list-check"></i> Testing equipment</span></template
+          >
+          <div>
+            <testing-equipment
+              :data="transformerJobDto.testingEquipmentData"
+              :testTypeListData="testTypeListData"
+            ></testing-equipment>
+          </div>
+        </el-tab-pane>
 
-                <!-- Tests -->
-                <el-tab-pane>
-                    <span slot="label"><i class="fa-solid fa-calculator"></i> Test data</span>
-                    <div id="tests" style="width: 100%;">
-                        <el-tabs v-model="objActiveName.activeName" type="card" class="w-100 h-100">
-                            <el-tab-pane v-for="(item, index) in transformerJobDto.testList" :key="index"
-                                :label="item.name" :name="item.name + index">
-                                <test-information :title="item.name" :data="item.testCondition" :assetData="assetData"
-                                    :attachment="item.testCondition.attachmentData">
-                                </test-information>
-                                <component :is="item.testTypeCode" :data="item.data" :asset="assetData">
-                                </component>
-                            </el-tab-pane>
-                        </el-tabs>
-                    </div>
-                </el-tab-pane>
+        <!-- Tests -->
+        <el-tab-pane>
+          <template #label
+            ><span><i class="fa-solid fa-calculator"></i> Test data</span></template
+          >
+          <div id="tests" style="width: 100%">
+            <el-tabs v-model="objActiveName.activeName" type="card" class="w-100 h-100">
+              <el-tab-pane
+                v-for="(item, index) in transformerJobDto.testList"
+                :key="index"
+                :label="item.name"
+                :name="item.name + index"
+              >
+                <test-information
+                  :title="item.name"
+                  :data="item.testCondition"
+                  :assetData="assetData"
+                  :attachment="item.testCondition.attachmentData"
+                >
+                </test-information>
+                <component :is="item.testTypeCode" :data="item.data" :asset="assetData">
+                </component>
+              </el-tab-pane>
             </el-tabs>
-        </el-row>
-    </div>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </el-row>
+  </div>
 </template>
 
 <script>
@@ -85,85 +112,81 @@ import ShortCircuitImpedanceTert from './components/ShortCircuitImpedanceTert/in
 import GasChromatography from './components/GasChromatography/index.vue'
 import Dga from './components/Dga/index.vue'
 
-
 import TestSummary from './components/TestSummary/index.vue'
 import TestInformation from '@/views/Common/TestInformation.vue'
 import HealthIndex from './components/HealthIndex/index.vue'
 import exportData from './components/ExportData/index.vue'
 
 export default {
-    name: 'JobViewTransformer',
-    components: {
-        SelectTest,
-        overview,
-        DCWindingPrim,
-        DCWindingSec,
-        DCWindingTert,
-        DimensionWeight,
-        EnergyEfficiency,
-        ExcitingCurrent,
-        GeneralInspection,
-        InducedAcVoltageTests,
-        InsulationResistance,
-        MeasurementOfNoLoad,
-        MeasurementOfOil,
-        MeasurementOfShortCircuit,
-        RatioPrimSec,
-        SeparateSourceAc,
-        TestingInstruments,
-        WindingDfCap,
-        BushingPrimC1,
-        BushingPrimC2,
-        BushingSecC1,
-        BushingSecC2,
-        BushingTertC1,
-        BushingTertC2,
-        Dga,
-        GasChromatography,
-        InsulationResistanceYokeCore,
-        ShortCircuitImpedancePrim,
-        ShortCircuitImpedanceSec,
-        ShortCircuitImpedanceTert,
-        TestSummary,
-        HealthIndex,
-        TestInformation,
-        exportData,
-        TestingEquipment
-
+  name: 'JobViewTransformer',
+  components: {
+    SelectTest,
+    overview,
+    DCWindingPrim,
+    DCWindingSec,
+    DCWindingTert,
+    DimensionWeight,
+    EnergyEfficiency,
+    ExcitingCurrent,
+    GeneralInspection,
+    InducedAcVoltageTests,
+    InsulationResistance,
+    MeasurementOfNoLoad,
+    MeasurementOfOil,
+    MeasurementOfShortCircuit,
+    RatioPrimSec,
+    SeparateSourceAc,
+    TestingInstruments,
+    WindingDfCap,
+    BushingPrimC1,
+    BushingPrimC2,
+    BushingSecC1,
+    BushingSecC2,
+    BushingTertC1,
+    BushingTertC2,
+    Dga,
+    GasChromatography,
+    InsulationResistanceYokeCore,
+    ShortCircuitImpedancePrim,
+    ShortCircuitImpedanceSec,
+    ShortCircuitImpedanceTert,
+    TestSummary,
+    HealthIndex,
+    TestInformation,
+    exportData,
+    TestingEquipment
+  },
+  props: {
+    parentOrganization: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  mixins: [mixin],
+  data() {
+    return {
+      objActiveName: {
+        activeName: null
+      },
+      testTypeListData: [],
+      assetData: {},
+      locationData: {},
+      productAssetModelData: {}
+    }
+  },
+  mounted() {},
+  methods: {
+    updateAttachmentOverView(attachment) {
+      this.attachmentData = attachment
     },
-    props: {
-        parentOrganization: {
-            type: Object,
-            default: () => ({})
-        },
-    },
-    mixins: [mixin],
-    data() {
-        return {
-            objActiveName: {
-                activeName: null
-            },
-            testTypeListData: [],
-            assetData : {},
-            locationData : {},
-            productAssetModelData: {},
-
-        }
-    },
-    mounted() { },
-    methods: {
-        updateAttachmentOverView(attachment) {
-            this.attachmentData = attachment
-        },
-        loadMapForView() {
-        }
-    },
+    loadMapForView() {}
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 #job {
-    width: 100%;
+  width: 100%;
 }
 
 :deep(.el-tabs__item) {
@@ -180,12 +203,12 @@ export default {
 
 #tests,
 #job__health-index {
-    width: calc(100vw - 145px);
-    overflow-y: auto;
-    overflow-x: hidden;
+  width: calc(100vw - 145px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .el-tabs--border-card {
-    border: none;
+  border: none;
 }
 </style>

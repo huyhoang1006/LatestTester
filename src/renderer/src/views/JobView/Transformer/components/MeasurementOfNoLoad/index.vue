@@ -1,69 +1,87 @@
 <template>
-    <div id="measurement-of-no-load">
-        <table class="table-strip-input-data" style="width: 70% ; font-size: 12px;">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Result</th>
-                    <th>Standard</th>
-                    <th class="assessment-col">Assessment</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item, index) in testData.table.table1" :key="index">
-                    <td>{{ item.name.value }}</td>
-                    <td><el-input size="small" type="text" number="positive" v-model="item.result.value"></el-input></td>
-                    <td><el-input size="small" type="text" number="positive" v-model="item.standard.value"></el-input></td>
-                    <td>
-                        <el-select class="assessment" size="small" v-model="item.assessment.value">
-                            <el-option value="Pass"><i class="fa-solid fa-square-check pass"></i> Pass</el-option>
-                            <el-option value="Fail"><i class="fa-solid fa-xmark fail"></i> Fail</el-option>
-                        </el-select>
-                        <span v-if="item.assessment.value === 'Pass'"
-                            class="fa-solid fa-square-check pass icon-status"></span>
-                        <span v-else-if="item.assessment.value === 'Fail'"
-                            class="fa-solid fa-xmark fail icon-status"></span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+  <div id="measurement-of-no-load">
+    <table class="table-strip-input-data" style="width: 70%; font-size: 12px">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Result</th>
+          <th>Standard</th>
+          <th class="assessment-col">Assessment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in testData.table.table1" :key="index">
+          <td>{{ item.name.value }}</td>
+          <td>
+            <el-input
+              size="small"
+              type="text"
+              number="positive"
+              v-model="item.result.value"
+            ></el-input>
+          </td>
+          <td>
+            <el-input
+              size="small"
+              type="text"
+              number="positive"
+              v-model="item.standard.value"
+            ></el-input>
+          </td>
+          <td>
+            <el-select class="assessment" size="small" v-model="item.assessment.value">
+              <el-option value="Pass"><i class="fa-solid fa-square-check pass"></i> Pass</el-option>
+              <el-option value="Fail"><i class="fa-solid fa-xmark fail"></i> Fail</el-option>
+            </el-select>
+            <span
+              v-if="item.assessment.value === 'Pass'"
+              class="fa-solid fa-square-check pass icon-status"
+            ></span>
+            <span
+              v-else-if="item.assessment.value === 'Fail'"
+              class="fa-solid fa-xmark fail icon-status"
+            ></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>
 import TransformerTestMap from '@/config/test-definitions/Transformer'
 import * as common from '../../../Common/index'
 export default {
-    name: 'MeasurementOfNoLoad',
-    props: {
-        data: {
-            type: Object,
-            require: true,
-            default() {
-                return {
-                    code: 'MeasurementOfNoLoad',
-                    no_load_loss: {
-                        result: '',
-                        standard: '',
-                        assessment: ''
-                    },
-                    no_load_current: {
-                        result: '',
-                        standard: '',
-                        assessment: ''
-                    }
-                }
-            }
+  name: 'MeasurementOfNoLoad',
+  props: {
+    data: {
+      type: Object,
+      require: true,
+      default() {
+        return {
+          code: 'MeasurementOfNoLoad',
+          no_load_loss: {
+            result: '',
+            standard: '',
+            assessment: ''
+          },
+          no_load_current: {
+            result: '',
+            standard: '',
+            assessment: ''
+          }
         }
-    },
-    computed: {
-        testData() {
-            return this.data
-        },
-        rowData() {
-            return common.buildEmptyTestRow(TransformerTestMap['MeasurementOfNoLoad'].columns)
-        }
+      }
     }
+  },
+  computed: {
+    testData() {
+      return this.data
+    },
+    rowData() {
+      return common.buildEmptyTestRow(TransformerTestMap['MeasurementOfNoLoad'].columns)
+    }
+  }
 }
 </script>
 

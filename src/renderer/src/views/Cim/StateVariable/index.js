@@ -1,7 +1,7 @@
 class StateVariable {
-    constructor() {
-        this.mrid = null
-    }
+  constructor() {
+    this.mrid = null
+  }
 }
 
 export default StateVariable

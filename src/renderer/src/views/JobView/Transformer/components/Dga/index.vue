@@ -1,105 +1,121 @@
 <template>
-    <div id="energy-efficiency">
-        <!-- Cấu hình -->
-        <el-row class="mgb-10">
-            <el-col>
-                <el-button class="btn-action" size="small" type="success" @click="openConditionIndicatorDialog = true">
-                    <i class="fa-solid fa-hammer"></i> Condition indicatior settings
-                </el-button>
-            </el-col>
-        </el-row>
-        <!-- Tính toán đánh giá -->
-        <el-row class="mgb-10">
-            <el-col>
-                <el-button size="small" type="primary" class="btn-action" @click="calculator"> <i
-                        class="fas fa-circle-play"></i> Assess results </el-button>
-                <el-button size="small" type="primary" class="btn-action" @click="clear"> <i class="fas fa-xmark"></i>
-                    Clear all </el-button>
-            </el-col>
-        </el-row>
+  <div id="energy-efficiency">
+    <!-- Cấu hình -->
+    <el-row class="mgb-10">
+      <el-col>
+        <el-button
+          class="btn-action"
+          size="small"
+          type="success"
+          @click="openConditionIndicatorDialog = true"
+        >
+          <i class="fa-solid fa-hammer"></i> Condition indicatior settings
+        </el-button>
+      </el-col>
+    </el-row>
+    <!-- Tính toán đánh giá -->
+    <el-row class="mgb-10">
+      <el-col>
+        <el-button size="small" type="primary" class="btn-action" @click="calculator">
+          <i class="fas fa-circle-play"></i> Assess results
+        </el-button>
+        <el-button size="small" type="primary" class="btn-action" @click="clear">
+          <i class="fas fa-xmark"></i> Clear all
+        </el-button>
+      </el-col>
+    </el-row>
 
-        <table class="table-strip-input-data" style="width: 120% ; font-size: 12px;">
-            <thead>
-                <tr>
-                    <th>H<sub>2</sub></th>
-                    <th>CH<sub>4</sub></th>
-                    <th>C<sub>2</sub>H<sub>2</sub></th>
-                    <th>C<sub>2</sub>H<sub>4</sub></th>
-                    <th>C<sub>2</sub>H<sub>6</sub></th>
-                    <th>CO</th>
-                    <th>CO<sub>2</sub></th>
-                    <th>TDCG</th>
-                    <th>Status</th>
-                    <th class="condition-indicator-col">Condition indicator</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item, index) in testData.table.table1" :key="index">
-                    <td>
-                        <el-input type="text" number="positive" size="small" v-model="item.h2.value">
-                            <template #append>ppm</template>
-                        </el-input>
-                    </td>
-                    <td>
-                        <el-input type="text" number="positive" size="small" v-model="item.ch4.value">
-                            <template #append>ppm</template>
-                        </el-input>
-                    </td>
-                    <td>
-                        <el-input type="text" number="positive" size="small" v-model="item.c2h2.value">
-                            <template #append>ppm</template>
-                        </el-input>
-                    </td>
-                    <td>
-                        <el-input type="text" number="positive" size="small" v-model="item.c2h4.value">
-                            <template #append>ppm</template>
-                        </el-input>
-                    </td>
-                    <td>
-                        <el-input type="text" number="positive" size="small" v-model="item.c2h6.value">
-                            <template #append>ppm</template>
-                        </el-input>
-                    </td>
-                    <td>
-                        <el-input type="text" number="positive" size="small" v-model="item.co.value">
-                            <template #append>ppm</template>
-                        </el-input>
-                    </td>
-                    <td>
-                        <el-input type="text" number="positive" size="small" v-model="item.co2.value">
-                            <template #append>ppm</template>
-                        </el-input>
-                    </td>
-                    <td>
-                        <el-input type="text" number="positive" size="small" v-model="item.tdcg.value">
-                            <template #append>ppm</template>
-                        </el-input>
-                    </td>
-                    <td>
-                        <el-select style="width: 120px" size="small" v-model="item.status.value">
-                            <el-option label="Condition 1" value="Condition 1"></el-option>
-                            <el-option label="Condition 2" value="Condition 2"></el-option>
-                            <el-option label="Condition 3" value="Condition 3"></el-option>
-                            <el-option label="Condition 4" value="Condition 4"></el-option>
-                        </el-select>
-                    </td>
-                    <td>
-                        <el-select :class="nameColor(item.condition_indicator.value)" id="condition" type="text"
-                            size="small" v-model="item.condition_indicator.value">
-                            <el-option value="Good">Good</el-option>
-                            <el-option value="Fair">Fair</el-option>
-                            <el-option value="Poor">Poor</el-option>
-                            <el-option value="Bad">Bad</el-option>
-                        </el-select>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <table class="table-strip-input-data" style="width: 120%; font-size: 12px">
+      <thead>
+        <tr>
+          <th>H<sub>2</sub></th>
+          <th>CH<sub>4</sub></th>
+          <th>C<sub>2</sub>H<sub>2</sub></th>
+          <th>C<sub>2</sub>H<sub>4</sub></th>
+          <th>C<sub>2</sub>H<sub>6</sub></th>
+          <th>CO</th>
+          <th>CO<sub>2</sub></th>
+          <th>TDCG</th>
+          <th>Status</th>
+          <th class="condition-indicator-col">Condition indicator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in testData.table.table1" :key="index">
+          <td>
+            <el-input type="text" number="positive" size="small" v-model="item.h2.value">
+              <template #append>ppm</template>
+            </el-input>
+          </td>
+          <td>
+            <el-input type="text" number="positive" size="small" v-model="item.ch4.value">
+              <template #append>ppm</template>
+            </el-input>
+          </td>
+          <td>
+            <el-input type="text" number="positive" size="small" v-model="item.c2h2.value">
+              <template #append>ppm</template>
+            </el-input>
+          </td>
+          <td>
+            <el-input type="text" number="positive" size="small" v-model="item.c2h4.value">
+              <template #append>ppm</template>
+            </el-input>
+          </td>
+          <td>
+            <el-input type="text" number="positive" size="small" v-model="item.c2h6.value">
+              <template #append>ppm</template>
+            </el-input>
+          </td>
+          <td>
+            <el-input type="text" number="positive" size="small" v-model="item.co.value">
+              <template #append>ppm</template>
+            </el-input>
+          </td>
+          <td>
+            <el-input type="text" number="positive" size="small" v-model="item.co2.value">
+              <template #append>ppm</template>
+            </el-input>
+          </td>
+          <td>
+            <el-input type="text" number="positive" size="small" v-model="item.tdcg.value">
+              <template #append>ppm</template>
+            </el-input>
+          </td>
+          <td>
+            <el-select style="width: 120px" size="small" v-model="item.status.value">
+              <el-option label="Condition 1" value="Condition 1"></el-option>
+              <el-option label="Condition 2" value="Condition 2"></el-option>
+              <el-option label="Condition 3" value="Condition 3"></el-option>
+              <el-option label="Condition 4" value="Condition 4"></el-option>
+            </el-select>
+          </td>
+          <td>
+            <el-select
+              :class="nameColor(item.condition_indicator.value)"
+              id="condition"
+              type="text"
+              size="small"
+              v-model="item.condition_indicator.value"
+            >
+              <el-option value="Good">Good</el-option>
+              <el-option value="Fair">Fair</el-option>
+              <el-option value="Poor">Poor</el-option>
+              <el-option value="Bad">Bad</el-option>
+            </el-select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-        <!-- Condition indicator settings -->
-        <el-dialog append-to-body title="Condition indicator settings" v-model="openConditionIndicatorDialog"
-            width="1120px">
-            <!-- <table class="table-strip-input-data mgb-10">
+    <!-- Condition indicator settings -->
+    <el-dialog
+      append-to-body
+      title="Condition indicator settings"
+      v-model="openConditionIndicatorDialog"
+      width="1120px"
+    >
+      <!-- <table class="table-strip-input-data mgb-10">
                 <thead>
                     <tr>
                         <th>Status</th>
@@ -165,109 +181,104 @@
                     </tr>
                 </tbody>
             </table> -->
-        </el-dialog>
-    </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
 export default {
-    data() {
-        return {
-            openConditionIndicatorDialog: false
-        }
-    },
-    props: {
-        data: {
-            type: Object,
-            require: true
-        }
-    },
-    computed: {
-        testData: function () {
-            return this.data
-        },
-        conditionIndicatorSetting() {
-            return this.data.condition_indicator_setting
-        }
-    },
-    methods: {
-        calculator() {
-            this.$message.success('Calculating successfully')
-        },
-        clear() {
-            this.testData.h2 = ''
-            this.testData.ch4 = ''
-            this.testData.c2h2 = ''
-            this.testData.c2h4 = ''
-            this.testData.c2h6 = ''
-            this.testData.co = ''
-            this.testData.co2 = ''
-            this.testData.tdcg = ''
-            this.testData.status = ''
-            this.testData.condition_indicator = ''
-        },
-        nameColor(data) {
-            if (data === this.$constant.GOOD) {
-                return 'Good'
-            }
-            else if (data === this.$constant.FAIR) {
-                return 'Fair'
-            }
-            else if (data === this.$constant.POOR) {
-                return 'Poor'
-            }
-            else if (data === this.$constant.BAD) {
-                return 'Bad'
-            }
-            else {
-                return;
-            }
-        }
-    },
-    watch: {
-        testData: {
-            handler: function () {
-                if (
-                    this.testData.h2 !== '' &&
-                    this.testData.ch4 !== '' &&
-                    this.testData.c2h2 !== '' &&
-                    this.testData.c2h4 !== '' &&
-                    this.testData.c2h6 !== '' &&
-                    this.testData.co !== '' &&
-                    this.testData.co2 !== ''
-                ) {
-                    this.testData.tdcg =
-                        +this.testData.h2 +
-                        +this.testData.ch4 +
-                        +this.testData.c2h2 +
-                        +this.testData.c2h4 +
-                        +this.testData.c2h6 +
-                        +this.testData.co +
-                        +this.testData.co2
-                }
-            },
-            deep: true,
-            immediate: true
-        }
+  data() {
+    return {
+      openConditionIndicatorDialog: false
     }
+  },
+  props: {
+    data: {
+      type: Object,
+      require: true
+    }
+  },
+  computed: {
+    testData: function () {
+      return this.data
+    },
+    conditionIndicatorSetting() {
+      return this.data.condition_indicator_setting
+    }
+  },
+  methods: {
+    calculator() {
+      this.$message.success('Calculating successfully')
+    },
+    clear() {
+      this.testData.h2 = ''
+      this.testData.ch4 = ''
+      this.testData.c2h2 = ''
+      this.testData.c2h4 = ''
+      this.testData.c2h6 = ''
+      this.testData.co = ''
+      this.testData.co2 = ''
+      this.testData.tdcg = ''
+      this.testData.status = ''
+      this.testData.condition_indicator = ''
+    },
+    nameColor(data) {
+      if (data === this.$constant.GOOD) {
+        return 'Good'
+      } else if (data === this.$constant.FAIR) {
+        return 'Fair'
+      } else if (data === this.$constant.POOR) {
+        return 'Poor'
+      } else if (data === this.$constant.BAD) {
+        return 'Bad'
+      } else {
+        return
+      }
+    }
+  },
+  watch: {
+    testData: {
+      handler: function () {
+        if (
+          this.testData.h2 !== '' &&
+          this.testData.ch4 !== '' &&
+          this.testData.c2h2 !== '' &&
+          this.testData.c2h4 !== '' &&
+          this.testData.c2h6 !== '' &&
+          this.testData.co !== '' &&
+          this.testData.co2 !== ''
+        ) {
+          this.testData.tdcg =
+            +this.testData.h2 +
+            +this.testData.ch4 +
+            +this.testData.c2h2 +
+            +this.testData.c2h4 +
+            +this.testData.c2h6 +
+            +this.testData.co +
+            +this.testData.co2
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  }
 }
-
 </script>
 
 <style>
 .Good input {
-    background: #00CC00;
+  background: #00cc00;
 }
 
 .Fair input {
-    background: #ffff00;
+  background: #ffff00;
 }
 
 .Poor input {
-    background: #ff9900;
+  background: #ff9900;
 }
 
 .Bad input {
-    background: #ff3300;
+  background: #ff3300;
 }
 </style>

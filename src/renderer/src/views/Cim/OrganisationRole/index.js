@@ -1,9 +1,9 @@
-import IdentifiedObject from "../IdentifiedObject"
+import IdentifiedObject from '../IdentifiedObject'
 class OrganisationRole extends IdentifiedObject {
-    constructor() {
-        super()
-        this.organisation = null
-    }
+  constructor() {
+    super()
+    this.organisation = null
+  }
 }
 
 export default OrganisationRole

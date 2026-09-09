@@ -23,7 +23,7 @@ export default {
         if (node.expanded) {
           // Reset flag để force fetch lại
           node._childrenFetched = false
-          
+
           // Gọi fetchChildren tùy theo client hay server
           if (this.clientSlide) {
             await this.fetchChildren(node)
@@ -31,13 +31,13 @@ export default {
             await this.fetchChildrenServer(node)
           }
         }
-        
+
         // Xóa flag refreshing sau khi hoàn thành
         // Delay một chút để người dùng thấy hiệu ứng
         setTimeout(() => {
           this.setRefreshingState(node, false)
         }, 500)
-        
+
         this.$message.success('Node refreshed successfully')
       } catch (error) {
         console.error('[REFRESH] Error refreshing node:', error)
@@ -50,13 +50,13 @@ export default {
     // Helper function để set refreshing state cho node và tất cả children
     setRefreshingState(node, isRefreshing) {
       if (!node) return
-      
+
       // Set cho chính node
       node._isRefreshing = isRefreshing
-      
+
       // Set cho tất cả children (recursive)
       if (node.children && Array.isArray(node.children)) {
-        node.children.forEach(child => {
+        node.children.forEach((child) => {
           this.setRefreshingState(child, isRefreshing)
         })
       }
@@ -83,7 +83,11 @@ export default {
           }
         } else if (node.mode === 'substation') {
           const userStore = useUserStore()
-const result = await window.electronAPI.getSubstationEntityByMrid(node.mrid, userStore.user?.user_id, node.parentId)
+          const result = await window.electronAPI.getSubstationEntityByMrid(
+            node.mrid,
+            userStore.user?.user_id,
+            node.parentId
+          )
           if (result.success && result.data) {
             // Map từ Entity sang DTO
             const SubstationMapping = await import('@/views/Mapping/Substation/index')
@@ -114,7 +118,7 @@ const result = await window.electronAPI.getSubstationEntityByMrid(node.mrid, use
           // Fetch asset data based on asset type
           const assetType = node.asset
           let result = null
-          
+
           if (assetType === 'Transformer') {
             result = await window.electronAPI.getTransformerEntityByMrid(node.mrid)
           } else if (assetType === 'Circuit breaker') {

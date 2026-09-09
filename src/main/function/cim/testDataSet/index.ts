@@ -2,59 +2,76 @@ import db from '../../datacontext/index'
 import * as procedureDataSetFunc from '../procedureDataSet/index'
 
 export const getTestDataSetById = async (mrid: string) => {
-    try {
-        const procedureDataSet: any = await procedureDataSetFunc.getProcedureDataSetById(mrid)
-        if (!procedureDataSet.success) {
-            return { success: false, data: null, message: 'ProcedureDataSet not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get(
-                `SELECT * FROM test_dataset WHERE mrid=?`,
-                [mrid],
-                (err: any, row: any) => {
-                    if (err) return reject({ success: false, err, message: 'Get testDataSet by id failed' })
-                    if (!row) return resolve({ success: false, data: null, message: 'TestDataSet not found' })
-                    return resolve({ success: true, data: { ...procedureDataSet.data, ...row }, message: 'Get testDataSet by id completed' })
-                }
-            )
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get testDataSet by id failed' }
+  try {
+    const procedureDataSet: any = await procedureDataSetFunc.getProcedureDataSetById(mrid)
+    if (!procedureDataSet.success) {
+      return { success: false, data: null, message: 'ProcedureDataSet not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM test_dataset WHERE mrid=?`, [mrid], (err: any, row: any) => {
+        if (err) return reject({ success: false, err, message: 'Get testDataSet by id failed' })
+        if (!row) return resolve({ success: false, data: null, message: 'TestDataSet not found' })
+        return resolve({
+          success: true,
+          data: { ...procedureDataSet.data, ...row },
+          message: 'Get testDataSet by id completed'
+        })
+      })
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get testDataSet by id failed' }
+  }
 }
 
 export const getTestDataSetByWorkTaskId = async (workTaskId: string) => {
-    try {
-        return new Promise((resolve, reject) => {
-            db.all(
-                `SELECT td.*, pd.*, d.*, io.*
+  try {
+    return new Promise((resolve, reject) => {
+      db.all(
+        `SELECT td.*, pd.*, d.*, io.*
                  FROM test_dataset td
                  LEFT JOIN procedure_dataset pd ON td.mrid = pd.mrid
                  LEFT JOIN document d ON td.mrid = d.mrid
                  LEFT JOIN identified_object io ON td.mrid = io.mrid
                  WHERE pd.work_task = ?`,
-                [workTaskId],
-                (err: any, rows: any) => {
-                    if (err) return reject({ success: false, err, message: 'Get testDataSet by workTaskId failed' })
-                    if (!rows || rows.length === 0) return resolve({ success: false, data: [], message: 'No testDataSet found for this workTaskId' })
-                    return resolve({ success: true, data: rows, message: 'Get testDataSet by workTaskId completed' })
-                }
-            )
-        });
-    } catch (err) {
-        return { success: false, err, message: 'Get testDataSet by workTaskId failed' }
-    }
+        [workTaskId],
+        (err: any, rows: any) => {
+          if (err)
+            return reject({ success: false, err, message: 'Get testDataSet by workTaskId failed' })
+          if (!rows || rows.length === 0)
+            return resolve({
+              success: false,
+              data: [],
+              message: 'No testDataSet found for this workTaskId'
+            })
+          return resolve({
+            success: true,
+            data: rows,
+            message: 'Get testDataSet by workTaskId completed'
+          })
+        }
+      )
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get testDataSet by workTaskId failed' }
+  }
 }
 
 export const insertTestDataSetTransaction = async (testDataSet: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const procResult: any = await procedureDataSetFunc.insertProcedureDataSetTransaction(testDataSet, dbsql)
-            if (!procResult.success) {
-                return reject({ success: false, message: 'Insert procedureDataSet failed', err: procResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO test_dataset(
+  return new Promise(async (resolve, reject) => {
+    try {
+      const procResult: any = await procedureDataSetFunc.insertProcedureDataSetTransaction(
+        testDataSet,
+        dbsql
+      )
+      if (!procResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert procedureDataSet failed',
+          err: procResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO test_dataset(
                     mrid, conclusion, specimen_id, specimen_to_lab_date_time
                 ) VALUES (?, ?, ?, ?)
                 ON CONFLICT(mrid) DO UPDATE SET
@@ -62,64 +79,85 @@ export const insertTestDataSetTransaction = async (testDataSet: any, dbsql: any)
                     specimen_id = excluded.specimen_id,
                     specimen_to_lab_date_time = excluded.specimen_to_lab_date_time
                 `,
-                [
-                    testDataSet.mrid,
-                    testDataSet.conclusion,
-                    testDataSet.specimen_id,
-                    testDataSet.specimen_to_lab_date_time
-                ],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Insert testDataSet failed' })
-                    return resolve({ success: true, data: testDataSet, message: 'Insert testDataSet completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Insert testDataSet failed' })
+        [
+          testDataSet.mrid,
+          testDataSet.conclusion,
+          testDataSet.specimen_id,
+          testDataSet.specimen_to_lab_date_time
+        ],
+        function (err: any) {
+          if (err) return reject({ success: false, err, message: 'Insert testDataSet failed' })
+          return resolve({
+            success: true,
+            data: testDataSet,
+            message: 'Insert testDataSet completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Insert testDataSet failed' })
+    }
+  })
 }
 
-export const updateTestDataSetByIdTransaction = async (mrid: string, testDataSet: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const procResult: any = await procedureDataSetFunc.updateProcedureDataSetByIdTransaction(mrid, testDataSet, dbsql)
-            if (!procResult.success) {
-                return reject({ success: false, message: 'Update procedureDataSet failed', err: procResult.err })
-            }
-            dbsql.run(
-                `UPDATE test_dataset SET
+export const updateTestDataSetByIdTransaction = async (
+  mrid: string,
+  testDataSet: any,
+  dbsql: any
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const procResult: any = await procedureDataSetFunc.updateProcedureDataSetByIdTransaction(
+        mrid,
+        testDataSet,
+        dbsql
+      )
+      if (!procResult.success) {
+        return reject({
+          success: false,
+          message: 'Update procedureDataSet failed',
+          err: procResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE test_dataset SET
                     conclusion = ?,
                     specimen_id = ?,
                     specimen_to_lab_date_time = ?
                 WHERE mrid = ?`,
-                [
-                    testDataSet.conclusion,
-                    testDataSet.specimen_id,
-                    testDataSet.specimen_to_lab_date_time,
-                    mrid
-                ],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Update testDataSet failed' })
-                    return resolve({ success: true, data: testDataSet, message: 'Update testDataSet completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Update testDataSet failed' })
+        [
+          testDataSet.conclusion,
+          testDataSet.specimen_id,
+          testDataSet.specimen_to_lab_date_time,
+          mrid
+        ],
+        function (err: any) {
+          if (err) return reject({ success: false, err, message: 'Update testDataSet failed' })
+          return resolve({
+            success: true,
+            data: testDataSet,
+            message: 'Update testDataSet completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Update testDataSet failed' })
+    }
+  })
 }
 
 export const deleteTestDataSetByIdTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            dbsql.run("DELETE FROM test_dataset WHERE mrid=?", [mrid], function (this: any, err: any) {
-                if (err) return reject({ success: false, err, message: 'Delete testDataSet failed' })
-                if (this.changes === 0) return resolve({ success: false, data: null, message: 'TestDataSet not found' })
-                procedureDataSetFunc.deleteProcedureDataSetByIdTransaction(mrid, dbsql)
-                return resolve({ success: true, data: null, message: 'Delete testDataSet completed' })
-            })
-        } catch (err) {
-            return reject({ success: false, err, message: 'Delete testDataSet failed' })
-        }
-    })
+  return new Promise(async (resolve, reject) => {
+    try {
+      dbsql.run('DELETE FROM test_dataset WHERE mrid=?', [mrid], function (this: any, err: any) {
+        if (err) return reject({ success: false, err, message: 'Delete testDataSet failed' })
+        if (this.changes === 0)
+          return resolve({ success: false, data: null, message: 'TestDataSet not found' })
+        procedureDataSetFunc.deleteProcedureDataSetByIdTransaction(mrid, dbsql)
+        return resolve({ success: true, data: null, message: 'Delete testDataSet completed' })
+      })
+    } catch (err) {
+      return reject({ success: false, err, message: 'Delete testDataSet failed' })
+    }
+  })
 }

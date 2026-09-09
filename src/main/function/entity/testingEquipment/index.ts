@@ -1,85 +1,714 @@
 import db from '../../datacontext/index'
+import {
+  insertAssetTransaction,
+  getAssetById,
+  deleteAssetByIdTransaction
+} from '../../cim/asset/index'
+import {
+  insertProductAssetModelTransaction,
+  getProductAssetModelById
+} from '../../cim/productAssetModel/index'
+import { insertLifecycleDateTransaction, getLifecycleDateById } from '../../cim/lifecycleDate/index'
+import { insertInUseDateTransaction, getInUseDateById } from '../../cim/inUseDate/index'
+import { insertSoftwareLicenseTransaction, getSoftwareLicenseById } from '../softwareLicense/index'
+import {
+  insertSoftwareLicenseTestingEquipmentTransaction,
+  getSoftwareLicenseByTestingEquipmentId,
+  deleteSoftwareLicenseTestingEquipmentTransaction,
+  deleteSoftwareLicenseTestingEquipmentByTestingEquipmentIdTransaction
+} from '../softwareLicenseTestingEquipment/index'
+import {
+  insertCalibrationRecordTransaction,
+  getCalibrationRecordByTestingEquipmentId,
+  deleteCalibrationRecordByIdTransaction
+} from '../calibrationRecord/index'
+import {
+  insertAccessoryTestingEquipmentTransaction,
+  getAccessoryDetailsByEquipmentId,
+  deleteAccessoryTestingEquipmentTransaction,
+  deleteAccessoryTestingEquipmentByEquipmentIdTransaction
+} from '../accessoryTestingEquipment/index'
+import {
+  insertActivityRecordTransaction,
+  getActivityRecordByAssetId,
+  deleteActivityRecordByIdTransaction
+} from '../../cim/activityRecord/index'
+import { uploadAttachmentTransaction, getAttachmentByForeignIdAndType } from '../attachment/index'
+import {
+  insertUserIdentifiedObjectTransaction,
+  getUserIdentifiedObjectByIdentifiedObjectId
+} from '../userIdentifiedObject/index'
+import { insertUserTransaction } from '../user/index'
 
-export const getTestingEquipmentById = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        db.get(
-            `SELECT * FROM testing_equipment WHERE mrid=?`,
-            [mrid],
-            (err: Error | null, row: unknown) => {
-                if (err) return reject({ success: false, err, message: 'Get testingEquipment by id failed' })
-                if (!row) return resolve({ success: false, data: null, message: 'TestingEquipment not found' })
-                return resolve({ success: true, data: row, message: 'Get testingEquipment by id completed' })
-            }
-        )
+// Chạy 1 câu lệnh SQL trực tiếp trên connection chính (dùng cho BEGIN/COMMIT/ROLLBACK)
+const runAsync = (sql: string, params: any[] = []) => {
+  return new Promise<void>((resolve, reject) => {
+    db.run(sql, params, function (err: any) {
+      if (err) reject(err)
+      else resolve()
     })
+  })
+}
+
+// Danh sách rút gọn cho màn hình list (join asset + product_asset_model + đếm repair).
+// Lọc theo user hiện tại qua user_identified_object; loại phụ kiện.
+export const getAllTestingEquipmentList = async (userId: string) => {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT te.mrid AS mrid,
+                    io.name AS name,
+                    a.serial_number AS serial,
+                    a.type AS type,
+                    pam.manufacturer AS manufacturer,
+                    pam.model_number AS model,
+                    te.asset_tag AS asset_tag,
+                    a.in_use_state AS status,
+                    (SELECT cr.calibration_date FROM calibration_record cr
+                     WHERE cr.testing_equipment = te.mrid
+                     ORDER BY substr(cr.calibration_date,7,4)||substr(cr.calibration_date,1,2)||substr(cr.calibration_date,4,2) DESC
+                     LIMIT 1) AS calibration_date,
+                    te.is_accessory AS is_accessory,
+                    (SELECT COUNT(*) FROM activity_record ar
+                     WHERE ar.asset = te.mrid AND ar.type = 'Repair') AS repair_count
+                    ,
+                    (SELECT COUNT(*) FROM activity_record ar
+                     WHERE ar.asset = te.mrid AND ar.type = 'Repair' AND ar.severity = 'InProgress') AS repair_in_progress_count
+             FROM testing_equipment te
+             JOIN asset a ON a.mrid = te.mrid
+             LEFT JOIN identified_object io ON io.mrid = te.mrid
+             LEFT JOIN product_asset_model pam ON pam.mrid = a.product_asset_model
+             WHERE
+                -- máy chính thuộc user
+                te.mrid IN (SELECT identified_object_id FROM user_identified_object WHERE user_id = ?)
+                -- hoặc là phụ kiện của máy chính thuộc user (qua junction)
+                OR te.mrid IN (
+                    SELECT x.accessory FROM accessory_testing_equipment x
+                    WHERE x.equipment IN (
+                        SELECT identified_object_id FROM user_identified_object WHERE user_id = ?
+                    )
+                )
+             ORDER BY COALESCE(te.is_accessory, 0), io.name`,
+      [userId, userId],
+      (err: any, rows: any) => {
+        if (err)
+          return reject({ success: false, err, message: 'Get testing equipment list failed' })
+        return resolve({
+          success: true,
+          data: rows || [],
+          message: 'Get testing equipment list completed'
+        })
+      }
+    )
+  })
+}
+
+// Kho phụ kiện: các testing_equipment được đánh dấu is_accessory = 1 (cho bảng chọn khi Add accessory)
+export const getAllAccessories = async () => {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT te.mrid AS mrid,
+                    io.name AS name,
+                    io.description AS description,
+                    a.serial_number AS serial_no,
+                    a.product_asset_model AS product_asset_model,
+                    pam.model_number AS model
+             FROM testing_equipment te
+             JOIN asset a ON a.mrid = te.mrid
+             LEFT JOIN identified_object io ON io.mrid = te.mrid
+             LEFT JOIN product_asset_model pam ON pam.mrid = a.product_asset_model
+             WHERE te.is_accessory = 1
+             ORDER BY io.name`,
+      [],
+      (err: any, rows: any) => {
+        if (err) return reject({ success: false, err, message: 'Get accessories pool failed' })
+        return resolve({
+          success: true,
+          data: rows || [],
+          message: 'Get accessories pool completed'
+        })
+      }
+    )
+  })
+}
+
+// Lấy testingEquipment theo mrid
+export const getTestingEquipmentById = async (mrid: string) => {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT * FROM testing_equipment WHERE mrid=?`, [mrid], (err: any, row: any) => {
+      if (err) return reject({ success: false, err, message: 'Get testingEquipment by id failed' })
+      if (!row)
+        return resolve({ success: false, data: null, message: 'TestingEquipment not found' })
+      return resolve({ success: true, data: row, message: 'Get testingEquipment by id completed' })
+    })
+  })
 }
 
 export const getTestingEquipmentByWorkId = async (workId: string) => {
-    return new Promise((resolve, reject) => {
-        db.all(
-            `SELECT * FROM testing_equipment WHERE work_id=?`,
-            [workId],
-            (err: Error | null, rows: unknown[]) => {
-                if (err) return reject({ success: false, err, message: 'Get testingEquipment by workId failed' })
-                if (!rows || rows.length === 0) return resolve({ success: false, data: null, message: 'TestingEquipment not found' })
-                return resolve({ success: true, data: rows, message: 'Get testingEquipment by workId completed' })
-            }
-        )
-    })
-}
-
-export const insertTestingEquipmentTransaction = async (
-    testingEquipment: { mrid: string; model: string | null; serial_number: string | null; work_id: string | null; calibration_date: string | null },
-    dbsql: typeof db
-) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `INSERT INTO testing_equipment(
-                mrid, model, serial_number, work_id, calibration_date
-            ) VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT(mrid) DO UPDATE SET
-                model = excluded.model,
-                serial_number = excluded.serial_number,
-                work_id = excluded.work_id,
-                calibration_date = excluded.calibration_date
-            `,
-            [testingEquipment.mrid, testingEquipment.model, testingEquipment.serial_number, testingEquipment.work_id, testingEquipment.calibration_date],
-            function (this: { lastID: number; changes: number }, err: Error | null) {
-                if (err) return reject({ success: false, err, message: 'Insert testingEquipment failed' })
-                return resolve({ success: true, data: testingEquipment, message: 'Insert testingEquipment completed' })
-            }
-        )
-    })
-}
-
-export const updateTestingEquipmentByIdTransaction = async (
-    mrid: string,
-    testingEquipment: { model: string | null; serial_number: string | null; work_id: string | null; calibration_date: string | null },
-    dbsql: typeof db
-) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `UPDATE testing_equipment SET
-                model = ?,
-                serial_number = ?,
-                work_id = ?,
-                calibration_date = ?
-            WHERE mrid = ?`,
-            [testingEquipment.model, testingEquipment.serial_number, testingEquipment.work_id, testingEquipment.calibration_date, mrid],
-            function (this: { lastID: number; changes: number }, err: Error | null) {
-                if (err) return reject({ success: false, err, message: 'Update testingEquipment failed' })
-                return resolve({ success: true, data: testingEquipment, message: 'Update testingEquipment completed' })
-            }
-        )
-    })
-}
-
-export const deleteTestingEquipmentByIdTransaction = async (mrid: string, dbsql: typeof db) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run('DELETE FROM testing_equipment WHERE mrid=?', [mrid], function (this: { lastID: number; changes: number }, err: Error | null) {
-            if (err) return reject({ success: false, err, message: 'Delete testingEquipment failed' })
-            if (this.changes === 0) return resolve({ success: false, data: null, message: 'TestingEquipment not found' })
-            return resolve({ success: true, data: null, message: 'Delete testingEquipment completed' })
+  return new Promise((resolve, reject) => {
+    // JOIN để lấy lại model/serial/calibration cho JobView
+    // (các cột này đã chuyển sang asset/identified_object/product_asset_model/calibration_record)
+    db.all(
+      `SELECT te.*,
+                    COALESCE(pam.model_number, io.name) AS model,
+                    a.serial_number AS serial_number,
+                    a.in_use_state AS status,
+                    (SELECT cr.calibration_date FROM calibration_record cr
+                     WHERE cr.testing_equipment = te.mrid
+                     ORDER BY substr(cr.calibration_date,7,4)||substr(cr.calibration_date,1,2)||substr(cr.calibration_date,4,2) DESC
+                     LIMIT 1) AS calibration_date
+             FROM testing_equipment te
+             JOIN asset a ON a.mrid = te.mrid
+             LEFT JOIN identified_object io ON io.mrid = te.mrid
+             LEFT JOIN product_asset_model pam ON pam.mrid = a.product_asset_model
+             WHERE te.work_id=?`,
+      [workId],
+      (err: any, rows: any) => {
+        if (err)
+          return reject({ success: false, err, message: 'Get testingEquipment by workId failed' })
+        if (!rows || rows.length === 0)
+          return resolve({ success: false, data: null, message: 'TestingEquipment not found' })
+        return resolve({
+          success: true,
+          data: rows,
+          message: 'Get testingEquipment by workId completed'
         })
+      }
+    )
+  })
+}
+
+// Usage history is inferred from job/test links instead of a separate table.
+// Some rows store test_type_id as work_task.mrid, while the current schema/UI
+// store it as procedure.mrid. Support both shapes across all equipment link tables.
+const TE_TEST_TYPE_TABLES = [
+  'transformer_testing_equipment_test_type',
+  'voltage_transformer_testing_equipment_test_type',
+  'current_transformer_testing_equipment_test_type',
+  'circuit_breaker_testing_equipment_test_type',
+  'power_cable_testing_equipment_test_type',
+  'surge_arrester_testing_equipment_test_type',
+  'reactor_testing_equipment_test_type',
+  'capacitor_testing_equipment_test_type',
+  'disconnector_testing_equipment_test_type',
+  'rotating_machine_testing_equipment_test_type',
+  'bushing_testing_equipment_test_type'
+]
+
+export const getTestingEquipmentUsageHistory = async (teMrid: string) => {
+  const unionSql = TE_TEST_TYPE_TABLES.map(
+    (t) => `
+        SELECT DISTINCT
+               ow.execution_date            AS date,
+               io_w.name                    AS job_name,
+               COALESCE(io_a.name, a.serial_number) AS asset_name,
+               COALESCE(io_wt.name, io_p.name) AS test_type,
+               ow.tested_by                 AS tested_by
+        FROM ${t} l
+        LEFT JOIN work_task wt ON wt.mrid = l.test_type_id
+        LEFT JOIN testing_equipment te ON te.mrid = l.testing_equipment_id
+        JOIN old_work ow ON ow.mrid = COALESCE(wt.work, te.work_id)
+        LEFT JOIN identified_object io_w ON io_w.mrid = ow.mrid
+        LEFT JOIN identified_object io_a ON io_a.mrid = ow.asset_id
+        LEFT JOIN asset a ON a.mrid = ow.asset_id
+        LEFT JOIN identified_object io_wt ON io_wt.mrid = wt.mrid
+        LEFT JOIN identified_object io_p ON io_p.mrid = l.test_type_id
+        WHERE l.testing_equipment_id = ?`
+  ).join('\n        UNION\n')
+
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT * FROM (${unionSql}) ORDER BY date DESC`,
+      TE_TEST_TYPE_TABLES.map(() => teMrid),
+      (err: any, rows: any) => {
+        if (err)
+          return reject({
+            success: false,
+            err,
+            message: 'Get testingEquipment usage history failed'
+          })
+        return resolve({
+          success: true,
+          data: rows || [],
+          message: 'Get testingEquipment usage history completed'
+        })
+      }
+    )
+  })
+}
+
+// Thêm mới testingEquipment
+export const insertTestingEquipmentTransaction = async (testingEquipment: any, dbsql: any) => {
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `INSERT INTO testing_equipment(
+                mrid, work_id, asset_tag, is_accessory
+            ) VALUES (?, ?, ?, ?)
+            ON CONFLICT(mrid) DO UPDATE SET
+                work_id = excluded.work_id,
+                asset_tag = excluded.asset_tag,
+                is_accessory = excluded.is_accessory
+            `,
+      [
+        testingEquipment.mrid,
+        testingEquipment.work_id,
+        testingEquipment.asset_tag,
+        testingEquipment.is_accessory != null ? testingEquipment.is_accessory : 0
+      ],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Insert testingEquipment failed' })
+        return resolve({
+          success: true,
+          data: testingEquipment,
+          message: 'Insert testingEquipment completed'
+        })
+      }
+    )
+  })
+}
+
+// Đảm bảo asset nền tồn tại (FK: testing_equipment.mrid -> asset.mrid).
+// Dùng cho luồng save job: equipment gõ tay chưa có trong kho -> tạo asset tối thiểu,
+// equipment chọn từ kho -> ON CONFLICT DO NOTHING, không đụng data manager.
+export const ensureTestingEquipmentAssetTransaction = async (equipment: any, dbsql: any) => {
+  const runOne = (sql: string, params: any[]) =>
+    new Promise<void>((resolve, reject) => {
+      dbsql.run(sql, params, function (err: any) {
+        if (err)
+          return reject({
+            success: false,
+            err,
+            message: 'Ensure asset for testingEquipment failed'
+          })
+        return resolve()
+      })
     })
+  // Thứ tự FK: identified_object -> asset (asset.mrid FK -> identified_object.mrid)
+  await runOne(
+    `INSERT INTO identified_object(mrid, name) VALUES (?, ?)
+         ON CONFLICT(mrid) DO NOTHING`,
+    [equipment.mrid, equipment.model || null]
+  )
+  await runOne(
+    `INSERT INTO asset(mrid, serial_number) VALUES (?, ?)
+         ON CONFLICT(mrid) DO NOTHING`,
+    [equipment.mrid, equipment.serial_number || null]
+  )
+  return { success: true, data: equipment, message: 'Ensure asset for testingEquipment completed' }
+}
+
+// calibration_date của form job -> calibration_record (cột trong testing_equipment đã bị bỏ).
+// PHẢI gọi SAU insertTestingEquipmentTransaction (FK: calibration_record.testing_equipment -> testing_equipment.mrid).
+// mrid định danh '<te>-jobcal' để save nhiều lần không nhân bản; bỏ qua nếu đã có record trùng ngày.
+export const persistJobCalibrationTransaction = async (equipment: any, dbsql: any) => {
+  if (!equipment.calibration_date)
+    return { success: true, data: null, message: 'No calibration date to persist' }
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `INSERT INTO calibration_record(mrid, testing_equipment, calibration_date)
+             SELECT ?, ?, ?
+             WHERE NOT EXISTS (
+                SELECT 1 FROM calibration_record WHERE testing_equipment = ? AND calibration_date = ?
+             )
+             ON CONFLICT(mrid) DO UPDATE SET calibration_date = excluded.calibration_date`,
+      [
+        `${equipment.mrid}-jobcal`,
+        equipment.mrid,
+        equipment.calibration_date,
+        equipment.mrid,
+        equipment.calibration_date
+      ],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Persist job calibration failed' })
+        return resolve({
+          success: true,
+          data: equipment,
+          message: 'Persist job calibration completed'
+        })
+      }
+    )
+  })
+}
+
+// Gỡ equipment khỏi work (không xóa bản ghi — equipment có thể là máy trong kho manager)
+export const unlinkTestingEquipmentFromWorkTransaction = async (mrid: string, dbsql: any) => {
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `UPDATE testing_equipment SET work_id = NULL WHERE mrid = ?`,
+      [mrid],
+      function (err: any) {
+        if (err)
+          return reject({
+            success: false,
+            err,
+            message: 'Unlink testingEquipment from work failed'
+          })
+        return resolve({
+          success: true,
+          data: null,
+          message: 'Unlink testingEquipment from work completed'
+        })
+      }
+    )
+  })
+}
+
+// Cập nhật testingEquipment
+export const updateTestingEquipmentByIdTransaction = async (
+  mrid: string,
+  testingEquipment: any,
+  dbsql: any
+) => {
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `UPDATE testing_equipment SET
+                asset_tag = ?, work_id = ?, is_accessory = ?
+            WHERE mrid = ?`,
+      [
+        testingEquipment.asset_tag,
+        testingEquipment.work_id,
+        testingEquipment.is_accessory != null ? testingEquipment.is_accessory : 0,
+        mrid
+      ],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Update testingEquipment failed' })
+        return resolve({
+          success: true,
+          data: testingEquipment,
+          message: 'Update testingEquipment completed'
+        })
+      }
+    )
+  })
+}
+
+// Xóa testingEquipment
+export const deleteTestingEquipmentByIdTransaction = async (mrid: string, dbsql: any) => {
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      'DELETE FROM testing_equipment WHERE mrid=?',
+      [mrid],
+      function (this: { changes: number }, err: any) {
+        if (err) return reject({ success: false, err, message: 'Delete testingEquipment failed' })
+        if (this.changes === 0)
+          return resolve({ success: false, data: null, message: 'TestingEquipment not found' })
+        return resolve({ success: true, data: null, message: 'Delete testingEquipment completed' })
+      }
+    )
+  })
+}
+
+/* =========================================================================
+ * FULL ENTITY (gom tất cả thông tin của 1 testing equipment)
+ *
+ * entity = {
+ *   asset:            {...},   // bản ghi cim asset (asset.mrid === testingEquipment.mrid)
+ *   testingEquipment: { mrid, work_id, asset_tag },
+ *   softwareLicenses: [ { mrid, option_name, ... } ],          // n-n qua software_license_testing_equipment
+ *   calibrations:     [ { mrid, testing_equipment, ... } ],    // 1-n calibration_record
+ *   repairs:          [ { mrid, reason, status, provider, cost, ... } ], // 1-n activity_record (type='Repair', asset=mrid)
+ *   accessories:      [ { equipment, accessory } ]             // n-n accessory_testing_equipment (accessory = mrid của TE phụ kiện)
+ * }
+ * old_entity: trạng thái cũ (cùng shape) để tính phần cần xóa. Truyền {} khi tạo mới.
+ * ========================================================================= */
+
+// Tạo mới / cập nhật toàn bộ thông tin của 1 testing equipment trong 1 transaction
+export const insertTestingEquipmentEntity = async (old_entity: any, entity: any) => {
+  try {
+    const teMrid = entity.testingEquipment && entity.testingEquipment.mrid
+    if (!teMrid) {
+      return {
+        success: false,
+        error: new Error('MRID is required for testing equipment entity'),
+        message: ''
+      }
+    }
+
+    old_entity = old_entity || {}
+    const oldLicenses = old_entity.softwareLicenses || []
+    const oldCalibrations = old_entity.calibrations || []
+    const oldRepairs = old_entity.repairs || []
+    const oldAccessories = old_entity.accessories || []
+
+    await runAsync('BEGIN TRANSACTION')
+
+    // 0a) đảm bảo user tồn tại trong bảng user (FK cho user_identified_object)
+    const ownerUserId =
+      (entity.user && entity.user.user_id) ||
+      (entity.userIdentifiedObject && entity.userIdentifiedObject.user_id)
+    if (ownerUserId) {
+      await insertUserTransaction(
+        {
+          user_id: ownerUserId,
+          role: entity.user && entity.user.role != null ? entity.user.role : null,
+          permission: entity.user && entity.user.permission != null ? entity.user.permission : null,
+          username: entity.user && entity.user.username != null ? entity.user.username : null,
+          token: entity.user && entity.user.token != null ? entity.user.token : null,
+          group_user: entity.user && entity.user.group_user != null ? entity.user.group_user : null
+        },
+        db
+      )
+    }
+
+    // 0) product_asset_model + lifecycle_date (asset tham chiếu FK tới 2 bảng này -> insert trước)
+    if (entity.lifecycleDate && entity.lifecycleDate.mrid) {
+      await insertLifecycleDateTransaction(entity.lifecycleDate, db)
+      entity.asset.lifecycle_date = entity.lifecycleDate.mrid
+    }
+    if (entity.inUseDate && entity.inUseDate.mrid) {
+      await insertInUseDateTransaction(entity.inUseDate, db)
+      entity.asset.in_use_date = entity.inUseDate.mrid
+    }
+    if (entity.productAssetModel && entity.productAssetModel.mrid) {
+      await insertProductAssetModelTransaction(entity.productAssetModel, db)
+      entity.asset.product_asset_model = entity.productAssetModel.mrid
+    }
+
+    // 1) asset (nền) — nếu vướng FK location thì thử lại với location = null
+    let assetResult: any = await insertAssetTransaction(entity.asset, db)
+    if (!assetResult.success && assetResult.err && assetResult.err.code === 'SQLITE_CONSTRAINT') {
+      entity.asset.location = null
+      assetResult = await insertAssetTransaction(entity.asset, db)
+    }
+    if (!assetResult.success) {
+      throw new Error(`Insert asset failed: ${assetResult.message}`)
+    }
+
+    // 2) testing_equipment
+    await insertTestingEquipmentTransaction(entity.testingEquipment, db)
+
+    // 3) software licenses (n-n): upsert license + đảm bảo có link; link cũ bị bỏ thì xóa link
+    const newLicenseIds = (entity.softwareLicenses || []).map((l: any) => l.mrid).filter(Boolean)
+    for (const lic of entity.softwareLicenses || []) {
+      if (!lic.mrid) continue
+      await insertSoftwareLicenseTransaction(lic, db)
+      await insertSoftwareLicenseTestingEquipmentTransaction(
+        { software_license: lic.mrid, testing_equipment: teMrid },
+        db
+      )
+    }
+    for (const oldLic of oldLicenses) {
+      if (oldLic.mrid && !newLicenseIds.includes(oldLic.mrid)) {
+        // chỉ gỡ liên kết, không xóa hẳn license (có thể đang dùng chung máy khác)
+        await deleteSoftwareLicenseTestingEquipmentTransaction(oldLic.mrid, teMrid, db)
+      }
+    }
+
+    // 4) calibration records (1-n): upsert; bản ghi cũ bị bỏ thì xóa hẳn
+    const newCalibIds = (entity.calibrations || []).map((c: any) => c.mrid).filter(Boolean)
+    for (const cal of entity.calibrations || []) {
+      if (!cal.mrid) continue
+      cal.testing_equipment = teMrid
+      await insertCalibrationRecordTransaction(cal, db)
+    }
+    for (const oldCal of oldCalibrations) {
+      if (oldCal.mrid && !newCalibIds.includes(oldCal.mrid)) {
+        await deleteCalibrationRecordByIdTransaction(oldCal.mrid, db)
+      }
+    }
+
+    // 5) repairs (activity_record type='Repair', 1-n theo asset); insert tự lo identified_object cha
+    const newRepairIds = (entity.repairs || []).map((r: any) => r.mrid).filter(Boolean)
+    for (const rep of entity.repairs || []) {
+      if (!rep.mrid) continue
+      rep.type = 'Repair'
+      rep.asset = teMrid
+      await insertActivityRecordTransaction(rep, db)
+    }
+    for (const oldRep of oldRepairs) {
+      if (oldRep.mrid && !newRepairIds.includes(oldRep.mrid)) {
+        await deleteActivityRecordByIdTransaction(oldRep.mrid, db)
+      }
+    }
+
+    // 6) accessories (n-n): mỗi phụ kiện là 1 testing_equipment con (asset) + link
+    const newAccIds = (entity.accessories || [])
+      .map((a: any) => a.asset && a.asset.mrid)
+      .filter(Boolean)
+    for (const acc of entity.accessories || []) {
+      if (!acc.asset || !acc.asset.mrid) continue
+      // 6a) model -> product_asset_model (nếu có)
+      if (
+        acc.productAssetModel &&
+        acc.productAssetModel.mrid &&
+        acc.productAssetModel.model_number
+      ) {
+        await insertProductAssetModelTransaction(acc.productAssetModel, db)
+        acc.asset.product_asset_model = acc.productAssetModel.mrid
+      } else {
+        acc.asset.product_asset_model = null
+      }
+      // 6b) asset (+ identified_object) của phụ kiện
+      await insertAssetTransaction(acc.asset, db)
+      // 6c) testing_equipment con
+      await insertTestingEquipmentTransaction(acc.testingEquipment, db)
+      // 6d) link n-n
+      await insertAccessoryTestingEquipmentTransaction(
+        { equipment: teMrid, accessory: acc.asset.mrid },
+        db
+      )
+      // 6e) gán phụ kiện cho user (để hiện trong list của user)
+      if (
+        acc.userIdentifiedObject &&
+        acc.userIdentifiedObject.mrid &&
+        acc.userIdentifiedObject.user_id
+      ) {
+        acc.userIdentifiedObject.identified_object_id = acc.asset.mrid
+        await insertUserIdentifiedObjectTransaction(acc.userIdentifiedObject, db)
+      }
+    }
+    // gỡ link phụ kiện bị bỏ (giữ nguyên asset vì có thể dùng chung máy khác)
+    for (const oldAcc of oldAccessories) {
+      const oldMrid = oldAcc.asset ? oldAcc.asset.mrid : oldAcc.mrid || oldAcc.accessory
+      if (oldMrid && !newAccIds.includes(oldMrid)) {
+        await deleteAccessoryTestingEquipmentTransaction(teMrid, oldMrid, db)
+      }
+    }
+
+    // 7) attachment (1 record, path = JSON danh sách file [{path}])
+    if (entity.attachment && entity.attachment.id) {
+      entity.attachment.id_foreign = teMrid
+      entity.attachment.type = 'asset'
+      await uploadAttachmentTransaction(entity.attachment, db)
+    }
+
+    // 8) user link (user_identified_object): gán thiết bị cho user hiện tại
+    if (
+      entity.userIdentifiedObject &&
+      entity.userIdentifiedObject.mrid &&
+      entity.userIdentifiedObject.user_id
+    ) {
+      entity.userIdentifiedObject.identified_object_id = teMrid
+      await insertUserIdentifiedObjectTransaction(entity.userIdentifiedObject, db)
+    }
+
+    await runAsync('COMMIT')
+    return { success: true, data: entity, message: 'Testing equipment entity saved successfully' }
+  } catch (error: any) {
+    await runAsync('ROLLBACK')
+    console.error('Error in insertTestingEquipmentEntity:', error)
+    return {
+      success: false,
+      error,
+      message: `Error saving testing equipment entity: ${error.message || 'Unknown error'}`
+    }
+  }
+}
+
+// Lấy toàn bộ thông tin của 1 testing equipment theo mrid
+export const getTestingEquipmentEntity = async (mrid: string) => {
+  try {
+    if (!mrid) return { success: false, error: new Error('Invalid ID') }
+
+    const entity: any = {
+      asset: null,
+      productAssetModel: null,
+      lifecycleDate: null,
+      inUseDate: null,
+      testingEquipment: null,
+      attachment: null,
+      userIdentifiedObject: null,
+      softwareLicenses: [],
+      calibrations: [],
+      repairs: [],
+      accessories: []
+    }
+
+    const assetRes: any = await getAssetById(mrid)
+    if (!assetRes.success) {
+      return {
+        success: false,
+        error: assetRes.err || new Error('Asset not found'),
+        message: `Asset ${mrid} not found`
+      }
+    }
+    entity.asset = assetRes.data
+
+    // product_asset_model + lifecycle_date (theo FK trên asset)
+    if (entity.asset.product_asset_model) {
+      const pamRes: any = await getProductAssetModelById(entity.asset.product_asset_model)
+      if (pamRes.success && pamRes.data) entity.productAssetModel = pamRes.data
+    }
+    if (entity.asset.lifecycle_date) {
+      const lcRes: any = await getLifecycleDateById(entity.asset.lifecycle_date)
+      if (lcRes.success && lcRes.data) entity.lifecycleDate = lcRes.data
+    }
+    if (entity.asset.in_use_date) {
+      const iudRes: any = await getInUseDateById(entity.asset.in_use_date)
+      if (iudRes.success && iudRes.data) entity.inUseDate = iudRes.data
+    }
+
+    const teRes: any = await getTestingEquipmentById(mrid)
+    if (teRes.success) entity.testingEquipment = teRes.data
+
+    // calibration records
+    const calRes: any = await getCalibrationRecordByTestingEquipmentId(mrid)
+    if (calRes.success && calRes.data) entity.calibrations = calRes.data
+
+    // repairs (activity_record type='Repair')
+    const repRes: any = await getActivityRecordByAssetId(mrid, 'Repair')
+    if (repRes.success && repRes.data) entity.repairs = repRes.data
+
+    // software licenses (qua bảng link)
+    const linkRes: any = await getSoftwareLicenseByTestingEquipmentId(mrid)
+    if (linkRes.success && linkRes.data) {
+      for (const link of linkRes.data) {
+        const licRes: any = await getSoftwareLicenseById(link.software_license)
+        if (licRes.success && licRes.data) entity.softwareLicenses.push(licRes.data)
+      }
+    }
+
+    // accessories (chi tiết từ testing_equipment con)
+    const accRes: any = await getAccessoryDetailsByEquipmentId(mrid)
+    if (accRes.success && accRes.data) entity.accessories = accRes.data
+
+    // attachment (1 record theo id_foreign = mrid, type='asset')
+    const attRes: any = await getAttachmentByForeignIdAndType(mrid, 'asset')
+    if (attRes.success && attRes.data) entity.attachment = attRes.data
+
+    // user link
+    const uioRes: any = await getUserIdentifiedObjectByIdentifiedObjectId(mrid)
+    if (uioRes.success && uioRes.data) entity.userIdentifiedObject = uioRes.data
+
+    return {
+      success: true,
+      data: entity,
+      message: 'Testing equipment entity retrieved successfully'
+    }
+  } catch (error) {
+    console.error('Error in getTestingEquipmentEntity:', error)
+    return { success: false, error, message: 'Error retrieving testing equipment entity' }
+  }
+}
+
+// Xóa toàn bộ thông tin của 1 testing equipment
+// (calibration_record / software_license_testing_equipment / accessory_testing_equipment
+//  đều FK ON DELETE CASCADE tới testing_equipment, nên xóa testing_equipment rồi asset là đủ.
+//  Vẫn gỡ tường minh các link để chắc chắn, kể cả khi phụ kiện này được máy khác tham chiếu.)
+export const deleteTestingEquipmentEntity = async (mrid: string) => {
+  try {
+    if (!mrid) return { success: false, error: new Error('Invalid ID') }
+
+    await runAsync('BEGIN TRANSACTION')
+
+    // gỡ các quan hệ mà mrid này đóng vai trò máy chính hoặc phụ kiện
+    await deleteAccessoryTestingEquipmentByEquipmentIdTransaction(mrid, db)
+    await deleteSoftwareLicenseTestingEquipmentByTestingEquipmentIdTransaction(mrid, db)
+
+    // xóa testing_equipment (kéo theo calibration_record + link còn lại nhờ cascade)
+    await deleteTestingEquipmentByIdTransaction(mrid, db)
+
+    // xóa asset nền
+    await deleteAssetByIdTransaction(mrid, db)
+
+    await runAsync('COMMIT')
+    return { success: true, data: null, message: 'Testing equipment entity deleted successfully' }
+  } catch (error: any) {
+    await runAsync('ROLLBACK')
+    console.error('Error in deleteTestingEquipmentEntity:', error)
+    return {
+      success: false,
+      error,
+      message: `Error deleting testing equipment entity: ${error.message || 'Unknown error'}`
+    }
+  }
 }

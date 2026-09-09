@@ -1,12 +1,12 @@
-import Document from "../Document";
+import Document from '../Document'
 
 class Procedure extends Document {
-    constructor() {
-        super();
-                this.instruction = null; // e.g., "surgical", "diagnostic"
-                this.kind = null; // e.g., "scalpel", "surgical drape"
-                this.sequenceNumber = null; // e.g., "2023-10-01
-    }
+  constructor() {
+    super()
+    this.instruction = null // e.g., "surgical", "diagnostic"
+    this.kind = null // e.g., "scalpel", "surgical drape"
+    this.sequenceNumber = null // e.g., "2023-10-01
+  }
 }
 
-export default Procedure;
+export default Procedure

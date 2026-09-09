@@ -1,33 +1,33 @@
-import Attachment from "../Attachment";
-import Asset from "../../Cim/Asset";
-import LifecycleDate from "../../Cim/LifecycleDate";
-import AssetPsr from "../../Cim/AssetPsr";
-import DisconnectorInfo from "../../Cim/DisconnectorInfo";
-import ProductAssetModel from "../../Cim/ProductAssetModel";
+import Attachment from '../Attachment'
+import Asset from '../../Cim/Asset'
+import LifecycleDate from '../../Cim/LifecycleDate'
+import AssetPsr from '../../Cim/AssetPsr'
+import DisconnectorInfo from '../../Cim/DisconnectorInfo'
+import ProductAssetModel from '../../Cim/ProductAssetModel'
 
 class DisconnectorEntity {
-    asset: any
-    assetPsr: any
-    attachment: any
-    currentFlow: any
-    disconnectorInfo: any
-    frequency: any
-    lifecycleDate: any
-    productAssetModel: any
-    seconds: any
-    voltage: any 
-    constructor() {
-        this.disconnectorInfo = new DisconnectorInfo()
-        this.asset = new Asset()
-        this.productAssetModel = new ProductAssetModel()
-        this.attachment = new Attachment()
-        this.lifecycleDate = new LifecycleDate()
-        this.assetPsr = new AssetPsr()
-        this.frequency = []
-        this.voltage = []
-        this.currentFlow = []
-        this.seconds = []
-    }
+  asset: any
+  assetPsr: any
+  attachment: any
+  currentFlow: any
+  disconnectorInfo: any
+  frequency: any
+  lifecycleDate: any
+  productAssetModel: any
+  seconds: any
+  voltage: any
+  constructor() {
+    this.disconnectorInfo = new DisconnectorInfo()
+    this.asset = new Asset()
+    this.productAssetModel = new ProductAssetModel()
+    this.attachment = new Attachment()
+    this.lifecycleDate = new LifecycleDate()
+    this.assetPsr = new AssetPsr()
+    this.frequency = []
+    this.voltage = []
+    this.currentFlow = []
+    this.seconds = []
+  }
 }
 
-export default DisconnectorEntity;
+export default DisconnectorEntity

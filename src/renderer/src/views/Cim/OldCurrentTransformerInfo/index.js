@@ -31,28 +31,27 @@
 	FOREIGN KEY("um_rms") REFERENCES "voltage"("mrid")
 );
  */
-import CurrentTransformerInfo from "../CurrentTransformerInfo";
+import CurrentTransformerInfo from '../CurrentTransformerInfo'
 
 class OldCurrentTransformerInfo extends CurrentTransformerInfo {
-    constructor() {
-        super();
-        this.standard = null;
-        this.rated_frequency = null;
-        this.primary_winding_count = null;
-        this.um_rms = null;
-        this.u_withstand_rms = null;
-        this.u_lightning_peak = null;
-        this.i_cth = null;
-        this.i_dynamic_peak = null;
-        this.ith_rms = null;
-        this.ith_duration = null;
-        this.system_voltage = null;
-        this.system_voltage_type = null;
-        this.bil = null;
-        this.rating_factor = null;
-        this.rating_factor_temp = null;
-    }
-
+  constructor() {
+    super()
+    this.standard = null
+    this.rated_frequency = null
+    this.primary_winding_count = null
+    this.um_rms = null
+    this.u_withstand_rms = null
+    this.u_lightning_peak = null
+    this.i_cth = null
+    this.i_dynamic_peak = null
+    this.ith_rms = null
+    this.ith_duration = null
+    this.system_voltage = null
+    this.system_voltage_type = null
+    this.bil = null
+    this.rating_factor = null
+    this.rating_factor_temp = null
+  }
 }
 
-export default OldCurrentTransformerInfo;
+export default OldCurrentTransformerInfo

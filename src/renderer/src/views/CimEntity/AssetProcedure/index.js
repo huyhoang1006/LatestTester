@@ -1,9 +1,9 @@
 class AssetProcedure {
-    constructor() {
-        this.mRID = null;
-                this.assetId = null;
-                this.procedureId = null;
-    }
+  constructor() {
+    this.mRID = null
+    this.assetId = null
+    this.procedureId = null
+  }
 }
 
-export default AssetProcedure;
+export default AssetProcedure

@@ -92,15 +92,9 @@ const MANUFACTURER_MAP = {
     'Westinghouse',
     'Wilson transformer',
     'ZTR'
-    ],
+  ],
 
-  BushingAssetDto: [
-    'ABB',
-    'Electro composites',
-    'HSP',
-    'Micafil',
-    'PCORE Electric',
-    ],
+  BushingAssetDto: ['ABB', 'Electro composites', 'HSP', 'Micafil', 'PCORE Electric'],
 
   CircuitBreakerDto: [
     'ABB',
@@ -119,8 +113,8 @@ const MANUFACTURER_MAP = {
     'Sampletronics',
     'Siemens',
     'Sprecher & Schuh',
-    'Westinghouse',
-    ],
+    'Westinghouse'
+  ],
 
   CurrentTransformerDto: [
     'ABB',
@@ -137,7 +131,7 @@ const MANUFACTURER_MAP = {
     'Toshiba',
     'Westinghouse',
     'Zelisko'
-    ],
+  ],
 
   VoltageTransformerDto: [
     'ABB',
@@ -153,8 +147,8 @@ const MANUFACTURER_MAP = {
     'Mitsubishi Electric',
     'Toshiba',
     'Westinghouse',
-    'Zelisko',
-    ],
+    'Zelisko'
+  ],
 
   DisconnectorDTO: [
     'ABB',
@@ -165,7 +159,7 @@ const MANUFACTURER_MAP = {
     'Siemens',
     'Toshiba',
     'Westinghouse'
-    ],
+  ],
   PowerCableDTO: [
     'Cadivi',
     'Cadisun',
@@ -189,6 +183,18 @@ const MANUFACTURER_MAP = {
     'Siemens',
     'Toshiba',
     'Westinghouse'
+  ],
+  TestingEquipmentDto: [
+    'OMICRON',
+    'HVI',
+    'Megger',
+    'Doble',
+    'Phenix Technologies',
+    'Haefely',
+    'Vanguard Instruments',
+    'ISA',
+    'Raytech',
+    'SebaKMT'
   ]
 }
 

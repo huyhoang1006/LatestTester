@@ -1,592 +1,744 @@
 <template>
-    <div id="tap-changers" class="mgt-20">
+  <div id="tap-changers" class="mgt-20">
+    <el-row :gutter="20" class="content">
+      <el-col :span="24">
+        <el-radio-group
+          v-model="tapChangersData.mode"
+          @change="onChangeTapChanger"
+          class="radio-two-col"
+        >
+          <el-radio style="display: flex; width: 100%" label="oltc">OLTC</el-radio>
+          <el-radio style="display: flex; width: 100%" label="detc">DETC</el-radio>
+        </el-radio-group>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20" class="content mgt-10">
+      <!-- oltc -->
+      <el-col
+        :xs="24"
+        :md="12"
+        class="col-content"
+        :class="{ 'col-hidden': tapChangersData.mode !== 'oltc' }"
+      >
         <el-row :gutter="20" class="content">
-            <el-col :span="24">
-                <el-radio-group v-model="tapChangersData.mode" @change="onChangeTapChanger" class="radio-two-col">
-                    <el-radio style="display: flex; width: 100%" label="oltc">OLTC</el-radio>
-                    <el-radio style="display: flex; width: 100%" label="detc">DETC</el-radio>
-                </el-radio-group>
-            </el-col>
+          <el-col :span="24" class="col-content">
+            <el-form
+              :inline-message="true"
+              :label-width="labelWidth"
+              size="small"
+              label-position="left"
+            >
+              <el-form-item label="Serial no.">
+                <el-input v-model="tapChangersData.serial_no"></el-input>
+              </el-form-item>
+              <el-form-item label="Manufacturer">
+                <el-input v-model="tapChangersData.manufacturer"></el-input>
+              </el-form-item>
+              <el-form-item label="Manufacturer type">
+                <el-input v-model="tapChangersData.manufacturer_type"></el-input>
+              </el-form-item>
+            </el-form>
+          </el-col>
         </el-row>
         <el-row :gutter="20" class="content mgt-10">
-            <!-- oltc -->
-            <el-col :xs="24" :md="12" class="col-content" :class="{ 'col-hidden': tapChangersData.mode !== 'oltc' }">
-                <el-row :gutter="20" class="content">
-                    <el-col :span="24" class="col-content">
-                        <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
-                            <el-form-item label="Serial no.">
-                                <el-input v-model="tapChangersData.serial_no"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Manufacturer">
-                                <el-input v-model="tapChangersData.manufacturer"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Manufacturer type">
-                                <el-input v-model="tapChangersData.manufacturer_type"></el-input>
-                            </el-form-item>
-                        </el-form>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="20" class="content mgt-10">
-                    <el-col :span="24" class="col-content">
-                        <span class="bolder">Tap changers configuration</span>
-                        <el-divider></el-divider>
-                        <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
-                            <el-form-item label="Winding">
-                                <el-select :disabled="!tapChangersData.mode" v-model="tapChangersData.winding"
-                                    @change="onChangeWinding" class="w-100">
-                                    <el-option label="Prim" value="Prim"> </el-option>
-                                    <el-option label="Sec" value="Sec"> </el-option>
-                                    <el-option label="Tert" value="Tert"
-                                        v-if="properties.asset_type === $constant.THREE_WINDING"> </el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item label="Tap scheme">
-                                <el-select :disabled="!tapChangersData.winding" v-model="tapChangersData.tap_scheme"
-                                    @change="onChangeTapScheme" class="w-100">
-                                    <el-option label="1...33" value="1...33"> </el-option>
-                                    <el-option label="33...1" value="33...1"> </el-option>
-                                    <el-option label="Free" value="Free"> </el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item label="No. of taps">
-                                <el-input type="text" number="positive" v-model.number="tapChangersData.no_of_taps"
-                                    :disabled="!tapChangersData.tap_scheme" @keyup.enter.native="onEnterNoTapReset()">
-                                </el-input>
-                            </el-form-item>
-                        </el-form>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="20" class="content mgt-10">
-                    <el-col :span="24" class="col-content">
-                        <span class="bolder">Voltage table</span>
-                        <el-divider></el-divider>
-                        <el-row :gutter="8">
-                            <el-col :span="24">
-                                <el-row :gutter="8">
-                                    <el-col :span="12">
-                                        <el-button :disabled="!tapChangersData.tap_scheme" size="small" type="primary"
-                                            class="btn-fluid" @click="openDialog = true">
-                                            <i class="fas fa-calculator"></i>
-                                            Calculate
-                                        </el-button>
-                                    </el-col>
-                                    <el-col :span="12">
-                                        <el-button size="small" type="primary" class="btn-fluid"
-                                            :disabled="!tapChangersData.tap_scheme" @click="removeAllVoltageTable">
-                                            <i class="fas fa-xmark"></i>
-                                            Remove all
-                                        </el-button>
-                                    </el-col>
-                                </el-row>
-                            </el-col>
-                        </el-row>
-                        <div class="table-scroll mgt-5">
-                            <table class="table-strip-input-data responsive-table">
-                                <colgroup>
-                                    <col class="col-tap" />
-                                    <col class="col-voltage" />
-                                    <col class="col-action" />
-                                    <col class="col-action" />
-                                </colgroup>
-                                <thead>
-                                    <tr>
-                                        <th>Tap</th>
-                                        <th>Voltage</th>
-                                        <th class="action-col"></th>
-                                        <th class="action-col"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(item, index) in tapChangersData.voltage_table" :key="index">
-                                        <td>
-                                            <el-input size="small" type="text" number="positive" v-model="item.tap"></el-input>
-                                        </td>
-                                        <td>
-                                            <el-input size="small" type="text" number="positive" v-model="item.voltage.value">
-                                                <template #append>V</template>
-                                            </el-input>
-                                        </td>
-                                        <td>
-                                            <el-button size="small" type="primary" class="w-100"
-                                                @click="addVoltage(index)">
-                                                <i class="fa-solid fa-plus"></i>
-                                            </el-button>
-                                        </td>
-                                        <td>
-                                            <el-button size="small" type="danger" class="w-100"
-                                                @click="deleteVoltageTable(index)">
-                                                <i class="fas fa-trash"></i></el-button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </el-col>
-                </el-row>
-            </el-col>
-
-            <!-- detc -->
-            <el-col :xs="24" :md="12" class="col-content" :class="{ 'col-hidden': tapChangersData.mode !== 'detc' }">
-                <el-row :gutter="20" class="content">
-                    <el-col :span="24" class="col-content">
-                        <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
-                            <el-form-item label="Serial no.">
-                                <el-input v-model="tapChangersData.serial_no"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Manufacturer">
-                                <el-input v-model="tapChangersData.manufacturer"></el-input>
-                            </el-form-item>
-                            <el-form-item label="Manufacturer type">
-                                <el-input v-model="tapChangersData.manufacturer_type"></el-input>
-                            </el-form-item>
-                        </el-form>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="20" class="content mgt-10">
-                    <el-col :span="24" class="col-content">
-                        <span class="bolder">Tap changers configuration</span>
-                        <el-divider></el-divider>
-                        <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
-                            <el-form-item label="Winding">
-                                <el-select :disabled="!tapChangersData.mode" v-model="tapChangersData.winding"
-                                    @change="onChangeWinding" class="w-100">
-                                    <el-option label="Prim" value="Prim"> </el-option>
-                                    <el-option label="Sec" value="Sec"> </el-option>
-                                    <el-option label="Tert" value="Tert"
-                                        v-if="properties.asset_type === $constant.THREE_WINDING">
-                                    </el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item label="Tap scheme">
-                                <el-select :disabled="!tapChangersData.winding" v-model="tapChangersData.tap_scheme"
-                                    @change="onChangeTapScheme" class="w-100">
-                                    <el-option label="1...N" value="1...N"> </el-option>
-                                    <el-option label="N...1" value="N...1"> </el-option>
-                                    <el-option label="Free" value="Free"> </el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item label="No. of taps">
-                                <el-input type="text" number="positive" v-model.number="tapChangersData.no_of_taps"
-                                    :disabled="!tapChangersData.tap_scheme" @keyup.enter.native="onEnterNoTapReset()">
-                                </el-input>
-                            </el-form-item>
-                        </el-form>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="20" class="content mgt-10">
-                    <el-col :span="24" class="col-content">
-                        <span class="bolder">Voltage table</span>
-                        <el-divider></el-divider>
-                        <el-row :gutter="8">
-                            <el-col :span="24">
-                                <el-row :gutter="8">
-                                    <el-col :span="12">
-                                        <el-button :disabled="!tapChangersData.tap_scheme" size="small" type="primary"
-                                            class="btn-fluid" @click="openDialog = true">
-                                            <i class="fas fa-calculator"></i>
-                                            Calculate
-                                        </el-button>
-                                    </el-col>
-                                    <el-col :span="12">
-                                        <el-button size="small" type="primary" class="btn-fluid"
-                                            :disabled="!tapChangersData.tap_scheme" @click="removeAllVoltageTable">
-                                            <i class="fas fa-xmark"></i>
-                                            Remove all
-                                        </el-button>
-                                    </el-col>
-                                </el-row>
-                            </el-col>
-                        </el-row>
-                        <div class="table-scroll mgt-5">
-                            <table class="table-strip-input-data responsive-table">
-                                <colgroup>
-                                    <col class="col-tap" />
-                                    <col class="col-voltage" />
-                                    <col class="col-action" />
-                                    <col class="col-action" />
-                                </colgroup>
-                                <thead>
-                                    <tr>
-                                        <th>Tap</th>
-                                        <th>Voltage</th>
-                                        <th class="action-col"></th>
-                                        <th class="action-col"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(item, index) in tapChangersData.voltage_table" :key="index">
-                                        <td>
-                                            <el-input size="small" type="text" number="positive" v-model="item.tap"></el-input>
-                                        </td>
-                                        <td>
-                                            <el-input size="small" type="text" number="positive" v-model="item.voltage.value">
-                                                <template #append>V</template>
-                                            </el-input>
-                                        </td>
-                                        <td>
-                                            <el-button size="small" type="primary" class="w-100"
-                                                @click="addVoltage(index)">
-                                                <i class="fa-solid fa-plus"></i>
-                                            </el-button>
-                                        </td>
-                                        <td>
-                                            <el-button size="small" type="danger" class="w-100"
-                                                @click="deleteVoltageTable(index)">
-                                                <i class="fas fa-trash"></i></el-button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </el-col>
-                </el-row>
-            </el-col>
+          <el-col :span="24" class="col-content">
+            <span class="bolder">Tap changers configuration</span>
+            <el-divider></el-divider>
+            <el-form
+              :inline-message="true"
+              :label-width="labelWidth"
+              size="small"
+              label-position="left"
+            >
+              <el-form-item label="Winding">
+                <el-select
+                  :disabled="!tapChangersData.mode"
+                  v-model="tapChangersData.winding"
+                  @change="onChangeWinding"
+                  class="w-100"
+                >
+                  <el-option label="Prim" value="Prim"> </el-option>
+                  <el-option label="Sec" value="Sec"> </el-option>
+                  <el-option
+                    label="Tert"
+                    value="Tert"
+                    v-if="properties.asset_type === $constant.THREE_WINDING"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Tap scheme">
+                <el-select
+                  :disabled="!tapChangersData.winding"
+                  v-model="tapChangersData.tap_scheme"
+                  @change="onChangeTapScheme"
+                  class="w-100"
+                >
+                  <el-option label="1...33" value="1...33"> </el-option>
+                  <el-option label="33...1" value="33...1"> </el-option>
+                  <el-option label="Free" value="Free"> </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="No. of taps">
+                <el-input
+                  type="text"
+                  number="positive"
+                  v-model.number="tapChangersData.no_of_taps"
+                  :disabled="!tapChangersData.tap_scheme"
+                  @keyup.enter="onEnterNoTapReset()"
+                >
+                </el-input>
+              </el-form-item>
+            </el-form>
+          </el-col>
         </el-row>
+        <el-row :gutter="20" class="content mgt-10">
+          <el-col :span="24" class="col-content">
+            <span class="bolder">Voltage table</span>
+            <el-divider></el-divider>
+            <el-row :gutter="8">
+              <el-col :span="24">
+                <el-row :gutter="8">
+                  <el-col :span="12">
+                    <el-button
+                      :disabled="!tapChangersData.tap_scheme"
+                      size="small"
+                      type="primary"
+                      class="btn-fluid"
+                      @click="openDialog = true"
+                    >
+                      <i class="fas fa-calculator"></i>
+                      Calculate
+                    </el-button>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-button
+                      size="small"
+                      class="btn-fluid"
+                      :disabled="!tapChangersData.tap_scheme"
+                      @click="removeAllVoltageTable"
+                    >
+                      <i class="fas fa-xmark"></i>
+                      Remove all
+                    </el-button>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+            <div class="table-scroll mgt-5">
+              <table class="table-strip-input-data responsive-table">
+                <colgroup>
+                  <col class="col-tap" />
+                  <col class="col-voltage" />
+                  <col class="col-action" />
+                  <col class="col-action" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Tap</th>
+                    <th>Voltage</th>
+                    <th class="action-col"></th>
+                    <th class="action-col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in tapChangersData.voltage_table" :key="index">
+                    <td>
+                      <el-input
+                        size="small"
+                        type="text"
+                        number="positive"
+                        v-model="item.tap"
+                      ></el-input>
+                    </td>
+                    <td>
+                      <el-input
+                        size="small"
+                        type="text"
+                        number="positive"
+                        v-model="item.voltage.value"
+                      >
+                        <template #append>V</template>
+                      </el-input>
+                    </td>
+                    <td>
+                      <el-button
+                        size="small"
+                        type="primary"
+                        class="w-100"
+                        @click="addVoltage(index)"
+                      >
+                        <i class="fa-solid fa-plus"></i>
+                      </el-button>
+                    </td>
+                    <td>
+                      <el-button
+                        size="small"
+                        type="danger"
+                        class="w-100"
+                        @click="deleteVoltageTable(index)"
+                      >
+                        <i class="fas fa-trash"></i
+                      ></el-button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </el-col>
+        </el-row>
+      </el-col>
 
-        <calculate-tapchanger v-if="tapChangersData.voltage_table.length !== 0" :openDialog="openDialog"
-            :tapVoltable="tapChangersData.voltage_table" :tapScheme="tapChangersData.tap_scheme"
-            :numberOfTaps="tapChangersData.no_of_taps.toString()" @cancel-dialog="onCancelDialog"
-            @calculate-dialog="onCalculateDialog" @calculate-result="calculateResult">
-        </calculate-tapchanger>
-    </div>
+      <!-- detc -->
+      <el-col
+        :xs="24"
+        :md="12"
+        class="col-content"
+        :class="{ 'col-hidden': tapChangersData.mode !== 'detc' }"
+      >
+        <el-row :gutter="20" class="content">
+          <el-col :span="24" class="col-content">
+            <el-form
+              :inline-message="true"
+              :label-width="labelWidth"
+              size="small"
+              label-position="left"
+            >
+              <el-form-item label="Serial no.">
+                <el-input v-model="tapChangersData.serial_no"></el-input>
+              </el-form-item>
+              <el-form-item label="Manufacturer">
+                <el-input v-model="tapChangersData.manufacturer"></el-input>
+              </el-form-item>
+              <el-form-item label="Manufacturer type">
+                <el-input v-model="tapChangersData.manufacturer_type"></el-input>
+              </el-form-item>
+            </el-form>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20" class="content mgt-10">
+          <el-col :span="24" class="col-content">
+            <span class="bolder">Tap changers configuration</span>
+            <el-divider></el-divider>
+            <el-form
+              :inline-message="true"
+              :label-width="labelWidth"
+              size="small"
+              label-position="left"
+            >
+              <el-form-item label="Winding">
+                <el-select
+                  :disabled="!tapChangersData.mode"
+                  v-model="tapChangersData.winding"
+                  @change="onChangeWinding"
+                  class="w-100"
+                >
+                  <el-option label="Prim" value="Prim"> </el-option>
+                  <el-option label="Sec" value="Sec"> </el-option>
+                  <el-option
+                    label="Tert"
+                    value="Tert"
+                    v-if="properties.asset_type === $constant.THREE_WINDING"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Tap scheme">
+                <el-select
+                  :disabled="!tapChangersData.winding"
+                  v-model="tapChangersData.tap_scheme"
+                  @change="onChangeTapScheme"
+                  class="w-100"
+                >
+                  <el-option label="1...N" value="1...N"> </el-option>
+                  <el-option label="N...1" value="N...1"> </el-option>
+                  <el-option label="Free" value="Free"> </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="No. of taps">
+                <el-input
+                  type="text"
+                  number="positive"
+                  v-model.number="tapChangersData.no_of_taps"
+                  :disabled="!tapChangersData.tap_scheme"
+                  @keyup.enter="onEnterNoTapReset()"
+                >
+                </el-input>
+              </el-form-item>
+            </el-form>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20" class="content mgt-10">
+          <el-col :span="24" class="col-content">
+            <span class="bolder">Voltage table</span>
+            <el-divider></el-divider>
+            <el-row :gutter="8">
+              <el-col :span="24">
+                <el-row :gutter="8">
+                  <el-col :span="12">
+                    <el-button
+                      :disabled="!tapChangersData.tap_scheme"
+                      size="small"
+                      type="primary"
+                      class="btn-fluid"
+                      @click="openDialog = true"
+                    >
+                      <i class="fas fa-calculator"></i>
+                      Calculate
+                    </el-button>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-button
+                      size="small"
+                      class="btn-fluid"
+                      :disabled="!tapChangersData.tap_scheme"
+                      @click="removeAllVoltageTable"
+                    >
+                      <i class="fas fa-xmark"></i>
+                      Remove all
+                    </el-button>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+            <div class="table-scroll mgt-5">
+              <table class="table-strip-input-data responsive-table">
+                <colgroup>
+                  <col class="col-tap" />
+                  <col class="col-voltage" />
+                  <col class="col-action" />
+                  <col class="col-action" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Tap</th>
+                    <th>Voltage</th>
+                    <th class="action-col"></th>
+                    <th class="action-col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in tapChangersData.voltage_table" :key="index">
+                    <td>
+                      <el-input
+                        size="small"
+                        type="text"
+                        number="positive"
+                        v-model="item.tap"
+                      ></el-input>
+                    </td>
+                    <td>
+                      <el-input
+                        size="small"
+                        type="text"
+                        number="positive"
+                        v-model="item.voltage.value"
+                      >
+                        <template #append>V</template>
+                      </el-input>
+                    </td>
+                    <td>
+                      <el-button
+                        size="small"
+                        type="primary"
+                        class="w-100"
+                        @click="addVoltage(index)"
+                      >
+                        <i class="fa-solid fa-plus"></i>
+                      </el-button>
+                    </td>
+                    <td>
+                      <el-button
+                        size="small"
+                        type="danger"
+                        class="w-100"
+                        @click="deleteVoltageTable(index)"
+                      >
+                        <i class="fas fa-trash"></i
+                      ></el-button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
+
+    <calculate-tapchanger
+      v-if="tapChangersData.voltage_table.length !== 0"
+      :openDialog="openDialog"
+      :tapVoltable="tapChangersData.voltage_table"
+      :tapScheme="tapChangersData.tap_scheme"
+      :numberOfTaps="tapChangersData.no_of_taps.toString()"
+      @cancel-dialog="onCancelDialog"
+      @calculate-dialog="onCalculateDialog"
+      @calculate-result="calculateResult"
+    >
+    </calculate-tapchanger>
+  </div>
 </template>
 
 <script>
 import CalculateTapchanger from './CalculateTapchanger/index.vue'
 
 export default {
-    name: 'TapChanger',
-    components: {
-        CalculateTapchanger
-    },
-    props: {
-        data: {
-            type: Object,
-            required: true,
-            default() {
-                return {
-                    id: '',
-                    mode: '',
-                    serial_no: '',
-                    manufacturer: '',
-                    manufacturer_type: '',
-                    winding: '',
-                    tap_scheme: '',
-                    no_of_taps: '0',
-                    voltage_table: []
-                }
-            }
-        },
-        properties: {
-            type: Object,
-            required: true,
-            default() {
-                return {
-                    id: '',
-                    asset: 'Transformer',
-                    asset_type: 'Two-winding',
-                    serial_no: '',
-                    manufacturer: '',
-                    manufacturer_type: '',
-                    manufacturing_year: '',
-                    asset_system_code: '',
-                    apparatus_id: '',
-                    feeder: '',
-                    date_of_warehouse_receipt: '',
-                    date_of_delivery: '',
-                    date_of_production_order: '',
-                    comment: ''
-                }
-            }
-        }
-    },
-    data() {
+  name: 'TapChanger',
+  components: {
+    CalculateTapchanger
+  },
+  props: {
+    data: {
+      type: Object,
+      required: true,
+      default() {
         return {
-            labelWidth: `${120}px`,
-            openDialog: false
+          id: '',
+          mode: '',
+          serial_no: '',
+          manufacturer: '',
+          manufacturer_type: '',
+          winding: '',
+          tap_scheme: '',
+          no_of_taps: '0',
+          voltage_table: []
         }
+      }
     },
-    computed: {
-        tapChangersData: function () {
-            return this.data
+    properties: {
+      type: Object,
+      required: true,
+      default() {
+        return {
+          id: '',
+          asset: 'Transformer',
+          asset_type: 'Two-winding',
+          serial_no: '',
+          manufacturer: '',
+          manufacturer_type: '',
+          manufacturing_year: '',
+          asset_system_code: '',
+          apparatus_id: '',
+          feeder: '',
+          date_of_warehouse_receipt: '',
+          date_of_delivery: '',
+          date_of_production_order: '',
+          comment: ''
         }
-    },
-    /* eslint-disable */
-    watch: {
-        'tapChangersData.no_of_taps': {
-            handler: function (newVal) {
-                if (newVal > 121) {
-                    this.$message.error("Invalid")
-                } else {
-                    this.onEnterNoTap()
-                }
-            }
-        }
-    },
-    async beforeMount() { },
-    mounted() { },
-    methods: {
-        onChangeWinding() {
-            this.tapChangersData.tap_scheme = ''
-            this.tapChangersData.no_of_taps = '0'
-        },
-        onChangeTapScheme() {
-            this.tapChangersData.no_of_taps = '0'
-        },
-        onEnterNoTap() {
-            if (this.tapChangersData.voltage_table.length == 0)
-                if (this.tapChangersData.tap_scheme === '1...33' || this.tapChangersData.tap_scheme === '1...N' || this.tapChangersData.tap_scheme === 'Free') {
-                    for (let i = 1; i <= this.tapChangersData.no_of_taps; i++) {
-                        const id = this.$uuid.newUuid()
-                        this.tapChangersData.voltage_table.push({
-                            id,
-                            tap: i,
-                            voltage: {
-                                mrid : '',
-                                value : 0,
-                                unit : "V"
-                            }
-                        })
-                    }
-                } else {
-                    for (let i = this.tapChangersData.no_of_taps; i >= 1; i--) {
-                        const id = this.$uuid.newUuid()
-                        this.tapChangersData.voltage_table.push({
-                            id,
-                            tap: i,
-                            voltage: {
-                                mrid : '',
-                                value : 0,
-                                unit : "V"
-                            }
-                        })
-                    }
-                }
-            else {
-                if (this.tapChangersData.voltage_table.length > this.tapChangersData.no_of_taps) {
-                    this.tapChangersData.voltage_table.splice(this.tapChangersData.no_of_taps, this.tapChangersData.voltage_table.length - this.tapChangersData.no_of_taps)
-                } else {
-                    if (this.tapChangersData.tap_scheme === '1...33' || this.tapChangersData.tap_scheme === '1...N' || this.tapChangersData.tap_scheme === 'Free') {
-                        for (let i = this.tapChangersData.voltage_table.length + 1; i <= this.tapChangersData.no_of_taps; i++) {
-                            const id = this.$uuid.newUuid()
-                            this.tapChangersData.voltage_table.push({
-                                id,
-                                tap: i,
-                                voltage: {
-                                    mrid : '',
-                                    value : 0,
-                                    unit : "V"
-                                }
-                            })
-                        }
-                    } else {
-                        for (let i = this.tapChangersData.voltage_table.length; i < this.tapChangersData.no_of_taps; i++) {
-                            const id = this.$uuid.newUuid()
-                            this.tapChangersData.voltage_table.push({
-                                id,
-                                tap: this.tapChangersData.no_of_taps - i,
-                                voltage: {
-                                    mrid : '',
-                                    value : 0,
-                                    unit : "V"
-                                }
-                            })
-                        }
-                        for (let i = 0; i < this.tapChangersData.no_of_taps; i++) {
-                            this.tapChangersData.voltage_table[i].tap = this.tapChangersData.no_of_taps - i
-                        }
-                    }
-                }
-            }
-        },
-        onEnterNoTapReset() {
-            this.tapChangersData.voltage_table = []
-            if (this.tapChangersData.tap_scheme === '1...33' || this.tapChangersData.tap_scheme === '1...N' || this.tapChangersData.tap_scheme === 'Free') {
-                for (let i = 1; i <= this.tapChangersData.no_of_taps; i++) {
-                    const id = this.$uuid.newUuid()
-                    this.tapChangersData.voltage_table.push({
-                        id,
-                        tap: i,
-                        voltage: {
-                            mrid : '',
-                            value : 0,
-                            unit : "V"
-                        }
-                    })
-                }
-            } else {
-                for (let i = this.tapChangersData.no_of_taps; i >= 1; i--) {
-                    const id = this.$uuid.newUuid()
-                    this.tapChangersData.voltage_table.push({
-                        id,
-                        tap: i,
-                        voltage: {
-                            mrid : '',
-                            value : 0,
-                            unit : "V"
-                        }
-                    })
-                }
-            }
-        },
-        onChangeTapChanger() {
-            this.tapChangersData.serial_no = ''
-            this.tapChangersData.manufacturer = ''
-            this.tapChangersData.manufacturer_type = ''
-            this.tapChangersData.winding = ''
-            this.tapChangersData.tap_scheme = ''
-            this.tapChangersData.no_of_taps = '0'
-            this.tapChangersData.voltage_table = []
-        },
-        async addVoltageTable() {
-            const id = this.$uuid.newUuid()
-
-            await this.tapChangersData.voltage_table.push({
-                id,
-                tap: '',
-                voltage: {
-                    mrid : '',
-                    value : 0,
-                    unit : "V"
-                }
-            })
-            this.tapChangersData.no_of_taps++
-        },
-        removeAllVoltageTable() {
-            this.tapChangersData.voltage_table = []
-            this.tapChangersData.no_of_taps = 0
-        },
-        deleteVoltageTable(index) {
-            this.tapChangersData.voltage_table.splice(index, 1)
-            this.tapChangersData.no_of_taps--
-        },
-        addVoltage(index) {
-            const id = this.$uuid.newUuid()
-            const row = {
-                id,
-                tap: '',
-                voltage: {
-                    mrid : '',
-                    value : 0,
-                    unit : "V"
-                }
-            }
-            this.tapChangersData.voltage_table.splice(index + 1, 0, row)
-            this.tapChangersData.no_of_taps++
-        },
-        onCancelDialog() {
-            this.openDialog = false
-        },
-        onCalculateDialog() {
-            this.openDialog = false
-        },
-        calculateResult(data) {
-            for (let i = 0; i < this.tapChangersData.no_of_taps; i++) {
-                this.tapChangersData.voltage_table[i].voltage.value = data[i]
-            }
-        }
+      }
     }
+  },
+  data() {
+    return {
+      labelWidth: `${120}px`,
+      openDialog: false
+    }
+  },
+  computed: {
+    tapChangersData: function () {
+      return this.data
+    }
+  },
+  /* eslint-disable */
+  watch: {
+    'tapChangersData.no_of_taps': {
+      handler: function (newVal) {
+        if (newVal > 121) {
+          this.$message.error('Invalid')
+        } else {
+          this.onEnterNoTap()
+        }
+      }
+    }
+  },
+  async beforeMount() {},
+  mounted() {},
+  methods: {
+    onChangeWinding() {
+      this.tapChangersData.tap_scheme = ''
+      this.tapChangersData.no_of_taps = '0'
+    },
+    onChangeTapScheme() {
+      this.tapChangersData.no_of_taps = '0'
+    },
+    onEnterNoTap() {
+      if (this.tapChangersData.voltage_table.length == 0)
+        if (
+          this.tapChangersData.tap_scheme === '1...33' ||
+          this.tapChangersData.tap_scheme === '1...N' ||
+          this.tapChangersData.tap_scheme === 'Free'
+        ) {
+          for (let i = 1; i <= this.tapChangersData.no_of_taps; i++) {
+            const id = this.$uuid.newUuid()
+            this.tapChangersData.voltage_table.push({
+              id,
+              tap: i,
+              voltage: {
+                mrid: '',
+                value: 0,
+                unit: 'V'
+              }
+            })
+          }
+        } else {
+          for (let i = this.tapChangersData.no_of_taps; i >= 1; i--) {
+            const id = this.$uuid.newUuid()
+            this.tapChangersData.voltage_table.push({
+              id,
+              tap: i,
+              voltage: {
+                mrid: '',
+                value: 0,
+                unit: 'V'
+              }
+            })
+          }
+        }
+      else {
+        if (this.tapChangersData.voltage_table.length > this.tapChangersData.no_of_taps) {
+          this.tapChangersData.voltage_table.splice(
+            this.tapChangersData.no_of_taps,
+            this.tapChangersData.voltage_table.length - this.tapChangersData.no_of_taps
+          )
+        } else {
+          if (
+            this.tapChangersData.tap_scheme === '1...33' ||
+            this.tapChangersData.tap_scheme === '1...N' ||
+            this.tapChangersData.tap_scheme === 'Free'
+          ) {
+            for (
+              let i = this.tapChangersData.voltage_table.length + 1;
+              i <= this.tapChangersData.no_of_taps;
+              i++
+            ) {
+              const id = this.$uuid.newUuid()
+              this.tapChangersData.voltage_table.push({
+                id,
+                tap: i,
+                voltage: {
+                  mrid: '',
+                  value: 0,
+                  unit: 'V'
+                }
+              })
+            }
+          } else {
+            for (
+              let i = this.tapChangersData.voltage_table.length;
+              i < this.tapChangersData.no_of_taps;
+              i++
+            ) {
+              const id = this.$uuid.newUuid()
+              this.tapChangersData.voltage_table.push({
+                id,
+                tap: this.tapChangersData.no_of_taps - i,
+                voltage: {
+                  mrid: '',
+                  value: 0,
+                  unit: 'V'
+                }
+              })
+            }
+            for (let i = 0; i < this.tapChangersData.no_of_taps; i++) {
+              this.tapChangersData.voltage_table[i].tap = this.tapChangersData.no_of_taps - i
+            }
+          }
+        }
+      }
+    },
+    onEnterNoTapReset() {
+      this.tapChangersData.voltage_table = []
+      if (
+        this.tapChangersData.tap_scheme === '1...33' ||
+        this.tapChangersData.tap_scheme === '1...N' ||
+        this.tapChangersData.tap_scheme === 'Free'
+      ) {
+        for (let i = 1; i <= this.tapChangersData.no_of_taps; i++) {
+          const id = this.$uuid.newUuid()
+          this.tapChangersData.voltage_table.push({
+            id,
+            tap: i,
+            voltage: {
+              mrid: '',
+              value: 0,
+              unit: 'V'
+            }
+          })
+        }
+      } else {
+        for (let i = this.tapChangersData.no_of_taps; i >= 1; i--) {
+          const id = this.$uuid.newUuid()
+          this.tapChangersData.voltage_table.push({
+            id,
+            tap: i,
+            voltage: {
+              mrid: '',
+              value: 0,
+              unit: 'V'
+            }
+          })
+        }
+      }
+    },
+    onChangeTapChanger() {
+      this.tapChangersData.serial_no = ''
+      this.tapChangersData.manufacturer = ''
+      this.tapChangersData.manufacturer_type = ''
+      this.tapChangersData.winding = ''
+      this.tapChangersData.tap_scheme = ''
+      this.tapChangersData.no_of_taps = '0'
+      this.tapChangersData.voltage_table = []
+    },
+    async addVoltageTable() {
+      const id = this.$uuid.newUuid()
+
+      await this.tapChangersData.voltage_table.push({
+        id,
+        tap: '',
+        voltage: {
+          mrid: '',
+          value: 0,
+          unit: 'V'
+        }
+      })
+      this.tapChangersData.no_of_taps++
+    },
+    removeAllVoltageTable() {
+      this.tapChangersData.voltage_table = []
+      this.tapChangersData.no_of_taps = 0
+    },
+    deleteVoltageTable(index) {
+      this.tapChangersData.voltage_table.splice(index, 1)
+      this.tapChangersData.no_of_taps--
+    },
+    addVoltage(index) {
+      const id = this.$uuid.newUuid()
+      const row = {
+        id,
+        tap: '',
+        voltage: {
+          mrid: '',
+          value: 0,
+          unit: 'V'
+        }
+      }
+      this.tapChangersData.voltage_table.splice(index + 1, 0, row)
+      this.tapChangersData.no_of_taps++
+    },
+    onCancelDialog() {
+      this.openDialog = false
+    },
+    onCalculateDialog() {
+      this.openDialog = false
+    },
+    calculateResult(data) {
+      for (let i = 0; i < this.tapChangersData.no_of_taps; i++) {
+        this.tapChangersData.voltage_table[i].voltage.value = data[i]
+      }
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .bolder {
-    font-size: 12px !important;
+  font-size: 12px !important;
 }
 
 :deep(.el-radio__label) {
-    font-size: 12px !important;
+  font-size: 12px !important;
 }
 
 :deep(.radio-two-col) {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 :deep(.radio-two-col .el-radio) {
-    flex: 1;
+  flex: 1;
 }
 
 :deep(.btn-fluid) {
-    width: 100%;
-    min-width: 0 !important;
-    padding-left: 8px;
-    padding-right: 8px;
-    box-sizing: border-box;
+  width: auto;
+  min-width: 72px;
+  padding-left: 8px;
+  padding-right: 8px;
+  box-sizing: border-box;
 }
 
 :deep(.table-scroll) {
-    width: 100%;
-    overflow-x: auto;
+  width: 100%;
+  overflow-x: auto;
 }
 
 :deep(.table-scroll::-webkit-scrollbar) {
-    height: 5px;
+  height: 5px;
 }
 
 :deep(.table-scroll::-webkit-scrollbar-track) {
-    background: transparent;
+  background: transparent;
 }
 
 :deep(.table-scroll::-webkit-scrollbar-thumb) {
-    background-color: rgba(120, 120, 120, 0.6);
-    border-radius: 6px;
+  background-color: rgba(120, 120, 120, 0.6);
+  border-radius: 6px;
 }
 
 :deep(.table-scroll::-webkit-scrollbar-thumb:hover) {
-    background-color: rgba(120, 120, 120, 0.85);
+  background-color: rgba(120, 120, 120, 0.85);
 }
 
 :deep(.responsive-table) {
-    width: 100%;
-    table-layout: auto;
+  width: 100%;
+  table-layout: auto;
 }
 
 :deep(.col-tap) {
-    min-width: 75px;
+  min-width: 75px;
 }
 
 :deep(.col-voltage) {
-    min-width: 165px;
+  min-width: 165px;
 }
 
 :deep(.col-action) {
-    width: 60px;
+  width: 60px;
 }
 
 :deep(.fixed-table th),
 :deep(.fixed-table td) {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 :deep(.table-strip-input-data) {
-    font-size: 12px !important;
+  font-size: 12px !important;
 }
 
 :deep(.col-hidden) {
-    visibility: hidden;
-    pointer-events: none;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 @media (max-width: 991px) {
-    :deep(.col-hidden) {
-        display: none;
-    }
+  :deep(.col-hidden) {
+    display: none;
+  }
 }
 
 @media (max-width: 767px) {
-    :deep(.el-form-item__label) {
-        float: none;
-        display: block;
-        width: 100% !important;
-        text-align: left;
-        line-height: 1.2;
-    }
+  :deep(.el-form-item__label) {
+    float: none;
+    display: block;
+    width: 100% !important;
+    text-align: left;
+    line-height: 1.2;
+  }
 
-    :deep(.el-form-item__content) {
-        margin-left: 0 !important;
-        width: 100%;
-    }
+  :deep(.el-form-item__content) {
+    margin-left: 0 !important;
+    width: 100%;
+  }
 }
 </style>

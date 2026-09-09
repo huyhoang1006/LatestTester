@@ -1,9 +1,9 @@
 class MeasurementProcedure {
-    constructor() {
-        this.mRID = null;
-                this.measurementId = null;
-                this.procedureId = null;
-    }
+  constructor() {
+    this.mRID = null
+    this.measurementId = null
+    this.procedureId = null
+  }
 }
 
-export default MeasurementProcedure;
+export default MeasurementProcedure

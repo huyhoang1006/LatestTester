@@ -1,10 +1,10 @@
-import OperatingMechanism from '../OperatingMechanism';
+import OperatingMechanism from '../OperatingMechanism'
 class OldOperatingMechanism extends OperatingMechanism {
-    constructor() {
-        super();
-                this.numberOfTripCoil = null;
-                this.numberOfCloseCoil = null;
-    }
+  constructor() {
+    super()
+    this.numberOfTripCoil = null
+    this.numberOfCloseCoil = null
+  }
 }
 
-export default OldOperatingMechanism;
+export default OldOperatingMechanism

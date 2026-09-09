@@ -1,0 +1,160 @@
+'use strict'
+import { ipcMain } from 'electron'
+import { entityFunc } from '@/function'
+
+// Tạo mới / cập nhật toàn bộ thông tin của 1 testing equipment
+export const insertTestingEquipmentEntity = () => {
+  ipcMain.handle('insertTestingEquipmentEntity', async function (_event, old_data, data) {
+    try {
+      const rs: any = await entityFunc.testingEquipmentEntityFunc.insertTestingEquipmentEntity(
+        old_data,
+        data
+      )
+      if (rs.success == true) {
+        return {
+          success: true,
+          message: 'Success',
+          data: rs.data,
+          changed: rs.changed
+        }
+      } else {
+        return {
+          success: false,
+          message: 'fail'
+        }
+      }
+    } catch (error: any) {
+      return {
+        error: error,
+        success: false,
+        message: error && error.message ? error.message : 'Internal error'
+      }
+    }
+  })
+}
+
+// Danh sách rút gọn tất cả testing equipment (cho màn hình list)
+export const getAllTestingEquipmentList = () => {
+  ipcMain.handle('getAllTestingEquipmentList', async function (_event, userId) {
+    try {
+      const rs: any = await entityFunc.testingEquipmentEntityFunc.getAllTestingEquipmentList(userId)
+      if (rs.success == true) {
+        return { success: true, message: 'Success', data: rs.data }
+      } else {
+        return { success: false, message: 'fail' }
+      }
+    } catch (error: any) {
+      return {
+        error,
+        success: false,
+        message: error && error.message ? error.message : 'Internal error'
+      }
+    }
+  })
+}
+
+// Kho phụ kiện (is_accessory = 1) cho bảng chọn
+export const getAllAccessories = () => {
+  ipcMain.handle('getAllAccessories', async function () {
+    try {
+      const rs: any = await entityFunc.testingEquipmentEntityFunc.getAllAccessories()
+      if (rs.success == true) {
+        return { success: true, message: 'Success', data: rs.data }
+      } else {
+        return { success: false, message: 'fail' }
+      }
+    } catch (error: any) {
+      return {
+        error,
+        success: false,
+        message: error && error.message ? error.message : 'Internal error'
+      }
+    }
+  })
+}
+
+// Lấy toàn bộ thông tin của 1 testing equipment theo mrid
+export const getTestingEquipmentEntityByMrid = () => {
+  ipcMain.handle('getTestingEquipmentEntityByMrid', async function (_event, mrid) {
+    try {
+      const rs: any = await entityFunc.testingEquipmentEntityFunc.getTestingEquipmentEntity(mrid)
+      if (rs.success == true) {
+        return {
+          success: true,
+          message: 'Success',
+          data: rs.data,
+          changed: rs.changed
+        }
+      } else {
+        return {
+          success: false,
+          message: 'fail'
+        }
+      }
+    } catch (error: any) {
+      console.error('Error retrieving testing equipment entity by MRID:', error)
+      return {
+        error: error,
+        success: false,
+        message: error && error.message ? error.message : 'Internal error'
+      }
+    }
+  })
+}
+
+// Usage history — suy ra từ job/test (bảng <asset>_testing_equipment_test_type), không lưu record riêng
+export const getTestingEquipmentUsage = () => {
+  ipcMain.handle('getTestingEquipmentUsage', async function (_event, mrid) {
+    try {
+      const rs: any =
+        await entityFunc.testingEquipmentEntityFunc.getTestingEquipmentUsageHistory(mrid)
+      if (rs.success == true) {
+        return { success: true, message: 'Success', data: rs.data }
+      } else {
+        return { success: false, message: 'fail' }
+      }
+    } catch (error: any) {
+      return {
+        error,
+        success: false,
+        message: error && error.message ? error.message : 'Internal error'
+      }
+    }
+  })
+}
+
+// Xóa toàn bộ thông tin của 1 testing equipment
+export const deleteTestingEquipmentEntity = () => {
+  ipcMain.handle('deleteTestingEquipmentEntity', async function (_event, mrid) {
+    try {
+      const rs: any = await entityFunc.testingEquipmentEntityFunc.deleteTestingEquipmentEntity(mrid)
+      if (rs.success == true) {
+        return {
+          success: true,
+          message: 'Success',
+          data: mrid
+        }
+      } else {
+        return {
+          success: false,
+          message: 'fail'
+        }
+      }
+    } catch (error: any) {
+      return {
+        error: error,
+        success: false,
+        message: error && error.message ? error.message : 'Internal error'
+      }
+    }
+  })
+}
+
+export const active = () => {
+  insertTestingEquipmentEntity()
+  getAllTestingEquipmentList()
+  getAllAccessories()
+  getTestingEquipmentEntityByMrid()
+  getTestingEquipmentUsage()
+  deleteTestingEquipmentEntity()
+}

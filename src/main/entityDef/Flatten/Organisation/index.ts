@@ -1,35 +1,35 @@
-import TelephoneNumber from '@/views/Cim/TelephoneNumber';
-import StreetAddress from '@/views/Cim/StreetAddress';
-import TownDetail from '@/views/Cim/TownDetail';
-import StreetDetail from '@/views/Cim/StreetDetail';    
-import Attachment from '@/views/Flatten/Attachment';
-import EletronicAddress from '@/views/Cim/ElectronicAddress';
-import Organisation from '@/views/Cim/Organisation';
+import TelephoneNumber from '@/views/Cim/TelephoneNumber'
+import StreetAddress from '@/views/Cim/StreetAddress'
+import TownDetail from '@/views/Cim/TownDetail'
+import StreetDetail from '@/views/Cim/StreetDetail'
+import Attachment from '@/views/Flatten/Attachment'
+import EletronicAddress from '@/views/Cim/ElectronicAddress'
+import Organisation from '@/views/Cim/Organisation'
 import User from '@/views/Flatten/User/index'
 
 class OrganisationEntity {
-    attachment: any
-    configurationEvent: any
-    electronicAddress: any
-    organisation: any
-    positionPoints: any
-    streetAddress: any
-    streetDetail: any
-    telephoneNumber: any
-    townDetail: any
-    user: any
-    constructor() {
-        this.organisation = new Organisation();
-        this.electronicAddress = new EletronicAddress();
-        this.telephoneNumber = new TelephoneNumber();
-        this.streetAddress = new StreetAddress();
-        this.townDetail = new TownDetail();
-        this.streetDetail = new StreetDetail();
-        this.attachment = new Attachment();
-        this.configurationEvent = []
-        this.positionPoints = []
-        this.user = new User();
-    }
+  attachment: any
+  configurationEvent: any
+  electronicAddress: any
+  organisation: any
+  positionPoints: any
+  streetAddress: any
+  streetDetail: any
+  telephoneNumber: any
+  townDetail: any
+  user: any
+  constructor() {
+    this.organisation = new Organisation()
+    this.electronicAddress = new EletronicAddress()
+    this.telephoneNumber = new TelephoneNumber()
+    this.streetAddress = new StreetAddress()
+    this.townDetail = new TownDetail()
+    this.streetDetail = new StreetDetail()
+    this.attachment = new Attachment()
+    this.configurationEvent = []
+    this.positionPoints = []
+    this.user = new User()
+  }
 }
 
-export default OrganisationEntity;
+export default OrganisationEntity

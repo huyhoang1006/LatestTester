@@ -11,15 +11,15 @@ import { capacitorJobPreload } from './capacitor'
 import { reactorJobPreload } from './reactor'
 
 export const jobEntityPreload = {
-    circuitBreakerJob: circuitBreakerJobPreload,
-    transformerJob: transformerJobPreload,
-    surgeArresterJob: surgeArresterJobPreload,
-    powerCableJob: powerCableJobPreload,
-    currentTransformerJob: currentTransformerJobPreload,
-    voltageTransformerJob: voltageTransformerJobPreload,
-    bushingJob: bushingJobPreload,
-    disconnectorJob: disconnectorJobPreload,
-    rotatingMachineJob: rotatingMachineJobPreload,
-    capacitorJob: capacitorJobPreload,
-    reactorJob: reactorJobPreload
+  circuitBreakerJob: circuitBreakerJobPreload,
+  transformerJob: transformerJobPreload,
+  surgeArresterJob: surgeArresterJobPreload,
+  powerCableJob: powerCableJobPreload,
+  currentTransformerJob: currentTransformerJobPreload,
+  voltageTransformerJob: voltageTransformerJobPreload,
+  bushingJob: bushingJobPreload,
+  disconnectorJob: disconnectorJobPreload,
+  rotatingMachineJob: rotatingMachineJobPreload,
+  capacitorJob: capacitorJobPreload,
+  reactorJob: reactorJobPreload
 }

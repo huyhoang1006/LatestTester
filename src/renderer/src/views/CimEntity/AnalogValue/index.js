@@ -1,12 +1,12 @@
-import MeasurementValue from '../MeasurementValue';
-import Analog from "../Analog";
+import MeasurementValue from '../MeasurementValue'
+import Analog from '../Analog'
 
 class AnalogValue extends MeasurementValue {
-    constructor() {
-        super();
-        this.value = null;
-        this.analog = new Analog();
-    }
+  constructor() {
+    super()
+    this.value = null
+    this.analog = new Analog()
+  }
 }
 
-export default AnalogValue;
+export default AnalogValue

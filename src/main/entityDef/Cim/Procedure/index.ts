@@ -1,17 +1,17 @@
-import Document from "../Document";
+import Document from '../Document'
 
 class Procedure extends Document {
-    generic_asset_model: any
-    instruction: any
-    kind: any
-    sequence_number: any
-    constructor() {
-        super();
-        this.instruction = null; // e.g., "surgical", "diagnostic"
-        this.kind = null; // e.g., "scalpel", "surgical drape"
-        this.sequence_number = null; // e.g., "2023-10-01
-        this.generic_asset_model = null; // e.g., "Model X"
-    }
+  generic_asset_model: any
+  instruction: any
+  kind: any
+  sequence_number: any
+  constructor() {
+    super()
+    this.instruction = null // e.g., "surgical", "diagnostic"
+    this.kind = null // e.g., "scalpel", "surgical drape"
+    this.sequence_number = null // e.g., "2023-10-01
+    this.generic_asset_model = null // e.g., "Model X"
+  }
 }
 
-export default Procedure;
+export default Procedure

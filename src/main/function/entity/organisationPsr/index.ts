@@ -1,9 +1,9 @@
 import db from '../../datacontext/index'
 
 export const insertOrganisationPsr: any = async (organisationPsr: any) => {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `INSERT INTO organisation_psr(
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO organisation_psr(
                 mrid,
                 organisation_id,
                 psr_id
@@ -11,23 +11,23 @@ export const insertOrganisationPsr: any = async (organisationPsr: any) => {
             ON CONFLICT(mrid) DO UPDATE SET
                 organisation_id = excluded.organisation_id,
                 psr_id = excluded.psr_id`,
-            [
-                organisationPsr.mrid,
-                organisationPsr.organisation_id,
-                organisationPsr.psr_id
-            ],
-            function (err: any) {
-                if (err) return reject({ success: false, err, message: 'Insert organisationPsr failed' })
-                return resolve({ success: true, data: organisationPsr, message: 'Insert organisationPsr completed' })
-            }
-        )
-    })
+      [organisationPsr.mrid, organisationPsr.organisation_id, organisationPsr.psr_id],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Insert organisationPsr failed' })
+        return resolve({
+          success: true,
+          data: organisationPsr,
+          message: 'Insert organisationPsr completed'
+        })
+      }
+    )
+  })
 }
 
 export const insertOrganisationPsrTransaction: any = async (organisationPsr: any, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `INSERT INTO organisation_psr(
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `INSERT INTO organisation_psr(
                 mrid,
                 organisation_id,
                 psr_id
@@ -35,86 +35,102 @@ export const insertOrganisationPsrTransaction: any = async (organisationPsr: any
             ON CONFLICT(mrid) DO UPDATE SET
                 organisation_id = excluded.organisation_id,
                 psr_id = excluded.psr_id`,
-            [
-                organisationPsr.mrid,
-                organisationPsr.organisation_id,
-                organisationPsr.psr_id
-            ],
-            function (err: any) {
-                if (err) return reject({ success: false, err, message: 'Insert organisationPsr failed' })
-                return resolve({ success: true, data: organisationPsr, message: 'Insert organisationPsr completed' })
-            }
-        )
-    })
+      [organisationPsr.mrid, organisationPsr.organisation_id, organisationPsr.psr_id],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Insert organisationPsr failed' })
+        return resolve({
+          success: true,
+          data: organisationPsr,
+          message: 'Insert organisationPsr completed'
+        })
+      }
+    )
+  })
 }
 
 export const getOrganisationPsrById: any = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        db.get("SELECT * FROM organisation_psr WHERE mrid = ?", [mrid], (err: any, row: any) => {
-            if (err) return reject({ success: false, err, message: 'Get organisationPsr failed' })
-            if (!row) return resolve({ success: false, data: null, message: 'OrganisationPsr not found' })
-            return resolve({ success: true, data: row, message: 'Get organisationPsr completed' })
-        })
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM organisation_psr WHERE mrid = ?', [mrid], (err: any, row: any) => {
+      if (err) return reject({ success: false, err, message: 'Get organisationPsr failed' })
+      if (!row) return resolve({ success: false, data: null, message: 'OrganisationPsr not found' })
+      return resolve({ success: true, data: row, message: 'Get organisationPsr completed' })
     })
+  })
 }
 
-export const getOrganisationPsrByOrganisationIdAndPsrId: any = async (organisation_id: string, psr_id: string) => {
-    return new Promise((resolve, reject) => {
-        db.get("SELECT * FROM organisation_psr WHERE organisation_id = ? AND psr_id = ?", [organisation_id, psr_id], (err: any, row: any) => {
-            if (err) return reject({ success: false, err, message: 'Get organisationPsr failed' })
-            if (!row) return resolve({ success: false, data: null, message: 'OrganisationPsr not found' })
-            return resolve({ success: true, data: row, message: 'Get organisationPsr completed' })
-        })
-    })
+export const getOrganisationPsrByOrganisationIdAndPsrId: any = async (
+  organisation_id: string,
+  psr_id: string
+) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      'SELECT * FROM organisation_psr WHERE organisation_id = ? AND psr_id = ?',
+      [organisation_id, psr_id],
+      (err: any, row: any) => {
+        if (err) return reject({ success: false, err, message: 'Get organisationPsr failed' })
+        if (!row)
+          return resolve({ success: false, data: null, message: 'OrganisationPsr not found' })
+        return resolve({ success: true, data: row, message: 'Get organisationPsr completed' })
+      }
+    )
+  })
 }
 
 export const getOrganisationPsrByOrganisationId: any = async (organisation_id: string) => {
-    return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM organisation_psr WHERE organisation_id = ?", [organisation_id], (err: any, rows: any) => {
-            if (err) return reject({ success: false, err, message: 'Get organisationPsr failed' })
-            if (!rows || rows.length === 0) return resolve({ success: false, data: null, message: 'OrganisationPsr not found' })
-            return resolve({ success: true, data: rows, message: 'Get organisationPsr completed' })
-        })
-    })
+  return new Promise((resolve, reject) => {
+    db.all(
+      'SELECT * FROM organisation_psr WHERE organisation_id = ?',
+      [organisation_id],
+      (err: any, rows: any) => {
+        if (err) return reject({ success: false, err, message: 'Get organisationPsr failed' })
+        if (!rows || rows.length === 0)
+          return resolve({ success: false, data: null, message: 'OrganisationPsr not found' })
+        return resolve({ success: true, data: rows, message: 'Get organisationPsr completed' })
+      }
+    )
+  })
 }
 
 export const getOrganisationPsrByPsrId: any = async (psr_id: string) => {
-    return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM organisation_psr WHERE psr_id = ?", [psr_id], (err: any, rows: any) => {
-            if (err) return reject({ success: false, err, message: 'Get organisationPsr failed' })
-            if (!rows || rows.length === 0) return resolve({ success: false, data: null, message: 'OrganisationPsr not found' })
-            return resolve({ success: true, data: rows, message: 'Get organisationPsr completed' })
-        })
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM organisation_psr WHERE psr_id = ?', [psr_id], (err: any, rows: any) => {
+      if (err) return reject({ success: false, err, message: 'Get organisationPsr failed' })
+      if (!rows || rows.length === 0)
+        return resolve({ success: false, data: null, message: 'OrganisationPsr not found' })
+      return resolve({ success: true, data: rows, message: 'Get organisationPsr completed' })
     })
+  })
 }
 
 export const updateOrganisationPsrById: any = async (mrid: string, organisationPsr: any) => {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `UPDATE organisation_psr SET
+  return new Promise((resolve, reject) => {
+    db.run(
+      `UPDATE organisation_psr SET
                 organisation_id = ?,
                 psr_id = ?
             WHERE mrid = ?`,
-            [
-                organisationPsr.organisation_id,
-                organisationPsr.psr_id,
-                mrid
-            ],
-            function (this: any, err: any) {
-                if (err) return reject({ success: false, err, message: 'Update organisationPsr failed' })
-                if (this.changes === 0) return resolve({ success: false, message: 'OrganisationPsr not found' })
-                return resolve({ success: true, data: organisationPsr, message: 'Update organisationPsr completed' })
-            }
-        )
-    })
+      [organisationPsr.organisation_id, organisationPsr.psr_id, mrid],
+      function (this: any, err: any) {
+        if (err) return reject({ success: false, err, message: 'Update organisationPsr failed' })
+        if (this.changes === 0)
+          return resolve({ success: false, message: 'OrganisationPsr not found' })
+        return resolve({
+          success: true,
+          data: organisationPsr,
+          message: 'Update organisationPsr completed'
+        })
+      }
+    )
+  })
 }
 
 export const deleteOrganisationPsrById: any = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        db.run("DELETE FROM organisation_psr WHERE mrid = ?", [mrid], function (this: any, err: any) {
-            if (err) return reject({ success: false, err, message: 'Delete organisationPsr failed' })
-            if (this.changes === 0) return resolve({ success: false, message: 'OrganisationPsr not found' })
-            return resolve({ success: true, message: 'Delete organisationPsr completed' })
-        })
+  return new Promise((resolve, reject) => {
+    db.run('DELETE FROM organisation_psr WHERE mrid = ?', [mrid], function (this: any, err: any) {
+      if (err) return reject({ success: false, err, message: 'Delete organisationPsr failed' })
+      if (this.changes === 0)
+        return resolve({ success: false, message: 'OrganisationPsr not found' })
+      return resolve({ success: true, message: 'Delete organisationPsr completed' })
     })
+  })
 }

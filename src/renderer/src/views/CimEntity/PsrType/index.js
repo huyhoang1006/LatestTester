@@ -1,8 +1,8 @@
-import IdentifiedObject from "../IdentifiedObject";
+import IdentifiedObject from '../IdentifiedObject'
 
 class PsrType extends IdentifiedObject {
-    constructor() {
-        super()
-    }
+  constructor() {
+    super()
+  }
 }
 export default PsrType

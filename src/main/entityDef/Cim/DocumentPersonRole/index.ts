@@ -1,9 +1,9 @@
-import PersonRole from "../PersonRole";
+import PersonRole from '../PersonRole'
 
 class DocumentPersonRole extends PersonRole {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super()
+  }
 }
 
-export default DocumentPersonRole;
+export default DocumentPersonRole

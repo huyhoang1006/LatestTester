@@ -1,7 +1,7 @@
 export default {
-    methods: {
-        handleExportXMLFromContext() {
-            this.openExportDialog = true
-        },
+  methods: {
+    handleExportXMLFromContext() {
+      this.openExportDialog = true
     }
+  }
 }

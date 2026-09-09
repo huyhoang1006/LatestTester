@@ -1,8 +1,8 @@
-import PowerSystemResource from "../PowerSystemResource";
+import PowerSystemResource from '../PowerSystemResource'
 
 class ConnectivityNodeContainer extends PowerSystemResource {
-    constructor() {
-        super()
-    }
+  constructor() {
+    super()
+  }
 }
 export default ConnectivityNodeContainer

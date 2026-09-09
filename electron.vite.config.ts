@@ -46,14 +46,15 @@ export default defineConfig({
         '@components': resolve(__dirname, 'src/renderer/src/components'),
         '@utils': resolve(__dirname, 'src/renderer/src/utils'),
         '@config': resolve(__dirname, 'src/renderer/src/config'),
-        'vue-plotly': resolve(__dirname, 'src/renderer/src/vue-plotly-stub.js'),
         'vue2-leaflet': resolve(__dirname, 'src/renderer/src/vue2-leaflet-stub.js')
       }
     },
     plugins: [vue()],
     server: {
-      port: 5173,
-      strictPort: true
+      host: '127.0.0.1',
+      port: 8080,
+      strictPort: true,
+      hmr: { host: '127.0.0.1', port: 8080 }
     }
   }
 })

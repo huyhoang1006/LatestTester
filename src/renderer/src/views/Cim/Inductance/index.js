@@ -1,10 +1,10 @@
 class Inductance {
-    constructor() {
-        this.mrid = null
-        this.multiplier = null
-        this.unit = null
-        this.value = null
-    }
+  constructor() {
+    this.mrid = null
+    this.multiplier = null
+    this.unit = null
+    this.value = null
+  }
 }
 
-export default Inductance;
+export default Inductance

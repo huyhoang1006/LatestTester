@@ -1,11 +1,11 @@
-import IdentifiedObject from "../IdentifiedObject";
-import Voltage from "../Voltage";
+import IdentifiedObject from '../IdentifiedObject'
+import Voltage from '../Voltage'
 
 class BaseVoltage extends IdentifiedObject {
-    constructor() {
-        super();
-                this.nominalVoltage = new Voltage(); // Base voltage value
-    }
+  constructor() {
+    super()
+    this.nominalVoltage = new Voltage() // Base voltage value
+  }
 }
 
-export default BaseVoltage;
+export default BaseVoltage

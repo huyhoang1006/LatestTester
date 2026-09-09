@@ -1,64 +1,85 @@
 <template>
-    <div id="properties">
-        <el-row :gutter="20" class="content">
-            <el-col :span="12" class="col-content">
-                <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
-                    <span class="bolder">Properties</span>
-                    <el-divider></el-divider>
-                    <el-form-item label="Asset">
-                        <el-select style="width: 100%" v-model="propertiesData.kind" placeholder="Select asset">
-                            <el-option label="Disconnector" value="Disconnector"> </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="Asset type">
-                        <el-select style="width: 100%" v-model="propertiesData.type" placeholder="Select asset type">
-                            <el-option label="Center-break disconnector" value="centerBreak"> </el-option>
-                            <el-option label="Double-break disconnector" value="doubleBreak"> </el-option>
-                            <el-option label="Horizontal knee disconnector" value="horizontalKnee"> </el-option>
-                            <el-option label="Pantograph disconnector" value="pantograph"> </el-option>
-                            <el-option label="Vertical-break disconnector" value="verticalBreak"> </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="Serial no.">
-                        <el-input v-model="propertiesData.serial_no"></el-input>
-                    </el-form-item>
-                    <el-form-item label="Manufacturer">
-                        <el-select style="width: 100%;" v-model="propertiesData.manufacturer" placeholder="Manufacturer"
-                            size="small">
-                            <el-option v-for="m in manufacturerList" :key="m" :label="m" :value="m">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="Manufacturer type">
-                        <el-input v-model="propertiesData.manufacturer_type"></el-input>
-                    </el-form-item>
-                    <el-form-item label="Manufacturing year">
-                        <el-input type="text" number="year" v-model="propertiesData.manufacturing_year"></el-input>
-                    </el-form-item>
-                    <el-form-item label="Country of origin">
-                        <el-select style="width: 100%;" filterable v-model="propertiesData.country_of_origin">
-                            <el-option v-for="item in countryData" :key="item" :label="item" :value="item"> </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="Apparatus ID">
-                        <el-input v-model="propertiesData.apparatus_id"></el-input>
-                    </el-form-item>
-                    <el-form-item label="Feeder">
-                        <el-input v-model="propertiesData.feeder"></el-input>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-            <el-col :span="12" class="col-content">
-                <el-form :label-width="labelWidth" size="small" label-position="left">
-                    <span class="bolder">Comment</span>
-                    <el-divider></el-divider>
-                    <el-input type="textarea" :rows="5" v-model="propertiesData.comment"></el-input>
-                    <Attachment :attachment_="this.attachmentData" title="disconnector" height="120px"
-                        @data-attachment="getDataAttachment"></Attachment>
-                </el-form>
-            </el-col>
-        </el-row>
-    </div>
+  <div id="properties">
+    <el-row :gutter="20" class="content">
+      <el-col :span="12" class="col-content">
+        <el-form
+          :inline-message="true"
+          :label-width="labelWidth"
+          size="small"
+          label-position="left"
+        >
+          <span class="bolder">Properties</span>
+          <el-divider></el-divider>
+          <el-form-item label="Asset">
+            <el-select style="width: 100%" v-model="propertiesData.kind" placeholder="Select asset">
+              <el-option label="Disconnector" value="Disconnector"> </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Asset type">
+            <el-select
+              style="width: 100%"
+              v-model="propertiesData.type"
+              placeholder="Select asset type"
+            >
+              <el-option label="Center-break disconnector" value="centerBreak"> </el-option>
+              <el-option label="Double-break disconnector" value="doubleBreak"> </el-option>
+              <el-option label="Horizontal knee disconnector" value="horizontalKnee"> </el-option>
+              <el-option label="Pantograph disconnector" value="pantograph"> </el-option>
+              <el-option label="Vertical-break disconnector" value="verticalBreak"> </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Serial no.">
+            <el-input v-model="propertiesData.serial_no"></el-input>
+          </el-form-item>
+          <el-form-item label="Manufacturer">
+            <el-select
+              style="width: 100%"
+              v-model="propertiesData.manufacturer"
+              placeholder="Manufacturer"
+              size="small"
+            >
+              <el-option v-for="m in manufacturerList" :key="m" :label="m" :value="m"> </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Manufacturer type">
+            <el-input v-model="propertiesData.manufacturer_type"></el-input>
+          </el-form-item>
+          <el-form-item label="Manufacturing year">
+            <el-input
+              type="text"
+              number="year"
+              v-model="propertiesData.manufacturing_year"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="Country of origin">
+            <el-select style="width: 100%" filterable v-model="propertiesData.country_of_origin">
+              <el-option v-for="item in countryData" :key="item" :label="item" :value="item">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Apparatus ID">
+            <el-input v-model="propertiesData.apparatus_id"></el-input>
+          </el-form-item>
+          <el-form-item label="Feeder">
+            <el-input v-model="propertiesData.feeder"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-col>
+      <el-col :span="12" class="col-content">
+        <el-form :label-width="labelWidth" size="small" label-position="left">
+          <span class="bolder">Comment</span>
+          <el-divider></el-divider>
+          <el-input type="textarea" :rows="5" v-model="propertiesData.comment"></el-input>
+          <Attachment
+            :attachment_="this.attachmentData"
+            title="disconnector"
+            height="120px"
+            @data-attachment="getDataAttachment"
+          ></Attachment>
+        </el-form>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 
 <script>
@@ -67,77 +88,77 @@ import MANUFACTURER_MAP from '@/views/ConstantAsset/manufacturer'
 import Attachment from '@/views/Common/Attachment.vue'
 
 export default {
-    name: 'voltageTransProperty',
-    components: {
-        Attachment
+  name: 'voltageTransProperty',
+  components: {
+    Attachment
+  },
+  props: {
+    properties: {
+      type: Object,
+      require: true
     },
-    props: {
-        properties: {
-            type: Object,
-            require: true,
-        },
-        title: {
-            require: true
-        },
-        attachment: {
-            type: Array,
-            default: () => []
-        },
+    title: {
+      require: true
     },
-    data() {
-        return {
-            labelWidth: `200px`,
-            countryData: country.default,
-            manufacturerList: MANUFACTURER_MAP['DisconnectorDTO'],
-            attachmentData: []
-        }
-    },
-    watch: {
-        attachment: {
-            handler(val) {
-                this.attachmentData = val
-            },
-        }
-    },
-    methods: {
-        getDataAttachment(rowData) {
-            this.attachmentData = rowData
-            this.$emit('update-attachment', this.attachmentData)
-        },
-    },
-    computed: {
-        propertiesData() {
-            return this.properties
-        }
-    },
+    attachment: {
+      type: Array,
+      default: () => []
+    }
+  },
+  data() {
+    return {
+      labelWidth: `200px`,
+      countryData: country.default,
+      manufacturerList: MANUFACTURER_MAP['DisconnectorDTO'],
+      attachmentData: []
+    }
+  },
+  watch: {
+    attachment: {
+      handler(val) {
+        this.attachmentData = val
+      }
+    }
+  },
+  methods: {
+    getDataAttachment(rowData) {
+      this.attachmentData = rowData
+      this.$emit('update-attachment', this.attachmentData)
+    }
+  },
+  computed: {
+    propertiesData() {
+      return this.properties
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 #asset {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 table,
 td,
 th {
-    border: 1px solid;
+  border: 1px solid;
 }
 
 table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
 th,
 td {
-    padding: 0px 10px;
-    height: 30px;
+  padding: 0px 10px;
+  height: 30px;
 }
 
 .bolder {
-    font-size: 12px;
+  font-size: 12px;
 }
 </style>

@@ -2,33 +2,37 @@ import db from '../../datacontext/index'
 import * as AssetInfoFunc from '../assetInfo/index'
 
 export const getSwitchInfoById = async (mrid: string) => {
-    try {
-        const assetInfoResult: any = await AssetInfoFunc.getAssetInfoById(mrid)
-        if (!assetInfoResult.success) {
-            return { success: false, data: null, message: 'AssetInfo not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get("SELECT * FROM switch_info WHERE mrid=?", [mrid], (err: any, row: any) => {
-                if (err) return reject({ success: false, err, message: 'Get SwitchInfo failed' })
-                if (!row) return resolve({ success: false, data: null, message: 'SwitchInfo not found' })
-                const data = { ...assetInfoResult.data, ...row }
-                return resolve({ success: true, data, message: 'Get SwitchInfo completed' })
-            })
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get SwitchInfo failed' }
+  try {
+    const assetInfoResult: any = await AssetInfoFunc.getAssetInfoById(mrid)
+    if (!assetInfoResult.success) {
+      return { success: false, data: null, message: 'AssetInfo not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM switch_info WHERE mrid=?', [mrid], (err: any, row: any) => {
+        if (err) return reject({ success: false, err, message: 'Get SwitchInfo failed' })
+        if (!row) return resolve({ success: false, data: null, message: 'SwitchInfo not found' })
+        const data = { ...assetInfoResult.data, ...row }
+        return resolve({ success: true, data, message: 'Get SwitchInfo completed' })
+      })
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get SwitchInfo failed' }
+  }
 }
 
 export const insertSwitchInfoTransaction = async (info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const assetInfoResult: any = await AssetInfoFunc.insertAssetInfoTransaction(info, dbsql)
-            if (!assetInfoResult.success) {
-                return reject({ success: false, message: 'Insert AssetInfo failed', err: assetInfoResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO switch_info (
+  return new Promise(async (resolve, reject) => {
+    try {
+      const assetInfoResult: any = await AssetInfoFunc.insertAssetInfoTransaction(info, dbsql)
+      if (!assetInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert AssetInfo failed',
+          err: assetInfoResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO switch_info (
                     mrid,
                     breaking_capacity,
                     gas_weight_per_tank,
@@ -48,66 +52,70 @@ export const insertSwitchInfoTransaction = async (info: any, dbsql: any) => {
                     rated_impulse_withstand_voltage = excluded.rated_impulse_withstand_voltage,
                     rated_interrupting_time = excluded.rated_interrupting_time,
                     rated_voltage = excluded.rated_voltage`,
-                [
-                    info.mrid,
-                    info.breaking_capacity || null,
-                    info.gas_weight_per_tank || null,
-                    info.oil_volume_per_tank || null,
-                    info.rated_current || null,
-                    info.rated_frequency || null,
-                    info.rated_impulse_withstand_voltage || null,
-                    info.rated_interrupting_time || null,
-                    info.rated_voltage || null
-                ],
-                function (err: any) {
-                    if (err) {
-                        return reject({ success: false, err, message: 'Insert SwitchInfo failed' })
-                    }
-                    return resolve({ success: true, data: info, message: 'Insert SwitchInfo completed' })
-                }
-            )
-        } catch (err) {
-            console.log(err);
+        [
+          info.mrid,
+          info.breaking_capacity || null,
+          info.gas_weight_per_tank || null,
+          info.oil_volume_per_tank || null,
+          info.rated_current || null,
+          info.rated_frequency || null,
+          info.rated_impulse_withstand_voltage || null,
+          info.rated_interrupting_time || null,
+          info.rated_voltage || null
+        ],
+        function (err: any) {
+          if (err) {
             return reject({ success: false, err, message: 'Insert SwitchInfo failed' })
+          }
+          return resolve({ success: true, data: info, message: 'Insert SwitchInfo completed' })
         }
-    })
+      )
+    } catch (err) {
+      console.log(err)
+      return reject({ success: false, err, message: 'Insert SwitchInfo failed' })
+    }
+  })
 }
 
 export const updateSwitchInfoTransaction = async (mrid: string, info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const assetInfoResult: any = await AssetInfoFunc.updateAssetInfoTransaction(mrid, info, dbsql)
-            if (!assetInfoResult.success) {
-                return reject({ success: false, message: 'Update AssetInfo failed', err: assetInfoResult.err })
-            }
-            dbsql.run(
-                `UPDATE switch_info SET name=?, location=?, rated_current=?, rated_voltage=? WHERE mrid=?`,
-                [info.name, info.location, info.rated_current, info.rated_voltage, mrid],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Update SwitchInfo failed' })
-                    return resolve({ success: true, data: info, message: 'Update SwitchInfo completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Update SwitchInfo failed' })
+  return new Promise(async (resolve, reject) => {
+    try {
+      const assetInfoResult: any = await AssetInfoFunc.updateAssetInfoTransaction(mrid, info, dbsql)
+      if (!assetInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Update AssetInfo failed',
+          err: assetInfoResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE switch_info SET name=?, location=?, rated_current=?, rated_voltage=? WHERE mrid=?`,
+        [info.name, info.location, info.rated_current, info.rated_voltage, mrid],
+        function (err: any) {
+          if (err) return reject({ success: false, err, message: 'Update SwitchInfo failed' })
+          return resolve({ success: true, data: info, message: 'Update SwitchInfo completed' })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Update SwitchInfo failed' })
+    }
+  })
 }
 
 export const deleteSwitchInfoByIdTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        AssetInfoFunc.deleteAssetInfoByIdTransaction(mrid, dbsql)
-            .then((result: any) => {
-                if (!result.success) {
-                    return reject({ success: false, message: 'Delete AssetInfo failed', err: result.err })
-                }
-                dbsql.run("DELETE FROM switch_info WHERE mrid=?", [mrid], function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Delete SwitchInfo failed' })
-                    return resolve({ success: true, data: mrid, message: 'Delete SwitchInfo completed' })
-                })
-            })
-            .catch((err: any) => {
-                return reject({ success: false, err, message: 'Delete SwitchInfo transaction failed' })
-            })
-    })
+  return new Promise((resolve, reject) => {
+    AssetInfoFunc.deleteAssetInfoByIdTransaction(mrid, dbsql)
+      .then((result: any) => {
+        if (!result.success) {
+          return reject({ success: false, message: 'Delete AssetInfo failed', err: result.err })
+        }
+        dbsql.run('DELETE FROM switch_info WHERE mrid=?', [mrid], function (err: any) {
+          if (err) return reject({ success: false, err, message: 'Delete SwitchInfo failed' })
+          return resolve({ success: true, data: mrid, message: 'Delete SwitchInfo completed' })
+        })
+      })
+      .catch((err: any) => {
+        return reject({ success: false, err, message: 'Delete SwitchInfo transaction failed' })
+      })
+  })
 }

@@ -1,9 +1,9 @@
-import IdentifiedObject from "../IdentifiedObject";
+import IdentifiedObject from '../IdentifiedObject'
 
 class MeasurementValueSource extends IdentifiedObject {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super()
+  }
 }
 
-export default MeasurementValueSource;
+export default MeasurementValueSource

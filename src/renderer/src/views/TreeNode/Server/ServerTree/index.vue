@@ -1,103 +1,119 @@
 <template>
-    <div ref="sidebarServer" class="sidebar">
-        <div class="title-temp">
+  <div ref="sidebarServer" class="sidebar">
+    <!-- <div class="title-temp">
             <div ref="tabContainer" class="tab-container">
                 <div ref="ownerRootServer" @click="$emit('showOwnerServerRoot')" class="tab">Organisation</div>
             </div>
-        </div>
+        </div> -->
 
-        <div class="child-nav" >
-            <ul>
-                <TreeNode v-for="item in ownerServerList" :key="getItemUniqueKey(item)" :node="item" :selectedNodes="selectedNodes"
-                    @update:selectedNodes="$emit('update:selectedNodes', $event)"
-                    @fetch-children="$emit('fetch-children-server', $event)"
-                    @show-properties="$emit('show-properties', $event)"
-                    @update-selection="$emit('update-selection', $event)"
-                    @clear-selection="$emit('clear-selection', $event)"
-                    @double-click-node="$emit('double-click-node-server', $event)" @open-context-menu="openContextMenu">
-                </TreeNode>
-            </ul>
+    <div class="child-nav">
+      <ul>
+        <TreeNode
+          v-for="item in ownerServerList"
+          :key="getItemUniqueKey(item)"
+          :node="item"
+          :selectedNodes="selectedNodes"
+          @update:selectedNodes="$emit('update:selectedNodes', $event)"
+          @fetch-children="$emit('fetch-children-server', $event)"
+          @show-properties="$emit('show-properties', $event)"
+          @update-selection="$emit('update-selection', $event)"
+          @clear-selection="$emit('clear-selection', $event)"
+          @double-click-node="$emit('double-click-node-server', $event)"
+          @open-context-menu="openContextMenu"
+        >
+        </TreeNode>
+      </ul>
 
-            <contextMenu ref="contextMenu" @show-data="$emit('show-data', $event)"
-                @show-zero-diagram="$emit('show-zero-diagram', $event)"
-                @export-json="$emit('export-json', $event)" @export-json-cim="$emit('export-json-cim', $event)"
-                @export-xml="$emit('export-xml', $event)" @export-excel="$emit('export-excel', $event)"
-                @export-word="$emit('export-word', $event)" @export-pdf="$emit('export-pdf', $event)"
-                @duplicate-node="$emit('duplicate-node', $event)" @move-node="$emit('move-node', $event)"
-                @import-json="$emit('import-json', $event)" @import-json-cim="$emit('import-json-cim', $event)"
-                @refresh-node="$emit('refresh-node', $event)">
-            </contextMenu>
-        </div>
+      <contextMenu
+        ref="contextMenu"
+        @show-data="$emit('show-data', $event)"
+        @show-zero-diagram="$emit('show-zero-diagram', $event)"
+        @export-json="$emit('export-json', $event)"
+        @export-json-cim="$emit('export-json-cim', $event)"
+        @export-xml="$emit('export-xml', $event)"
+        @export-excel="$emit('export-excel', $event)"
+        @export-word="$emit('export-word', $event)"
+        @export-pdf="$emit('export-pdf', $event)"
+        @duplicate-node="$emit('duplicate-node', $event)"
+        @move-node="$emit('move-node', $event)"
+        @import-json="$emit('import-json', $event)"
+        @import-json-cim="$emit('import-json-cim', $event)"
+        @download="$emit('download', $event)"
+        @upload="$emit('upload', $event)"
+        @fmeca="$emit('fmeca', $event)"
+        @show-equipment="$emit('show-equipment', $event)"
+        @refresh-node="$emit('refresh-node', $event)"
+      >
+      </contextMenu>
     </div>
+  </div>
 </template>
 
 <script>
-
-import TreeNode from '@/views/Common/TreeNode.vue';
-import ContextMenu from '@/views/Common/ContextMenu.vue';
+import TreeNode from '@/views/Common/TreeNode.vue'
+import ContextMenu from '@/views/Common/ContextMenu.vue'
 
 export default {
-    name: "ServerTreePanel",
-    components: {
-        TreeNode,
-        ContextMenu
+  name: 'ServerTreePanel',
+  components: {
+    TreeNode,
+    ContextMenu
+  },
+  props: {
+    // Dữ liệu Server
+    ownerServerList: {
+      type: Array,
+      required: true
     },
-    props: {
-        // Dữ liệu Server
-        ownerServerList: {
-            type: Array,
-            required: true
-        },
-        selectedNodes: {
-            type: Array,
-            default: () => []
-        }
-    },
-    methods: {
-      getItemUniqueKey(item) {
-    if (!item.mrid) return Math.random().toString(36).substr(2, 9)
-    if (item.mode === 'asset') {
+    selectedNodes: {
+      type: Array,
+      default: () => []
+    }
+  },
+  methods: {
+    getItemUniqueKey(item) {
+      if (!item.mrid) return Math.random().toString(36).substr(2, 9)
+      if (item.mode === 'asset') {
         return `${item.mrid}_${item.asset}`
+      }
+      return `${item.mrid}_${item.mode}`
+    },
+    // Hàm mở menu nội bộ
+    async openContextMenu(event, node) {
+      // 1. Lấy element của menu Server (ref="contextMenu")
+      // Lưu ý: Đảm bảo ref bên HTML là 'contextMenu'
+      const menu = this.$refs.contextMenu.$el
+
+      const menuHeight = menu.offsetHeight || 320
+      const menuWidth = menu.offsetWidth || 180
+
+      // 2. Lấy vị trí click từ event
+      const clickX = event.clientX
+      const clickY = event.clientY
+      const windowHeight = window.innerHeight
+      const windowWidth = window.innerWidth
+
+      // 3. Tính toán vị trí hiển thị (Logic y hệt bên Client)
+      let top = clickY
+      let left = clickX
+
+      // Xử lý tràn mép dưới
+      if (clickY + menuHeight > windowHeight) {
+        top = clickY - menuHeight
+        if (top < 0) top = 0
+      }
+
+      // Xử lý tràn mép phải
+      if (clickX + menuWidth > windowWidth) {
+        left = clickX - menuWidth
+        if (left < 0) left = 0
+      }
+
+      // 4. Gọi hàm mở menu và TRUYỀN THÊM object { top, left }
+      this.$refs.contextMenu.openContextMenu(event, node, { top, left })
     }
-    return `${item.mrid}_${item.mode}`
-},
-        // Hàm mở menu nội bộ
-        async openContextMenu(event, node) {
-            // 1. Lấy element của menu Server (ref="contextMenu")
-            // Lưu ý: Đảm bảo ref bên HTML là 'contextMenu'
-            const menu = this.$refs.contextMenu.$el
-
-            const menuHeight = menu.offsetHeight || 320
-            const menuWidth = menu.offsetWidth || 180
-
-            // 2. Lấy vị trí click từ event
-            const clickX = event.clientX
-            const clickY = event.clientY
-            const windowHeight = window.innerHeight
-            const windowWidth = window.innerWidth
-
-            // 3. Tính toán vị trí hiển thị (Logic y hệt bên Client)
-            let top = clickY
-            let left = clickX
-
-            // Xử lý tràn mép dưới
-            if (clickY + menuHeight > windowHeight) {
-                top = clickY - menuHeight
-                if (top < 0) top = 0
-            }
-
-            // Xử lý tràn mép phải
-            if (clickX + menuWidth > windowWidth) {
-                left = clickX - menuWidth
-                if (left < 0) left = 0
-            }
-
-            // 4. Gọi hàm mở menu và TRUYỀN THÊM object { top, left }
-            this.$refs.contextMenu.openContextMenu(event, node, { top, left })
-        },
-
-    }
-};
+  }
+}
 </script>
 
 <style scoped>
@@ -112,11 +128,13 @@ export default {
 
 .sidebar ul {
   list-style: none;
-  padding-left: 20px;
+  padding-left: 8px;
+  padding-right: 4px;
+  margin: 4px 0;
 }
 
 .sidebar li {
-  margin: 5px 0;
+  margin: 0;
   cursor: pointer;
 }
 
@@ -174,12 +192,14 @@ export default {
 
 .child-nav {
   overflow-y: hidden;
-  height: calc(100% - 80px);
+  overflow-x: hidden;
+  height: 100%;
   box-sizing: border-box;
 }
 
 .child-nav:hover {
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .title-node {

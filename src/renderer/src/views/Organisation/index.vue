@@ -1,140 +1,175 @@
 <template>
-    <div>
-        <el-row :gutter="20">
-            <el-col :xs="24" :md="12">
-                <div class="col-content">
-                    <el-form :model="properties" :inline-message="true" :label-width="labelWidth" size="small"
-                        label-position="left">
-                        <span class="bolder">Properties</span>
-                        <el-divider class="thick-divider"></el-divider>
-                        <el-form-item label="Organisation">
-                        </el-form-item>
-                        <el-form-item label="Name" class="custom-label">
-                            <el-input v-model="properties.name"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Tax code" class="custom-label">
-                            <el-input v-model="properties.tax_code"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Street" class="custom-label">
-                            <el-input v-model="properties.street"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Ward/ Commune" class="custom-label">
-                            <el-input v-model="properties.ward_or_commune"></el-input>
-                        </el-form-item>
-                        <el-form-item label="District/ Town" class="custom-label">
-                            <el-input v-model="properties.district_or_town"></el-input>
-                        </el-form-item>
-                        <el-form-item label="City" class="custom-label">
-                            <el-input v-model="properties.city"></el-input>
-                        </el-form-item>
-                        <el-form-item label="State/ Province" class="custom-label">
-                            <el-input v-model="properties.state_or_province"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Country" class="custom-label">
-                            <el-select style="width: 100%;" filterable v-model="properties.country">
-                                <el-option v-for="item in countryData" :key="item" :label="item" :value="item">
-                                </el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="Geo position x" class="custom-label geo-item">
-                            <div class="geo-row">
-                                <el-select class="geo-select" @change="changeValueGeo" v-model="properties.x_position">
-                                    <el-option v-for="(item, index) in properties.positionPoints.x" :key="index"
-                                        :value="index">
-                                        <div class="option-content">
-                                            <span>
-                                                {{ item.coor }}
-                                            </span>
-                                            <div class="icons">
-                                                <i @click="editCoor(index)" class="fa-solid fa-pen-to-square"
-                                                    style="color: green"></i>
-                                                <i @click="deleteCoor(index)" class="fa-solid fa-trash"
-                                                    style="color: red;"></i>
-                                            </div>
-                                        </div>
+    <div class="org-view">
+        <!-- Hàng 1: Properties | Comment + Attachment -->
+        <div class="org-row">
+            <div class="col-content">
+                <section class="org-card">
+                    <div class="org-header">
+                        <i class="fa-solid fa-building"></i>
+                        <span>Properties</span>
+                    </div>
+                    <div class="org-body">
+                        <el-form :model="properties" :inline-message="true" :label-width="labelWidth" size="small"
+                            label-position="left">
+                            <el-form-item label="Name">
+                                <el-input v-model="properties.name"></el-input>
+                            </el-form-item>
+                            <el-form-item label="Tax code">
+                                <el-input v-model="properties.tax_code"></el-input>
+                            </el-form-item>
+                            <el-form-item label="Street">
+                                <el-input v-model="properties.street"></el-input>
+                            </el-form-item>
+                            <el-form-item label="Ward / Suburb">
+                                <el-input v-model="properties.ward_or_commune"></el-input>
+                            </el-form-item>
+                            <el-form-item label="District / Town">
+                                <el-input v-model="properties.district_or_town"></el-input>
+                            </el-form-item>
+                            <el-form-item label="City">
+                                <el-input v-model="properties.city"></el-input>
+                            </el-form-item>
+                            <el-form-item label="State / Province">
+                                <el-input v-model="properties.state_or_province"></el-input>
+                            </el-form-item>
+                            <el-form-item label="Postcode">
+                                <el-input v-model="properties.postal_code"></el-input>
+                            </el-form-item>
+                            <el-form-item label="Country">
+                                <el-select filterable v-model="properties.country">
+                                    <el-option v-for="item in countryData" :key="item" :label="item" :value="item">
                                     </el-option>
                                 </el-select>
-                                <el-button class="geo-add-btn" @click="openAddGeo" type="primary"><i
-                                        class="fa-solid fa-plus"></i></el-button>
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="Geo position y" class="custom-label geo-item">
-                            <div class="geo-row">
-                                <el-select class="geo-select" @change="changeValueGeo" v-model="properties.y_position">
-                                    <el-option v-for="(item, index) in properties.positionPoints.y" :key="index"
-                                        :value="index">
-                                        <div class="option-content">
-                                            <span>
-                                                {{ item.coor }}
-                                            </span>
-                                            <div class="icons">
-                                                <i @click="editCoor(index)" class="fa-solid fa-pen-to-square"
-                                                    style="color: green"></i>
-                                                <i @click="deleteCoor(index)" class="fa-solid fa-trash"
-                                                    style="color: red;"></i>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </section>
+            </div>
+            <div class="col-content org-col-stack">
+                <section class="org-card org-comment-card">
+                    <div class="org-header">
+                        <i class="fa-solid fa-align-left"></i>
+                        <span>Comment</span>
+                    </div>
+                    <div class="org-body">
+                        <el-form size="small" class="org-comment-form">
+                            <el-input class="org-comment-input" type="textarea" v-model="properties.comment"></el-input>
+                        </el-form>
+                    </div>
+                </section>
+                <Attachment class="org-attach-card" :dataParent="this.properties" :deleteList="deleteList"
+                    :attachment_="this.attachmentData" title="substation" height="230px"
+                    @data-attachment="getDataAttachment"></Attachment>
+            </div>
+        </div>
+
+        <!-- Hàng 2: Geo location | Contact -->
+        <div class="org-row">
+            <div class="col-content">
+                <section class="org-card">
+                    <div class="org-header">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>Geo location</span>
+                    </div>
+                    <div class="org-body">
+                        <el-form :inline-message="true" :label-width="labelWidth" size="small" label-position="left">
+                            <el-form-item label="Geo position x" class="geo-item">
+                                <div class="geo-row">
+                                    <el-select class="geo-select" @change="changeValueGeo" v-model="properties.x_position">
+                                        <el-option v-for="(item, index) in properties.positionPoints.x" :key="index"
+                                            :value="index">
+                                            <div class="option-content">
+                                                <span>
+                                                    {{ item.coor }}
+                                                </span>
+                                                <div class="icons">
+                                                    <i @click="editCoor(index)" class="fa-solid fa-pen-to-square"
+                                                        style="color: green"></i>
+                                                    <i @click="deleteCoor(index)" class="fa-solid fa-trash"
+                                                        style="color: red;"></i>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </el-option>
-                                </el-select>
-                                <el-button class="geo-add-btn" @click="openAddGeo" type="primary"><i
-                                        class="fa-solid fa-plus"></i></el-button>
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="Geo position z" class="custom-label geo-item">
-                            <div class="geo-row">
-                                <el-select class="geo-select" @change="changeValueGeo" v-model="properties.z_position">
-                                    <el-option v-for="(item, index) in properties.positionPoints.z" :key="index"
-                                        :value="index">
-                                        <div class="option-content">
-                                            <span>
-                                                {{ item.coor }}
-                                            </span>
-                                            <div class="icons">
-                                                <i @click="editCoor(index)" class="fa-solid fa-pen-to-square"
-                                                    style="color: green"></i>
-                                                <i @click="deleteCoor(index)" class="fa-solid fa-trash"
-                                                    style="color: red;"></i>
+                                        </el-option>
+                                    </el-select>
+                                    <el-button class="geo-add-btn" @click="openAddGeo" type="primary"><i
+                                            class="fa-solid fa-plus"></i></el-button>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="Geo position y" class="geo-item">
+                                <div class="geo-row">
+                                    <el-select class="geo-select" @change="changeValueGeo" v-model="properties.y_position">
+                                        <el-option v-for="(item, index) in properties.positionPoints.y" :key="index"
+                                            :value="index">
+                                            <div class="option-content">
+                                                <span>
+                                                    {{ item.coor }}
+                                                </span>
+                                                <div class="icons">
+                                                    <i @click="editCoor(index)" class="fa-solid fa-pen-to-square"
+                                                        style="color: green"></i>
+                                                    <i @click="deleteCoor(index)" class="fa-solid fa-trash"
+                                                        style="color: red;"></i>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </el-option>
-                                </el-select>
-                                <el-button class="geo-add-btn" @click="openAddGeo" type="primary"><i
-                                        class="fa-solid fa-plus"></i></el-button>
-                            </div>
-                        </el-form-item>
-                            <geo-map class="mgt-20" ref='geoMap' :locationGeo='{}'></geo-map>
-                    </el-form>
-                </div>
-            </el-col>
-            <el-col :xs="24" :md="12">
-                <div class="col-content">
-                    <el-form :label-width="labelWidth" size="small" label-position="left">
-                        <span class="bolder">Contact</span>
-                        <el-divider></el-divider>
-                        <el-form-item label="Phone number">
-                            <el-input type="number" v-model="properties.phoneNumber"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Fax">
-                            <el-input type="number" v-model="properties.fax"></el-input>
-                        </el-form-item>
-                        <el-form-item label="Email">
-                            <el-input v-model="properties.email"></el-input>
-                        </el-form-item>
-                    </el-form>
-                </div>
-                <div class="col-content mgt-20">
-                    <el-form :label-width="labelWidth" size="small" label-position="left">
-                        <span class="bolder">Comment </span>
-                        <el-divider></el-divider>
-                        <el-input type="textarea" :rows="5" v-model="properties.comment"></el-input>
-                        <Attachment :dataParent="this.properties" :deleteList="deleteList"
-                            :attachment_="this.attachmentData" title="substation" height="120px"
-                            @data-attachment="getDataAttachment"></Attachment>
-                    </el-form>
-                </div>
-            </el-col>
-        </el-row>
-        <el-dialog custom-class="app-dialog" v-model="signAddGeo" :title="titleGeo" align-center
+                                        </el-option>
+                                    </el-select>
+                                    <el-button class="geo-add-btn" @click="openAddGeo" type="primary"><i
+                                            class="fa-solid fa-plus"></i></el-button>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="Geo position z" class="geo-item">
+                                <div class="geo-row">
+                                    <el-select class="geo-select" @change="changeValueGeo" v-model="properties.z_position">
+                                        <el-option v-for="(item, index) in properties.positionPoints.z" :key="index"
+                                            :value="index">
+                                            <div class="option-content">
+                                                <span>
+                                                    {{ item.coor }}
+                                                </span>
+                                                <div class="icons">
+                                                    <i @click="editCoor(index)" class="fa-solid fa-pen-to-square"
+                                                        style="color: green"></i>
+                                                    <i @click="deleteCoor(index)" class="fa-solid fa-trash"
+                                                        style="color: red;"></i>
+                                                </div>
+                                            </div>
+                                        </el-option>
+                                    </el-select>
+                                    <el-button class="geo-add-btn" @click="openAddGeo" type="primary"><i
+                                            class="fa-solid fa-plus"></i></el-button>
+                                </div>
+                            </el-form-item>
+                        </el-form>
+                        <Transition>
+                            <geo-map class="org-geo-map" ref='geoMap' :locationGeo='{}'></geo-map>
+                        </Transition>
+                    </div>
+                </section>
+            </div>
+            <div class="col-content">
+                <section class="org-card">
+                    <div class="org-header">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>Contact</span>
+                    </div>
+                    <div class="org-body">
+                        <el-form :label-width="labelWidth" size="small" label-position="left">
+                            <el-form-item label="Phone number">
+                                <el-input type="number" v-model="properties.phoneNumber"></el-input>
+                            </el-form-item>
+                            <el-form-item label="Fax">
+                                <el-input type="number" v-model="properties.fax"></el-input>
+                            </el-form-item>
+                            <el-form-item label="Email">
+                                <el-input v-model="properties.email"></el-input>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <el-dialog class="app-dialog" v-model="signAddGeo" :title="titleGeo" align-center
             :before-close="handleCloseGeo" :modal="true" append-to-body>
             <el-form :label-width="labelWidth" size="small" label-position="left">
                 <el-form-item label="Geographic coordinate x">
@@ -148,12 +183,12 @@
                 </el-form-item>
             </el-form>
             <template #footer>
-    <span class="dialog-footer custom-footer">
-                <el-button class="footer-btn" type="danger" @click="handleCloseGeo()" size="small">Cancel</el-button>
-                <el-button class="footer-btn" type="primary" @click="handleConfirmGeo()"
-                    size="small">Confirm</el-button>
-            </span>
-</template>
+                <span class="dialog-footer custom-footer">
+                    <el-button class="footer-btn" type="danger" @click="handleCloseGeo()" size="small">Cancel</el-button>
+                    <el-button class="footer-btn" type="primary" @click="handleConfirmGeo()"
+                        size="small">Confirm</el-button>
+                </span>
+            </template>
         </el-dialog>
     </div>
 </template>
@@ -194,7 +229,7 @@ export default {
                 z: ''
             },
             saved: false,
-            labelWidth: `150px`,
+            labelWidth: `130px`,
             indexGeo: '',
             signAddGeo: false,
             titleGeo: 'Add coordinate',
@@ -336,26 +371,120 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#location {
-    width: fit-content;
+.org-view {
+    display: flex;
+    flex-direction: column;
+    padding: 0 4px 16px;
+}
+
+.org-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: 20px;
+    margin-top: 14px;
 }
 
 .col-content {
-    width: 100%
+    min-width: 0;
 }
 
-:deep(.el-form-item__label) {
+.org-col-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.org-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid #e4e7ed;
+    border-radius: 6px;
+}
+
+.org-col-stack .org-comment-card {
+    flex: 1;
+}
+
+.org-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f5f7fa;
+    border-bottom: 1px solid #e4e7ed;
+    border-radius: 6px 6px 0 0;
+    color: #606266;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.org-header i {
+    color: #909399;
+}
+
+.org-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+}
+
+.org-comment-form,
+.org-comment-input,
+.org-comment-input :global(.el-textarea__inner) {
+    height: 100%;
+}
+
+.org-comment-form {
+    display: flex;
+    flex: 1;
+}
+
+.org-comment-input :global(.el-textarea__inner) {
+    min-height: 120px !important;
+    resize: vertical;
+}
+
+:global(.org-attach-card) {
+    min-height: 310px;
+}
+
+.org-geo-map {
+    margin-top: 12px;
+}
+
+:global(.el-select),
+:global(.el-input),
+:global(.el-textarea) {
+    width: 100%;
+}
+
+:global(.el-form-item) {
+    margin-bottom: 10px;
+}
+
+:global(.el-form-item__label) {
     font-size: 12px !important;
+    color: #303133;
 }
 
-:deep(.el-input__inner) {
-    height: 3.2vh !important;
-    /* Đặt chiều cao */
+:global(.el-input__wrapper) {
+    width: 100%;
 }
 
-.last-right-parent {
-    position: relative;
-    float: right;
+:global(.el-input__inner),
+:global(.el-select .el-input__inner) {
+    width: 100%;
+    font-size: 12px !important;
+    height: 32px;
+    line-height: 32px;
+}
+
+:global(.el-textarea__inner) {
+    font-size: 12px !important;
 }
 
 .option-content {
@@ -364,15 +493,9 @@ export default {
     align-items: center;
 }
 
-.bolder {
-    font-weight: bold;
-    font-size: 12px;
-}
-
 .icons {
     display: flex;
     gap: 8px;
-    /* Khoảng cách giữa các icon */
 }
 
 .geo-row {
@@ -387,10 +510,11 @@ export default {
 }
 
 .geo-add-btn {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
 }
@@ -400,13 +524,13 @@ export default {
     line-height: 1;
 }
 
-:deep(.custom-footer) {
+:global(.custom-footer) {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
 }
 
-:deep(.custom-footer .footer-btn) {
+:global(.custom-footer .footer-btn) {
     display: flex;
     flex: 1;
     align-items: center;
@@ -417,11 +541,11 @@ export default {
     max-width: 100px;
 }
 
-:deep(.app-dialog) {
+:global(.app-dialog) {
     box-sizing: border-box;
 }
 
-:deep(.app-dialog.el-dialog) {
+:global(.app-dialog.el-dialog) {
     width: 35%;
     margin-top: 5vh !important;
     border-radius: 6px;
@@ -432,72 +556,72 @@ export default {
     overflow: hidden;
 }
 
-:deep(.app-dialog .el-dialog__body) {
+:global(.app-dialog .el-dialog__body) {
     overflow-y: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
 
-:deep(.app-dialog .el-dialog__body::-webkit-scrollbar) {
+:global(.app-dialog .el-dialog__body::-webkit-scrollbar) {
     width: 0px;
     height: 0px;
 }
 
-:deep(.app-dialog .el-dialog__footer) {
+:global(.app-dialog .el-dialog__footer) {
     padding: 10px 20px;
     border-top: 1px solid #ebeef5;
 }
 
-:deep(.el-dialog .el-form-item__label) {
+:global(.el-dialog .el-form-item__label) {
     word-break: normal !important;
     overflow-wrap: break-word;
     white-space: normal;
 }
 
 @media (max-width: 991px) {
-    .col-content {
-        margin-bottom: 10px;
-    }
-
-    :deep(.app-dialog.el-dialog) {
+    :global(.app-dialog.el-dialog) {
         width: 50%;
     }
 }
 
 @media (max-width: 767px) {
-    :deep(.el-form-item) {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+    .org-view {
+        padding: 0 0 12px;
     }
 
-    :deep(.el-form-item__label) {
-        width: auto !important;
+    .org-row {
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .org-header {
+        padding: 8px 10px;
+    }
+
+    .org-body {
+        padding: 10px;
+    }
+
+    :global(.el-form-item) {
+        display: block;
+    }
+
+    :global(.el-form-item__label) {
+        float: none;
+        display: block;
+        width: 100% !important;
         margin-left: 0 !important;
-        padding-bottom: 0;
+        padding: 0 0 4px;
         text-align: left;
     }
 
-    :deep(.el-form-item__content) {
+    :global(.el-form-item__content) {
         width: 100%;
         margin-left: 0 !important;
     }
 
-    :deep(.el-form-item.custom-label .el-form-item__label) {
-        padding-left: 20px;
-    }
-
-    :deep(.custom-footer) {
+    :global(.custom-footer) {
         justify-content: center;
     }
-}
-</style>
-
-<style>
-.el-form-item.custom-label .el-form-item__label {
-    margin-left: 20px;
-    width: 130px !important;
-    /* Đặt chiều rộng cố định cho nhãn */
-    font-style: italic;
 }
 </style>

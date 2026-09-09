@@ -31,43 +31,42 @@
 	FOREIGN KEY("um_rms") REFERENCES "voltage"("mrid")
 );
  */
-import CurrentTransformerInfo from "../CurrentTransformerInfo";
+import CurrentTransformerInfo from '../CurrentTransformerInfo'
 
 class OldCurrentTransformerInfo extends CurrentTransformerInfo {
-    bil: any
-    i_cth: any
-    i_dynamic_peak: any
-    ith_duration: any
-    ith_rms: any
-    primary_winding_count: any
-    rated_frequency: any
-    rating_factor: any
-    rating_factor_temp: any
-    standard: any
-    system_voltage: any
-    system_voltage_type: any
-    u_lightning_peak: any
-    u_withstand_rms: any
-    um_rms: any
-    constructor() {
-        super();
-        this.standard = null;
-        this.rated_frequency = null;
-        this.primary_winding_count = null;
-        this.um_rms = null;
-        this.u_withstand_rms = null;
-        this.u_lightning_peak = null;
-        this.i_cth = null;
-        this.i_dynamic_peak = null;
-        this.ith_rms = null;
-        this.ith_duration = null;
-        this.system_voltage = null;
-        this.system_voltage_type = null;
-        this.bil = null;
-        this.rating_factor = null;
-        this.rating_factor_temp = null;
-    }
-
+  bil: any
+  i_cth: any
+  i_dynamic_peak: any
+  ith_duration: any
+  ith_rms: any
+  primary_winding_count: any
+  rated_frequency: any
+  rating_factor: any
+  rating_factor_temp: any
+  standard: any
+  system_voltage: any
+  system_voltage_type: any
+  u_lightning_peak: any
+  u_withstand_rms: any
+  um_rms: any
+  constructor() {
+    super()
+    this.standard = null
+    this.rated_frequency = null
+    this.primary_winding_count = null
+    this.um_rms = null
+    this.u_withstand_rms = null
+    this.u_lightning_peak = null
+    this.i_cth = null
+    this.i_dynamic_peak = null
+    this.ith_rms = null
+    this.ith_duration = null
+    this.system_voltage = null
+    this.system_voltage_type = null
+    this.bil = null
+    this.rating_factor = null
+    this.rating_factor_temp = null
+  }
 }
 
-export default OldCurrentTransformerInfo;
+export default OldCurrentTransformerInfo

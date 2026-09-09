@@ -10,14 +10,14 @@ import * as ipcDisconnectorJob from './disconnector/index.js'
 import * as ipcReactorJob from './reactor/index.js'
 
 export const active = () => {
-    ipcSurgeArresterJob.active()
-    ipcPowerCableJob.active()
-    ipcCurrentTransformerJob.active()
-    ipcVoltageTransformerJob.active()
-    ipcCapacitorJob.active()
-    ipcRotatingMachineJob.active()
-    ipcTransformerJob.active()
-    ipcCircuitBreakerJob.active()
-    ipcDisconnectorJob.active()
-    ipcReactorJob.active()
+  ipcSurgeArresterJob.active()
+  ipcPowerCableJob.active()
+  ipcCurrentTransformerJob.active()
+  ipcVoltageTransformerJob.active()
+  ipcCapacitorJob.active()
+  ipcRotatingMachineJob.active()
+  ipcTransformerJob.active()
+  ipcCircuitBreakerJob.active()
+  ipcDisconnectorJob.active()
+  ipcReactorJob.active()
 }

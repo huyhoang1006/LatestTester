@@ -1,9 +1,9 @@
-import IdentifiedObject from "../IdentifiedObject";
+import IdentifiedObject from '../IdentifiedObject'
 
 class ValueAliasSet extends IdentifiedObject {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super()
+  }
 }
 
-export default ValueAliasSet;
+export default ValueAliasSet

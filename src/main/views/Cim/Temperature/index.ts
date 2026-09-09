@@ -1,14 +1,14 @@
 class Temperature {
-    mrid: any
-    multiplier: any
-    unit: any
-    value: any
-    constructor() {
-        this.mrid = null
-        this.unit = null // e.g., "volt"
-        this.value = null // Numerical value of the temperature
-        this.multiplier = null // e.g., "kilo", "mega" for scaling the value
-    }
+  mrid: any
+  multiplier: any
+  unit: any
+  value: any
+  constructor() {
+    this.mrid = null
+    this.unit = null // e.g., "volt"
+    this.value = null // Numerical value of the temperature
+    this.multiplier = null // e.g., "kilo", "mega" for scaling the value
+  }
 }
 
-export default Temperature;
+export default Temperature

@@ -1,19 +1,20 @@
 import db from '../../datacontext/index'
 
 export const getStreetAddressById = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        db.get("SELECT * FROM street_address WHERE mrid=?", [mrid], (err: any, row: any) => {
-            if (err) return reject({ success: false, err: err, message: 'Get street address by id failed' })
-            if (!row) return resolve({ success: false, data: null, message: 'Street address not found' })
-            return resolve({ success: true, data: row, message: 'Get street address by id completed' })
-        })
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM street_address WHERE mrid=?', [mrid], (err: any, row: any) => {
+      if (err)
+        return reject({ success: false, err: err, message: 'Get street address by id failed' })
+      if (!row) return resolve({ success: false, data: null, message: 'Street address not found' })
+      return resolve({ success: true, data: row, message: 'Get street address by id completed' })
     })
+  })
 }
 
 export const insertStreetAddress = async (streetAddress: any) => {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `INSERT INTO street_address(mrid, language, po_box, postal_code, status, street_detail, town_detail)
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO street_address(mrid, language, po_box, postal_code, status, street_detail, town_detail)
              VALUES (?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(mrid) DO UPDATE SET
                 language = excluded.language,
@@ -22,27 +23,31 @@ export const insertStreetAddress = async (streetAddress: any) => {
                 status = excluded.status,
                 street_detail = excluded.street_detail,
                 town_detail = excluded.town_detail`,
-            [
-                streetAddress.mrid,
-                streetAddress.language,
-                streetAddress.po_box,
-                streetAddress.postal_code,
-                streetAddress.status,
-                streetAddress.street_detail,
-                streetAddress.town_detail
-            ],
-            function (err: any) {
-                if (err) return reject({ success: false, err, message: 'Insert identified object failed' })
-                return resolve({ success: true, data: streetAddress, message: 'Insert identified object completed' })
-            }
-        )
-    })
+      [
+        streetAddress.mrid,
+        streetAddress.language,
+        streetAddress.po_box,
+        streetAddress.postal_code,
+        streetAddress.status,
+        streetAddress.street_detail,
+        streetAddress.town_detail
+      ],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Insert identified object failed' })
+        return resolve({
+          success: true,
+          data: streetAddress,
+          message: 'Insert identified object completed'
+        })
+      }
+    )
+  })
 }
 
 export const insertStreetAddressTransaction = async (streetAddress: any, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `INSERT INTO street_address(mrid, language, po_box, postal_code, status, street_detail, town_detail)
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `INSERT INTO street_address(mrid, language, po_box, postal_code, status, street_detail, town_detail)
              VALUES (?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(mrid) DO UPDATE SET
                 language = excluded.language,
@@ -51,73 +56,105 @@ export const insertStreetAddressTransaction = async (streetAddress: any, dbsql: 
                 status = excluded.status,
                 street_detail = excluded.street_detail,
                 town_detail = excluded.town_detail`,
-            [
-                streetAddress.mrid,
-                streetAddress.language,
-                streetAddress.po_box,
-                streetAddress.postal_code,
-                streetAddress.status,
-                streetAddress.street_detail,
-                streetAddress.town_detail
-            ],
-            function (err: any) {
-                if (err) return reject({ success: false, err, message: 'Insert street address failed' })
-                return resolve({ success: true, data: streetAddress, message: 'Insert street address completed' })
-            }
-        )
-    })
+      [
+        streetAddress.mrid,
+        streetAddress.language,
+        streetAddress.po_box,
+        streetAddress.postal_code,
+        streetAddress.status,
+        streetAddress.street_detail,
+        streetAddress.town_detail
+      ],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Insert street address failed' })
+        return resolve({
+          success: true,
+          data: streetAddress,
+          message: 'Insert street address completed'
+        })
+      }
+    )
+  })
 }
 
 export const updateStreetAddressById = async (mrid: string, streetAddress: any) => {
-    return new Promise((resolve, reject) => {
-        db.run(
-            `UPDATE street_address
+  return new Promise((resolve, reject) => {
+    db.run(
+      `UPDATE street_address
              SET language = ?, po_box = ?, postal_code = ?, status = ?,
                  street_detail = ?, town_detail = ?
              WHERE mrid = ?`,
-            [streetAddress.language, streetAddress.po_box, streetAddress.postal_code, streetAddress.status,
-                streetAddress.street_detail, streetAddress.town_detail, mrid],
-            function (err: any) {
-                if (err) return reject({ success: false, err, message: 'Update street address failed' })
-                return resolve({ success: true, data: streetAddress, message: 'Update street address completed' })
-            }
-        )
-    })
+      [
+        streetAddress.language,
+        streetAddress.po_box,
+        streetAddress.postal_code,
+        streetAddress.status,
+        streetAddress.street_detail,
+        streetAddress.town_detail,
+        mrid
+      ],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Update street address failed' })
+        return resolve({
+          success: true,
+          data: streetAddress,
+          message: 'Update street address completed'
+        })
+      }
+    )
+  })
 }
 
-export const updateStreetAddressByIdTransaction = async (mrid: string, streetAddress: any, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run(
-            `UPDATE street_address
+export const updateStreetAddressByIdTransaction = async (
+  mrid: string,
+  streetAddress: any,
+  dbsql: any
+) => {
+  return new Promise((resolve, reject) => {
+    dbsql.run(
+      `UPDATE street_address
              SET language = ?, po_box = ?, postal_code = ?, status = ?,
                  street_detail = ?, town_detail = ?
              WHERE mrid = ?`,
-            [streetAddress.language, streetAddress.po_box, streetAddress.postal_code, streetAddress.status,
-                streetAddress.street_detail, streetAddress.town_detail, mrid],
-            function (err: any) {
-                if (err) return reject({ success: false, err, message: 'Update street address failed' })
-                return resolve({ success: true, data: streetAddress, message: 'Update street address completed' })
-            }
-        )
-    })
+      [
+        streetAddress.language,
+        streetAddress.po_box,
+        streetAddress.postal_code,
+        streetAddress.status,
+        streetAddress.street_detail,
+        streetAddress.town_detail,
+        mrid
+      ],
+      function (err: any) {
+        if (err) return reject({ success: false, err, message: 'Update street address failed' })
+        return resolve({
+          success: true,
+          data: streetAddress,
+          message: 'Update street address completed'
+        })
+      }
+    )
+  })
 }
 
 export const deleteStreetAddressById = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        db.run("DELETE FROM street_address WHERE mrid=?", [mrid], function (this: any, err: any) {
-            if (err) return reject({ success: false, err, message: 'Delete street address failed' })
-            if (this.changes === 0) return resolve({ success: false, data: null, message: 'Street address not found' })
-            return resolve({ success: true, data: null, message: 'Delete street address completed' })
-        })
+  return new Promise((resolve, reject) => {
+    db.run('DELETE FROM street_address WHERE mrid=?', [mrid], function (this: any, err: any) {
+      if (err) return reject({ success: false, err, message: 'Delete street address failed' })
+      if (this.changes === 0)
+        return resolve({ success: false, data: null, message: 'Street address not found' })
+      return resolve({ success: true, data: null, message: 'Delete street address completed' })
     })
+  })
 }
 
 export const deleteStreetAddressByIdTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        dbsql.run("DELETE FROM street_address WHERE mrid=?", [mrid], function (this: any, err: any) {
-            if (err) return reject({ success: false, err, message: 'Delete street address failed' })
-            if (this.changes === 0) return resolve({ success: false, data: null, message: 'Street address not found' })
-            return resolve({ success: true, data: null, message: 'Delete identified object completed' })
-        })
+  return new Promise((resolve, reject) => {
+    dbsql.run('DELETE FROM street_address WHERE mrid=?', [mrid], function (this: any, err: any) {
+      if (err) return reject({ success: false, err, message: 'Delete street address failed' })
+      if (this.changes === 0)
+        return resolve({ success: false, data: null, message: 'Street address not found' })
+      return resolve({ success: true, data: null, message: 'Delete identified object completed' })
     })
+  })
 }

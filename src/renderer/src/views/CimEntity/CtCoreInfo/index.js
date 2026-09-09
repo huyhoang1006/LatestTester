@@ -1,4 +1,4 @@
-import Resistance from "../Resistance";
+import Resistance from '../Resistance'
 /**
  * 	"mrid"	TEXT NOT NULL,
     "tap_count"	INTEGER,
@@ -38,38 +38,38 @@ import Resistance from "../Resistance";
  */
 
 class CtCoreInfo {
-    constructor() {
-        this.mRID = null;
-                this.tapCount = null;
-                this.commonTap = null;
-                this.coreApplication = null;
-                this.coreClass = null;
-                this.fs = null;
-                this.alf = null;
-                this.windingResistance = new Resistance();
-                this.ts = null;
-                this.ek = null;
-                this.e1 = null;
-                this.ie = null;
-                this.ie1 = null;
-                this.kssc = null;
-                this.val = null;
-                this.tp = null;
-                this.iai = null;
-                this.k = null;
-                this.ktd = null;
-                this.duty = null;
-                this.kx = null;
-                this.currentTransformerInfoId = null;
-                this.ex = null;
-                this.vb = null;
-                this.vk = null;
-                this.vk1 = null;
-                this.ik = null;
-                this.ik1 = null;
-                this.ratioError = null;
-                this.coreIndex = null;
-    }
+  constructor() {
+    this.mRID = null
+    this.tapCount = null
+    this.commonTap = null
+    this.coreApplication = null
+    this.coreClass = null
+    this.fs = null
+    this.alf = null
+    this.windingResistance = new Resistance()
+    this.ts = null
+    this.ek = null
+    this.e1 = null
+    this.ie = null
+    this.ie1 = null
+    this.kssc = null
+    this.val = null
+    this.tp = null
+    this.iai = null
+    this.k = null
+    this.ktd = null
+    this.duty = null
+    this.kx = null
+    this.currentTransformerInfoId = null
+    this.ex = null
+    this.vb = null
+    this.vk = null
+    this.vk1 = null
+    this.ik = null
+    this.ik1 = null
+    this.ratioError = null
+    this.coreIndex = null
+  }
 }
 
-export default CtCoreInfo;
+export default CtCoreInfo

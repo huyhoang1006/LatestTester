@@ -1,9 +1,9 @@
-import MeasurementValueSource from "../MeasurementValueSource";
+import MeasurementValueSource from '../MeasurementValueSource'
 
 class IOPointSource extends MeasurementValueSource {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super()
+  }
 }
 
-export default IOPointSource;
+export default IOPointSource

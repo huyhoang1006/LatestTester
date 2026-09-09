@@ -2,32 +2,36 @@ import db from '../../datacontext/index'
 import * as IdentifiedObjectFunc from '../identifiedObject/index'
 
 export const getCoolingPowerRatingById = async (mrid: string) => {
-    try {
-        const identifiedObjectResult: any = await IdentifiedObjectFunc.getIdentifiedObjectById(mrid)
-        if (!identifiedObjectResult.success) {
-            return { success: false, data: null, message: 'IdentifiedObject not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get(
-                `SELECT * FROM cooling_power_rating WHERE mrid=?`,
-                [mrid],
-                (err: any, row: any) => {
-                    if (err) return reject({ success: false, err, message: 'Get coolingPowerRating by id failed' })
-                    if (!row) return resolve({ success: false, data: null, message: 'CoolingPowerRating not found' })
-                    return resolve({ success: true, data: { ...identifiedObjectResult.data, ...row }, message: 'Get coolingPowerRating by id completed' })
-                }
-            )
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get coolingPowerRating by id failed' }
+  try {
+    const identifiedObjectResult: any = await IdentifiedObjectFunc.getIdentifiedObjectById(mrid)
+    if (!identifiedObjectResult.success) {
+      return { success: false, data: null, message: 'IdentifiedObject not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM cooling_power_rating WHERE mrid=?`, [mrid], (err: any, row: any) => {
+        if (err)
+          return reject({ success: false, err, message: 'Get coolingPowerRating by id failed' })
+        if (!row)
+          return resolve({ success: false, data: null, message: 'CoolingPowerRating not found' })
+        return resolve({
+          success: true,
+          data: { ...identifiedObjectResult.data, ...row },
+          message: 'Get coolingPowerRating by id completed'
+        })
+      })
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get coolingPowerRating by id failed' }
+  }
 }
 
-export const getCoolingPowerRatingByPowerTransformerInfoId = async (powerTransformerInfoId: string) => {
-    try {
-        const rows: any = await new Promise((resolve, reject) => {
-            db.all(
-                `
+export const getCoolingPowerRatingByPowerTransformerInfoId = async (
+  powerTransformerInfoId: string
+) => {
+  try {
+    const rows: any = await new Promise((resolve, reject) => {
+      db.all(
+        `
                 SELECT
                     cpr.*,
                     io.*
@@ -36,47 +40,51 @@ export const getCoolingPowerRatingByPowerTransformerInfoId = async (powerTransfo
                     ON io.mrid = cpr.mrid
                 WHERE cpr.power_transformer_info_id = ?
                 `,
-                [powerTransformerInfoId],
-                (err: any, rows: any) => {
-                    if (err) return reject(err);
-                    resolve(rows);
-                }
-            );
-        });
-
-        if (!rows || rows.length === 0) {
-            return {
-                success: false,
-                data: [],
-                message: 'No coolingPowerRating found for this powerTransformerInfoId'
-            };
+        [powerTransformerInfoId],
+        (err: any, rows: any) => {
+          if (err) return reject(err)
+          resolve(rows)
         }
+      )
+    })
 
-        return {
-            success: true,
-            data: rows,
-            message: 'Get coolingPowerRating by powerTransformerInfoId completed'
-        };
-    } catch (err) {
-        return {
-            success: false,
-            err,
-            data: [],
-            message: 'Get coolingPowerRating by powerTransformerInfoId failed'
-        };
+    if (!rows || rows.length === 0) {
+      return {
+        success: false,
+        data: [],
+        message: 'No coolingPowerRating found for this powerTransformerInfoId'
+      }
     }
+
+    return {
+      success: true,
+      data: rows,
+      message: 'Get coolingPowerRating by powerTransformerInfoId completed'
+    }
+  } catch (err) {
+    return {
+      success: false,
+      err,
+      data: [],
+      message: 'Get coolingPowerRating by powerTransformerInfoId failed'
+    }
+  }
 }
 
-
 export const insertCoolingPowerRatingTransaction = async (info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const identifiedObjectResult: any = await IdentifiedObjectFunc.insertIdentifiedObjectTransaction(info, dbsql)
-            if (!identifiedObjectResult.success) {
-                return reject({ success: false, message: 'Insert IdentifiedObject failed', err: identifiedObjectResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO cooling_power_rating(
+  return new Promise(async (resolve, reject) => {
+    try {
+      const identifiedObjectResult: any =
+        await IdentifiedObjectFunc.insertIdentifiedObjectTransaction(info, dbsql)
+      if (!identifiedObjectResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert IdentifiedObject failed',
+          err: identifiedObjectResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO cooling_power_rating(
                     mrid, power_rating, stage, cooling_kind, temp_rise_wind, power_transformer_info_id
                 ) VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(mrid) DO UPDATE SET
@@ -86,77 +94,105 @@ export const insertCoolingPowerRatingTransaction = async (info: any, dbsql: any)
                     temp_rise_wind = excluded.temp_rise_wind,
                     power_transformer_info_id = excluded.power_transformer_info_id
                 `,
-                [
-                    info.mrid,
-                    info.power_rating,
-                    info.stage,
-                    info.cooling_kind,
-                    info.temp_rise_wind,
-                    info.power_transformer_info_id
-                ],
-                function (err: any) {
-                    if (err) {
-                        return reject({ success: false, err, message: 'Insert coolingPowerRating failed' })
-                    }
-                    return resolve({ success: true, data: info, message: 'Insert coolingPowerRating completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Insert coolingPowerRating transaction failed' })
+        [
+          info.mrid,
+          info.power_rating,
+          info.stage,
+          info.cooling_kind,
+          info.temp_rise_wind,
+          info.power_transformer_info_id
+        ],
+        function (err: any) {
+          if (err) {
+            return reject({ success: false, err, message: 'Insert coolingPowerRating failed' })
+          }
+          return resolve({
+            success: true,
+            data: info,
+            message: 'Insert coolingPowerRating completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({
+        success: false,
+        err,
+        message: 'Insert coolingPowerRating transaction failed'
+      })
+    }
+  })
 }
 
 export const updateCoolingPowerRatingTransaction = async (mrid: string, info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const identifiedObjectResult: any = await IdentifiedObjectFunc.updateIdentifiedObjectByIdTransaction(mrid, info, dbsql)
-            if (!identifiedObjectResult.success) {
-                return reject({ success: false, message: 'Update IdentifiedObject failed', err: identifiedObjectResult.err })
-            }
-            dbsql.run(
-                `UPDATE cooling_power_rating SET
+  return new Promise(async (resolve, reject) => {
+    try {
+      const identifiedObjectResult: any =
+        await IdentifiedObjectFunc.updateIdentifiedObjectByIdTransaction(mrid, info, dbsql)
+      if (!identifiedObjectResult.success) {
+        return reject({
+          success: false,
+          message: 'Update IdentifiedObject failed',
+          err: identifiedObjectResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE cooling_power_rating SET
                     power_rating = ?,
                     stage = ?,
                     cooling_kind = ?,
                     temp_rise_wind = ?,
                     power_transformer_info_id = ?
                 WHERE mrid = ?`,
-                [
-                    info.power_rating,
-                    info.stage,
-                    info.cooling_kind,
-                    info.temp_rise_wind,
-                    mrid
-                ],
-                function (err: any) {
-                    if (err) {
-                        return reject({ success: false, err, message: 'Update coolingPowerRating failed' })
-                    }
-                    return resolve({ success: true, data: info, message: 'Update coolingPowerRating completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Update coolingPowerRating transaction failed' })
+        [info.power_rating, info.stage, info.cooling_kind, info.temp_rise_wind, mrid],
+        function (err: any) {
+          if (err) {
+            return reject({ success: false, err, message: 'Update coolingPowerRating failed' })
+          }
+          return resolve({
+            success: true,
+            data: info,
+            message: 'Update coolingPowerRating completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({
+        success: false,
+        err,
+        message: 'Update coolingPowerRating transaction failed'
+      })
+    }
+  })
 }
 
 export const deleteCoolingPowerRatingTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const identifiedObjectResult: any = await IdentifiedObjectFunc.deleteIdentifiedObjectByIdTransaction(mrid, dbsql)
-            if (!identifiedObjectResult.success) {
-                return reject({ success: false, message: 'Delete IdentifiedObject failed', err: identifiedObjectResult.err })
-            }
-            dbsql.run("DELETE FROM cooling_power_rating WHERE mrid=?", [mrid], function (err: any) {
-                if (err) {
-                    return reject({ success: false, err, message: 'Delete coolingPowerRating failed' })
-                }
-                return resolve({ success: true, data: mrid, message: 'Delete coolingPowerRating completed' })
-            })
-        } catch (err) {
-            return reject({ success: false, err, message: 'Delete coolingPowerRating transaction failed' })
+  return new Promise(async (resolve, reject) => {
+    try {
+      const identifiedObjectResult: any =
+        await IdentifiedObjectFunc.deleteIdentifiedObjectByIdTransaction(mrid, dbsql)
+      if (!identifiedObjectResult.success) {
+        return reject({
+          success: false,
+          message: 'Delete IdentifiedObject failed',
+          err: identifiedObjectResult.err
+        })
+      }
+      dbsql.run('DELETE FROM cooling_power_rating WHERE mrid=?', [mrid], function (err: any) {
+        if (err) {
+          return reject({ success: false, err, message: 'Delete coolingPowerRating failed' })
         }
-    })
+        return resolve({
+          success: true,
+          data: mrid,
+          message: 'Delete coolingPowerRating completed'
+        })
+      })
+    } catch (err) {
+      return reject({
+        success: false,
+        err,
+        message: 'Delete coolingPowerRating transaction failed'
+      })
+    }
+  })
 }

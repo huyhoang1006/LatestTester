@@ -1,7 +1,7 @@
 class Approver extends DocumentPersonRole {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super()
+  }
 }
 
-export default Approver;
+export default Approver

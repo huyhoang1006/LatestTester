@@ -1,12 +1,12 @@
-import Equipment from "../Equipment";
-import BaseVoltage from "../BaseVoltage";
+import Equipment from '../Equipment'
+import BaseVoltage from '../BaseVoltage'
 
 class ConductingEquipment extends Equipment {
-    constructor() {
-        super();
-        this.baseVoltage = new BaseVoltage();
-        this.jumpingAction = null;
-        this.outage = null;
-    }
+  constructor() {
+    super()
+    this.baseVoltage = new BaseVoltage()
+    this.jumpingAction = null
+    this.outage = null
+  }
 }
-export default ConductingEquipment;
+export default ConductingEquipment

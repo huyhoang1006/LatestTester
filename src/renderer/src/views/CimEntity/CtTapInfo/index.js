@@ -1,4 +1,4 @@
-import Percent from "../Percent";
+import Percent from '../Percent'
 /**
  * CREATE TABLE "ct_tap_info" (
 	"mrid"	TEXT NOT NULL,
@@ -25,22 +25,21 @@ import Percent from "../Percent";
  */
 
 class CtTapInfo {
-    constructor() {
-        this.mRID = null;
-                this.tapName = null;
-                this.ipn = null;
-                this.isn = null;
-                this.inUse = null;
-                this.ratedBurden = null;
-                this.burden = null;
-                this.extendedBurden = null;
-                this.burdenPowerFactor = new Percent();
-                this.operatingBurden = null;
-                this.operatingBurdenPowerFactor = new Percent();
-                this.ctCoreInfoId = null;
-                this.type = null;
-    }
-
+  constructor() {
+    this.mRID = null
+    this.tapName = null
+    this.ipn = null
+    this.isn = null
+    this.inUse = null
+    this.ratedBurden = null
+    this.burden = null
+    this.extendedBurden = null
+    this.burdenPowerFactor = new Percent()
+    this.operatingBurden = null
+    this.operatingBurdenPowerFactor = new Percent()
+    this.ctCoreInfoId = null
+    this.type = null
+  }
 }
 
-export default CtTapInfo;
+export default CtTapInfo

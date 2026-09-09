@@ -1,11 +1,11 @@
-import Asset from "../Asset";
-import WorkTask from "../WorkTask";
+import Asset from '../Asset'
+import WorkTask from '../WorkTask'
 
 class AssetWorkTask {
-    constructor() {
-        this.mRID = null;
-        this.asset = new Asset();
-        this.workTask = new WorkTask();
-    }
+  constructor() {
+    this.mRID = null
+    this.asset = new Asset()
+    this.workTask = new WorkTask()
+  }
 }
-export default AssetWorkTask;
+export default AssetWorkTask

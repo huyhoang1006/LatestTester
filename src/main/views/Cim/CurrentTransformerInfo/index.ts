@@ -34,42 +34,42 @@
 );
  */
 class CurrentTransformerInfo {
-    accuracy_class: any
-    accuracy_limit: any
-    core_count: any
-    ct_class: any
-    knee_point_current: any
-    knee_point_voltage: any
-    max_ratio: any
-    mrid: any
-    nominal_ratio: any
-    primary_fls_rating: any
-    primary_ratio: any
-    rated_current: any
-    secondary_fls_rating: any
-    secondary_ratio: any
-    tertiary_fls_rating: any
-    tertiary_ratio: any
-    usage: any
-    constructor() {
-        this.mrid = null;
-        this.accuracy_class = null;
-        this.accuracy_limit = null;
-        this.core_count = null;
-        this.ct_class = null;
-        this.knee_point_current = null;
-        this.knee_point_voltage = null;
-        this.max_ratio = null;
-        this.nominal_ratio = null;
-        this.primary_fls_rating = null;
-        this.primary_ratio = null;
-        this.rated_current = null;
-        this.secondary_fls_rating = null;
-        this.secondary_ratio = null;
-        this.tertiary_fls_rating = null;
-        this.tertiary_ratio = null;
-        this.usage = null;
-    }
+  accuracy_class: any
+  accuracy_limit: any
+  core_count: any
+  ct_class: any
+  knee_point_current: any
+  knee_point_voltage: any
+  max_ratio: any
+  mrid: any
+  nominal_ratio: any
+  primary_fls_rating: any
+  primary_ratio: any
+  rated_current: any
+  secondary_fls_rating: any
+  secondary_ratio: any
+  tertiary_fls_rating: any
+  tertiary_ratio: any
+  usage: any
+  constructor() {
+    this.mrid = null
+    this.accuracy_class = null
+    this.accuracy_limit = null
+    this.core_count = null
+    this.ct_class = null
+    this.knee_point_current = null
+    this.knee_point_voltage = null
+    this.max_ratio = null
+    this.nominal_ratio = null
+    this.primary_fls_rating = null
+    this.primary_ratio = null
+    this.rated_current = null
+    this.secondary_fls_rating = null
+    this.secondary_ratio = null
+    this.tertiary_fls_rating = null
+    this.tertiary_ratio = null
+    this.usage = null
+  }
 }
 
-export default CurrentTransformerInfo;
+export default CurrentTransformerInfo

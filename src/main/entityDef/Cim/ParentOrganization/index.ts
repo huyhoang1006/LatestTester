@@ -1,9 +1,9 @@
-import Organisation from "../Organisation";
+import Organisation from '../Organisation'
 
 class ParentOrganization extends Organisation {
-    constructor() {
-        super()
-    }
+  constructor() {
+    super()
+  }
 }
 
 export default ParentOrganization

@@ -1,9 +1,9 @@
 import Asset from '../Asset'
 class OperatingMechanism extends Asset {
-    constructor() {
-        super()
-                this.assetId = null;
-    }
+  constructor() {
+    super()
+    this.assetId = null
+  }
 }
 
-export default OperatingMechanism;
+export default OperatingMechanism

@@ -2,39 +2,40 @@ import db from '../../datacontext/index'
 import * as AssetInfoFunc from '../assetInfo/index'
 
 export const getReactorInfoById = async (mrid: string) => {
-    try {
-        const assetInfoResult: any = await AssetInfoFunc.getAssetInfoById(mrid)
-        if (!assetInfoResult.success) {
-            return { success: false, data: null, message: 'AssetInfo not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get(
-                `SELECT * FROM reactor_info WHERE mrid=?`,
-                [mrid],
-                (err: any, row: any) => {
-                    if (err) return reject({ success: false, err, message: 'Get reactorInfo by id failed' })
-                    if (!row) return resolve({ success: false, data: null, message: 'ReactorInfo not found' })
-                    console.log('=== Got ReactorInfo from DB ===');
-                    console.log('row.phase_name from DB:', row.phase_name);
-                    console.log('Full row:', JSON.stringify(row, null, 2));
-                    return resolve({ success: true, data: { ...assetInfoResult.data, ...row }, message: 'Get reactorInfo by id completed' })
-                }
-            )
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get reactorInfo by id failed' }
+  try {
+    const assetInfoResult: any = await AssetInfoFunc.getAssetInfoById(mrid)
+    if (!assetInfoResult.success) {
+      return { success: false, data: null, message: 'AssetInfo not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM reactor_info WHERE mrid=?`, [mrid], (err: any, row: any) => {
+        if (err) return reject({ success: false, err, message: 'Get reactorInfo by id failed' })
+        if (!row) return resolve({ success: false, data: null, message: 'ReactorInfo not found' })
+        return resolve({
+          success: true,
+          data: { ...assetInfoResult.data, ...row },
+          message: 'Get reactorInfo by id completed'
+        })
+      })
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get reactorInfo by id failed' }
+  }
 }
 
 export const insertReactorInfoTransaction = async (info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const assetInfoResult: any = await AssetInfoFunc.insertAssetInfoTransaction(info, dbsql)
-            if (!assetInfoResult.success) {
-                return reject({ success: false, message: 'Insert assetInfo failed', err: assetInfoResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO reactor_info(
+  return new Promise(async (resolve, reject) => {
+    try {
+      const assetInfoResult: any = await AssetInfoFunc.insertAssetInfoTransaction(info, dbsql)
+      if (!assetInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert assetInfo failed',
+          err: assetInfoResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO reactor_info(
                     mrid, rated_voltage, rated_current, rated_frequency,
                     rated_power, insulation_type, inductance
                 ) VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -46,37 +47,41 @@ export const insertReactorInfoTransaction = async (info: any, dbsql: any) => {
                     insulation_type = excluded.insulation_type,
                     inductance = excluded.inductance
                 `,
-                [
-                    info.mrid,
-                    info.rated_voltage,
-                    info.rated_current,
-                    info.rated_frequency,
-                    info.rated_power,
-                    info.insulation_type,
-                    info.inductance
-                ],
-                function (err: any) {
-                    if (err) {
-                        return reject({ success: false, err, message: 'Insert reactorInfo failed' })
-                    }
-                    return resolve({ success: true, data: info, message: 'Insert reactorInfo completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Insert reactorInfo transaction failed' })
+        [
+          info.mrid,
+          info.rated_voltage,
+          info.rated_current,
+          info.rated_frequency,
+          info.rated_power,
+          info.insulation_type,
+          info.inductance
+        ],
+        function (err: any) {
+          if (err) {
+            return reject({ success: false, err, message: 'Insert reactorInfo failed' })
+          }
+          return resolve({ success: true, data: info, message: 'Insert reactorInfo completed' })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Insert reactorInfo transaction failed' })
+    }
+  })
 }
 
 export const updateReactorInfoTransaction = async (mrid: string, info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const assetInfoResult: any = await AssetInfoFunc.updateAssetInfoTransaction(mrid, info, dbsql)
-            if (!assetInfoResult.success) {
-                return reject({ success: false, message: 'Update assetInfo failed', err: assetInfoResult.err })
-            }
-            dbsql.run(
-                `UPDATE reactor_info SET
+  return new Promise(async (resolve, reject) => {
+    try {
+      const assetInfoResult: any = await AssetInfoFunc.updateAssetInfoTransaction(mrid, info, dbsql)
+      if (!assetInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Update assetInfo failed',
+          err: assetInfoResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE reactor_info SET
                     rated_voltage = ?,
                     rated_current = ?,
                     rated_frequency = ?,
@@ -84,50 +89,54 @@ export const updateReactorInfoTransaction = async (mrid: string, info: any, dbsq
                     insulation_type = ?,
                     inductance = ?
                 WHERE mrid = ?`,
-                [
-                    info.rated_voltage,
-                    info.rated_current,
-                    info.rated_frequency,
-                    info.rated_power,
-                    info.insulation_type,
-                    info.inductance,
-                    mrid
-                ],
-                function (err: any) {
-                    if (err) {
-                        return reject({ success: false, err, message: 'Update reactorInfo failed' })
-                    }
-                    return resolve({ success: true, data: info, message: 'Update reactorInfo completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Update reactorInfo transaction failed' })
+        [
+          info.rated_voltage,
+          info.rated_current,
+          info.rated_frequency,
+          info.rated_power,
+          info.insulation_type,
+          info.inductance,
+          mrid
+        ],
+        function (err: any) {
+          if (err) {
+            return reject({ success: false, err, message: 'Update reactorInfo failed' })
+          }
+          return resolve({ success: true, data: info, message: 'Update reactorInfo completed' })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Update reactorInfo transaction failed' })
+    }
+  })
 }
 
 export const deleteReactorInfoTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const assetInfoResult: any = await AssetInfoFunc.deleteAssetInfoByIdTransaction(mrid, dbsql)
-            if (!assetInfoResult.success) {
-                return reject({ success: false, message: 'Delete assetInfo failed', err: assetInfoResult.err })
-            }
-            dbsql.run("DELETE FROM reactor_info WHERE mrid=?", [mrid], function (err: any) {
-                if (err) {
-                    return reject({ success: false, err, message: 'Delete reactorInfo failed' })
-                }
-                return resolve({ success: true, data: mrid, message: 'Delete reactorInfo completed' })
-            })
-        } catch (err) {
-            return reject({ success: false, err, message: 'Delete reactorInfo transaction failed' })
+  return new Promise(async (resolve, reject) => {
+    try {
+      const assetInfoResult: any = await AssetInfoFunc.deleteAssetInfoByIdTransaction(mrid, dbsql)
+      if (!assetInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Delete assetInfo failed',
+          err: assetInfoResult.err
+        })
+      }
+      dbsql.run('DELETE FROM reactor_info WHERE mrid=?', [mrid], function (err: any) {
+        if (err) {
+          return reject({ success: false, err, message: 'Delete reactorInfo failed' })
         }
-    })
+        return resolve({ success: true, data: mrid, message: 'Delete reactorInfo completed' })
+      })
+    } catch (err) {
+      return reject({ success: false, err, message: 'Delete reactorInfo transaction failed' })
+    }
+  })
 }
 
 export default {
-    getReactorInfoById,
-    insertReactorInfoTransaction,
-    updateReactorInfoTransaction,
-    deleteReactorInfoTransaction
+  getReactorInfoById,
+  insertReactorInfoTransaction,
+  updateReactorInfoTransaction,
+  deleteReactorInfoTransaction
 }

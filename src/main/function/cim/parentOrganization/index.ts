@@ -2,77 +2,96 @@ import db from '../../datacontext/index'
 import * as organisationFunc from '../organisation/index'
 
 export const insertParentOrganisation = async (parentOrganization: any) => {
-    console.log('[ParentOrg] Insert parent organisation:', parentOrganization?.mrid, parentOrganization?.name)
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.run('BEGIN TRANSACTION', (err: any) => {
-                if (err) return reject({ success: false, err, message: 'Begin transaction failed' })
-                organisationFunc.insertOrganisationTransaction(parentOrganization, db)
-                    .then((parentResult: any) => {
-                        if (!parentResult.success) {
-                            db.run('ROLLBACK')
-                            return reject({ success: false, err: parentResult.err, message: 'Insert parent organisation failed' })
-                        }
-                        db.run(
-                            `INSERT INTO parent_organization(mrid) VALUES (?)
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION', (err: any) => {
+        if (err) return reject({ success: false, err, message: 'Begin transaction failed' })
+        organisationFunc
+          .insertOrganisationTransaction(parentOrganization, db)
+          .then((parentResult: any) => {
+            if (!parentResult.success) {
+              db.run('ROLLBACK')
+              return reject({
+                success: false,
+                err: parentResult.err,
+                message: 'Insert parent organisation failed'
+              })
+            }
+            db.run(
+              `INSERT INTO parent_organization(mrid) VALUES (?)
                              ON CONFLICT(mrid) DO NOTHING`,
-                            [parentOrganization.mrid],
-                            function (err: any) {
-                                if (err) {
-                                    db.run('ROLLBACK')
-                                    return reject({ success: false, err, message: 'Insert organisation failed' })
-                                }
-                                db.run('COMMIT', (commitErr: any) => {
-                                    if (commitErr) {
-                                        return reject({ success: false, err: commitErr, message: 'Commit failed' })
-                                    }
-                                    return resolve({ success: true, data: parentOrganization, message: 'Insert organisation completed' })
-                                })
-                            }
-                        )
-                    })
-                    .catch((err: any) => {
-                        db.run('ROLLBACK')
-                        return reject({ success: false, err, message: 'Insert organisation transaction failed' })
-                    })
+              [parentOrganization.mrid],
+              function (err: any) {
+                if (err) {
+                  db.run('ROLLBACK')
+                  return reject({ success: false, err, message: 'Insert organisation failed' })
+                }
+                db.run('COMMIT', (commitErr: any) => {
+                  if (commitErr) {
+                    return reject({ success: false, err: commitErr, message: 'Commit failed' })
+                  }
+                  return resolve({
+                    success: true,
+                    data: parentOrganization,
+                    message: 'Insert organisation completed'
+                  })
+                })
+              }
+            )
+          })
+          .catch((err: any) => {
+            db.run('ROLLBACK')
+            return reject({
+              success: false,
+              err,
+              message: 'Insert organisation transaction failed'
             })
-        })
+          })
+      })
     })
+  })
 }
 
 export const insertParentOrganizationTransaction = async (parentOrganization: any, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        organisationFunc.insertOrganisationTransaction(parentOrganization, dbsql)
-            .then((parentResult: any) => {
-                if (!parentResult.success) {
-                    return reject({ success: false, message: 'Insert parent organization failed', err: parentResult.err })
-                }
-                dbsql.run(
-                    `INSERT INTO parent_organization (
+  return new Promise((resolve, reject) => {
+    organisationFunc
+      .insertOrganisationTransaction(parentOrganization, dbsql)
+      .then((parentResult: any) => {
+        if (!parentResult.success) {
+          return reject({
+            success: false,
+            message: 'Insert parent organization failed',
+            err: parentResult.err
+          })
+        }
+        dbsql.run(
+          `INSERT INTO parent_organization (
                         mrid
                     ) VALUES (?)
                     ON CONFLICT(mrid) DO NOTHING`,
-                    [
-                        parentOrganization.mrid,
-                    ],
-                    function (err: any) {
-                        if (err) {
-                            return reject({ success: false, err, message: 'Insert parent organization failed' })
-                        }
-                        return resolve({ success: true, data: parentOrganization, message: 'Insert parent organization completed' })
-                    }
-                )
+          [parentOrganization.mrid],
+          function (err: any) {
+            if (err) {
+              return reject({ success: false, err, message: 'Insert parent organization failed' })
+            }
+            return resolve({
+              success: true,
+              data: parentOrganization,
+              message: 'Insert parent organization completed'
             })
-            .catch((err: any) => {
-                return reject({ success: false, err, message: 'Insert organisation transaction failed' })
-            })
-    })
+          }
+        )
+      })
+      .catch((err: any) => {
+        return reject({ success: false, err, message: 'Insert organisation transaction failed' })
+      })
+  })
 }
 
 export const getParentOrganizationById = async (mrid: string) => {
-    try {
-        return new Promise((resolve, reject) => {
-            const query = `
+  try {
+    return new Promise((resolve, reject) => {
+      const query = `
                 SELECT 
                     o.*, 
                     i.*,
@@ -95,29 +114,29 @@ export const getParentOrganizationById = async (mrid: string) => {
                 LEFT JOIN telephone_number tn ON o.phone = tn.mrid
                 WHERE CAST(o.mrid AS TEXT) = CAST(? AS TEXT)
             `
-            
-            const mridStr = String(mrid)
-            
-            db.get(query, [mridStr], (err: any, row: any) => {
-                if (err) {
-                    return reject({ success: false, err, message: 'Get parent organization failed' })
-                }
-                if (!row) {
-                    return resolve({ success: false, data: null, message: 'Parent organization not found' })
-                }
-                
-                return resolve({ success: true, data: row, message: 'Get parent organization completed' })
-            })
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get parent organization failed' }
-    }
+
+      const mridStr = String(mrid)
+
+      db.get(query, [mridStr], (err: any, row: any) => {
+        if (err) {
+          return reject({ success: false, err, message: 'Get parent organization failed' })
+        }
+        if (!row) {
+          return resolve({ success: false, data: null, message: 'Parent organization not found' })
+        }
+
+        return resolve({ success: true, data: row, message: 'Get parent organization completed' })
+      })
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get parent organization failed' }
+  }
 }
 
 export const getParentOrganizationByParentId = async (parentId: string) => {
-    return new Promise((resolve, reject) => {
-        db.all(
-            `SELECT 
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT 
                 o.*, 
                 i.*,
                 sd.address_general as address,
@@ -138,100 +157,134 @@ export const getParentOrganizationByParentId = async (parentId: string) => {
              LEFT JOIN electronic_address ea ON o.electronic_address = ea.mrid
              LEFT JOIN telephone_number tn ON o.phone = tn.mrid
              WHERE CAST(o.parent_organisation AS TEXT) = CAST(? AS TEXT)`,
-            [String(parentId)],
-            (err: any, rows: any) => {
-                if (err) {
-                    return reject({ success: false, err, message: 'Get parent organizations by parentId failed' })
-                }
-                if (!rows || rows.length === 0) {
-                    return resolve({ success: true, data: [], message: 'No parent organizations found' })
-                }
-               
-                return resolve({ success: true, data: rows, message: 'Get parent organizations by parentId completed' })
-            }
-        )
-    })
+      [String(parentId)],
+      (err: any, rows: any) => {
+        if (err) {
+          return reject({
+            success: false,
+            err,
+            message: 'Get parent organizations by parentId failed'
+          })
+        }
+        if (!rows || rows.length === 0) {
+          return resolve({ success: true, data: [], message: 'No parent organizations found' })
+        }
+
+        return resolve({
+          success: true,
+          data: rows,
+          message: 'Get parent organizations by parentId completed'
+        })
+      }
+    )
+  })
 }
 
 export const updateParentOrganizationById = async (mrid: string, parentOrganization: any) => {
-    return new Promise((resolve, reject) => {
-        db.serialize(() => {
-            db.run('BEGIN TRANSACTION')
-            organisationFunc.updateOrganisationByIdTransaction(mrid, parentOrganization, db)
-                .then((parentResult: any) => {
-                    if (!parentResult.success) {
-                        db.run('ROLLBACK')
-                        return reject({ success: false, message: 'Update parent organization failed', err: parentResult.err })
-                    }
-                    db.run(
-                        `UPDATE parent_organization SET
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      db.run('BEGIN TRANSACTION')
+      organisationFunc
+        .updateOrganisationByIdTransaction(mrid, parentOrganization, db)
+        .then((parentResult: any) => {
+          if (!parentResult.success) {
+            db.run('ROLLBACK')
+            return reject({
+              success: false,
+              message: 'Update parent organization failed',
+              err: parentResult.err
+            })
+          }
+          db.run(
+            `UPDATE parent_organization SET
                             mrid = ? 
                         WHERE mrid = ?`,
-                        [
-                            mrid
-                        ],
-                        function (err: any) {
-                            if (err) {
-                                db.run('ROLLBACK')
-                                console.log(err)
-                                return reject({ success: false, err, message: 'Update organisation failed' })
-                            }
-                            db.run('COMMIT')
-                            return resolve({ success: true, data: parentOrganization, message: 'Update organisation completed' })
-                        }
-                    )
-                })
-                .catch((err: any) => {
-                    db.run('ROLLBACK')
-                    return reject({ success: false, err, message: 'Update organisation transaction failed' })
-                })
+            [mrid],
+            function (err: any) {
+              if (err) {
+                db.run('ROLLBACK')
+                console.log(err)
+                return reject({ success: false, err, message: 'Update organisation failed' })
+              }
+              db.run('COMMIT')
+              return resolve({
+                success: true,
+                data: parentOrganization,
+                message: 'Update organisation completed'
+              })
+            }
+          )
+        })
+        .catch((err: any) => {
+          db.run('ROLLBACK')
+          return reject({ success: false, err, message: 'Update organisation transaction failed' })
         })
     })
+  })
 }
 
-export const updateParentOrganizationTransaction = async (mrid: string, parentOrganization: any, dbsql: any) => {
-    return new Promise((resolve, reject) => {
-        organisationFunc.updateOrganisationByIdTransaction(mrid, parentOrganization, dbsql)
-            .then((identifiedResult: any) => {
-                if (!identifiedResult.success) {
-                    return reject({ success: false, message: 'Update identified object failed', err: identifiedResult.err })
-                }
-                dbsql.run(
-                    `UPDATE parent_organization SET
+export const updateParentOrganizationTransaction = async (
+  mrid: string,
+  parentOrganization: any,
+  dbsql: any
+) => {
+  return new Promise((resolve, reject) => {
+    organisationFunc
+      .updateOrganisationByIdTransaction(mrid, parentOrganization, dbsql)
+      .then((identifiedResult: any) => {
+        if (!identifiedResult.success) {
+          return reject({
+            success: false,
+            message: 'Update identified object failed',
+            err: identifiedResult.err
+          })
+        }
+        dbsql.run(
+          `UPDATE parent_organization SET
                             mrid = ?
                         WHERE mrid = ?`,
-                    [
-                        mrid
-                    ],
-                    function (err: any) {
-                        if (err) {
-                            return reject({ success: false, err, message: 'Update organisation failed' })
-                        }
-                        return resolve({ success: true, data: parentOrganization, message: 'Update organisation completed' })
-                    }
-                )
+          [mrid],
+          function (err: any) {
+            if (err) {
+              return reject({ success: false, err, message: 'Update organisation failed' })
+            }
+            return resolve({
+              success: true,
+              data: parentOrganization,
+              message: 'Update organisation completed'
             })
-            .catch((err: any) => {
-                return reject({ success: false, err, message: 'Update parent transaction failed' })
-            })
-    })
+          }
+        )
+      })
+      .catch((err: any) => {
+        return reject({ success: false, err, message: 'Update parent transaction failed' })
+      })
+  })
 }
 
 export const deleteParentOrganizationById = async (mrid: string) => {
-    return new Promise((resolve, reject) => {
-        organisationFunc.deleteOrganisationByIdTransaction(mrid, db)
-            .then((result: any) => {
-                if (!result.success) {
-                    return reject({ success: false, message: 'Delete identified object failed', err: result.err })
-                }
-                return resolve({ success: true, message: 'Delete organisation (and identified object) completed' })
-            })
-            .catch((err: any) => {
-                return reject({ success: false, err, message: 'Delete organisation transaction failed' })
-            })
-    })
+  return new Promise((resolve, reject) => {
+    organisationFunc
+      .deleteOrganisationByIdTransaction(mrid, db)
+      .then((result: any) => {
+        if (!result.success) {
+          return reject({
+            success: false,
+            message: 'Delete identified object failed',
+            err: result.err
+          })
+        }
+        return resolve({
+          success: true,
+          message: 'Delete organisation (and identified object) completed'
+        })
+      })
+      .catch((err: any) => {
+        return reject({ success: false, err, message: 'Delete organisation transaction failed' })
+      })
+  })
 }
 
 export const deleteParentOrganizationByIdTransaction = async (mrid: string, dbsql: any) => {
-    return organisationFunc.deleteOrganisationByIdTransaction(mrid, dbsql)
+  return organisationFunc.deleteOrganisationByIdTransaction(mrid, dbsql)
 }

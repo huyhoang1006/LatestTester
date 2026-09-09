@@ -1,13 +1,13 @@
 class ContactTravelBreakerInfo {
-    constructor() {
-        this.mRID = null;
-                this.assessmentLimitBreakerInfoId = null;
-                this.parameterName = null;
-                this.dMin = null;
-                this.dMax = null;
-                this.dRef = null;
-                this.dDev = null;
-    }
+  constructor() {
+    this.mRID = null
+    this.assessmentLimitBreakerInfoId = null
+    this.parameterName = null
+    this.dMin = null
+    this.dMax = null
+    this.dRef = null
+    this.dDev = null
+  }
 }
 
-export default ContactTravelBreakerInfo;
+export default ContactTravelBreakerInfo

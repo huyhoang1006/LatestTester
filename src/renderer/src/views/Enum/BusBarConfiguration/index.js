@@ -1,6 +1,6 @@
 export const BusBarConfiguration = {
-    doubleBus: 'doubleBus',
-    mainWithTransfer: 'mainWithTransfer',
-    ringBus: 'ringBus',
-    singleBus: 'singleBus',
+  doubleBus: 'doubleBus',
+  mainWithTransfer: 'mainWithTransfer',
+  ringBus: 'ringBus',
+  singleBus: 'singleBus'
 }

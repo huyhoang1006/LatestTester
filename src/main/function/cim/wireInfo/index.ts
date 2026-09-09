@@ -2,36 +2,40 @@ import db from '../../datacontext/index'
 import * as AssetInfoFunc from '../assetInfo/index'
 
 export const getWireInfoById = async (mrid: string) => {
-    try {
-        const assetInfoResult: any = await AssetInfoFunc.getAssetInfoById(mrid)
-        if (!assetInfoResult.success) {
-            return { success: false, data: null, message: 'AssetInfo not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get(
-                `SELECT * FROM wire_info WHERE mrid=?`,
-                [mrid],
-                (err: any, row: any) => {
-                    if (err) return reject({ success: false, err, message: 'Get wireInfo by id failed' })
-                    if (!row) return resolve({ success: false, data: null, message: 'WireInfo not found' })
-                    return resolve({ success: true, data: { ...assetInfoResult.data, ...row }, message: 'Get wireInfo by id completed' })
-                }
-            )
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get wireInfo by id failed' }
+  try {
+    const assetInfoResult: any = await AssetInfoFunc.getAssetInfoById(mrid)
+    if (!assetInfoResult.success) {
+      return { success: false, data: null, message: 'AssetInfo not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM wire_info WHERE mrid=?`, [mrid], (err: any, row: any) => {
+        if (err) return reject({ success: false, err, message: 'Get wireInfo by id failed' })
+        if (!row) return resolve({ success: false, data: null, message: 'WireInfo not found' })
+        return resolve({
+          success: true,
+          data: { ...assetInfoResult.data, ...row },
+          message: 'Get wireInfo by id completed'
+        })
+      })
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get wireInfo by id failed' }
+  }
 }
 
 export const insertWireInfoTransaction = async (info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const assetInfoResult: any = await AssetInfoFunc.insertAssetInfoTransaction(info, dbsql)
-            if (!assetInfoResult.success) {
-                return reject({ success: false, message: 'Insert assetInfo failed', err: assetInfoResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO wire_info(
+  return new Promise(async (resolve, reject) => {
+    try {
+      const assetInfoResult: any = await AssetInfoFunc.insertAssetInfoTransaction(info, dbsql)
+      if (!assetInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert assetInfo failed',
+          err: assetInfoResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO wire_info(
                     mrid, core_radius, core_strand_count, gmr, insulated, insulation_material, insulation_thickness, material, r_ac, radius, rated_current, r_dc, size_description, strand_count
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(mrid) DO UPDATE SET
@@ -49,44 +53,48 @@ export const insertWireInfoTransaction = async (info: any, dbsql: any) => {
                     size_description = excluded.size_description,
                     strand_count = excluded.strand_count
                 `,
-                [
-                    info.mrid,
-                    info.core_radius,
-                    info.core_strand_count,
-                    info.gmr,
-                    info.insulated,
-                    info.insulation_material,
-                    info.insulation_thickness,
-                    info.material,
-                    info.r_ac,
-                    info.radius,
-                    info.rated_current,
-                    info.r_dc,
-                    info.size_description,
-                    info.strand_count
-                ],
-                function (err: any) {
-                    if (err) {
-                        return reject({ success: false, err, message: 'Insert wireInfo failed' })
-                    }
-                    return resolve({ success: true, data: info, message: 'Insert wireInfo completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Insert wireInfo transaction failed' })
+        [
+          info.mrid,
+          info.core_radius,
+          info.core_strand_count,
+          info.gmr,
+          info.insulated,
+          info.insulation_material,
+          info.insulation_thickness,
+          info.material,
+          info.r_ac,
+          info.radius,
+          info.rated_current,
+          info.r_dc,
+          info.size_description,
+          info.strand_count
+        ],
+        function (err: any) {
+          if (err) {
+            return reject({ success: false, err, message: 'Insert wireInfo failed' })
+          }
+          return resolve({ success: true, data: info, message: 'Insert wireInfo completed' })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Insert wireInfo transaction failed' })
+    }
+  })
 }
 
 export const updateWireInfoTransaction = async (mrid: string, info: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const assetInfoResult: any = await AssetInfoFunc.updateAssetInfoTransaction(mrid, info, dbsql)
-            if (!assetInfoResult.success) {
-                return reject({ success: false, message: 'Update assetInfo failed', err: assetInfoResult.err })
-            }
-            dbsql.run(
-                `UPDATE wire_info SET
+  return new Promise(async (resolve, reject) => {
+    try {
+      const assetInfoResult: any = await AssetInfoFunc.updateAssetInfoTransaction(mrid, info, dbsql)
+      if (!assetInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Update assetInfo failed',
+          err: assetInfoResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE wire_info SET
                     core_radius = ?,
                     core_strand_count = ?,
                     gmr = ?,
@@ -101,54 +109,65 @@ export const updateWireInfoTransaction = async (mrid: string, info: any, dbsql: 
                     size_description = ?,
                     strand_count = ?
                 WHERE mrid = ?`,
-                [
-                    info.core_radius,
-                    info.core_strand_count,
-                    info.gmr,
-                    info.insulated,
-                    info.insulation_material,
-                    info.insulation_thickness,
-                    info.material,
-                    info.r_ac,
-                    info.radius,
-                    info.rated_current,
-                    info.r_dc,
-                    info.size_description,
-                    info.strand_count,
-                    mrid
-                ],
-                function (err: any) {
-                    if (err) {
-                        return reject({ success: false, err, message: 'Update wireInfo failed' })
-                    }
-                    return resolve({ success: true, data: info, message: 'Update wireInfo completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Update wireInfo transaction failed' })
+        [
+          info.core_radius,
+          info.core_strand_count,
+          info.gmr,
+          info.insulated,
+          info.insulation_material,
+          info.insulation_thickness,
+          info.material,
+          info.r_ac,
+          info.radius,
+          info.rated_current,
+          info.r_dc,
+          info.size_description,
+          info.strand_count,
+          mrid
+        ],
+        function (err: any) {
+          if (err) {
+            return reject({ success: false, err, message: 'Update wireInfo failed' })
+          }
+          return resolve({ success: true, data: info, message: 'Update wireInfo completed' })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Update wireInfo transaction failed' })
+    }
+  })
 }
 
 export const deleteWireInfoTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            dbsql.run("DELETE FROM wire_info WHERE mrid=?", [mrid], async function (err: any) {
-                if (err) {
-                    return reject({ success: false, err, message: 'Delete wireInfo failed' })
-                }
-                try {
-                    const assetInfoResult: any = await AssetInfoFunc.deleteAssetInfoByIdTransaction(mrid, dbsql)
-                    if (!assetInfoResult.success) {
-                        return reject({ success: false, message: 'Delete assetInfo failed', err: assetInfoResult.err })
-                    }
-                    return resolve({ success: true, data: mrid, message: 'Delete wireInfo completed' })
-                } catch (err2) {
-                    return reject({ success: false, err: err2, message: 'Delete wireInfo transaction failed' })
-                }
-            })
-        } catch (err) {
-            return reject({ success: false, err, message: 'Delete wireInfo transaction failed' })
+  return new Promise(async (resolve, reject) => {
+    try {
+      dbsql.run('DELETE FROM wire_info WHERE mrid=?', [mrid], async function (err: any) {
+        if (err) {
+          return reject({ success: false, err, message: 'Delete wireInfo failed' })
         }
-    })
+        try {
+          const assetInfoResult: any = await AssetInfoFunc.deleteAssetInfoByIdTransaction(
+            mrid,
+            dbsql
+          )
+          if (!assetInfoResult.success) {
+            return reject({
+              success: false,
+              message: 'Delete assetInfo failed',
+              err: assetInfoResult.err
+            })
+          }
+          return resolve({ success: true, data: mrid, message: 'Delete wireInfo completed' })
+        } catch (err2) {
+          return reject({
+            success: false,
+            err: err2,
+            message: 'Delete wireInfo transaction failed'
+          })
+        }
+      })
+    } catch (err) {
+      return reject({ success: false, err, message: 'Delete wireInfo transaction failed' })
+    }
+  })
 }

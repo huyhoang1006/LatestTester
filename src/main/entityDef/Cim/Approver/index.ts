@@ -1,9 +1,9 @@
 import DocumentPersonRole from '../DocumentPersonRole'
 
 class Approver extends DocumentPersonRole {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super()
+  }
 }
 
-export default Approver;
+export default Approver

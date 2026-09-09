@@ -34,25 +34,25 @@
 );
  */
 class CurrentTransformerInfo {
-    constructor() {
-        this.mrid = null;
-        this.accuracy_class = null;
-        this.accuracy_limit = null;
-        this.core_count = null;
-        this.ct_class = null;
-        this.knee_point_current = null;
-        this.knee_point_voltage = null;
-        this.max_ratio = null;
-        this.nominal_ratio = null;
-        this.primary_fls_rating = null;
-        this.primary_ratio = null;
-        this.rated_current = null;
-        this.secondary_fls_rating = null;
-        this.secondary_ratio = null;
-        this.tertiary_fls_rating = null;
-        this.tertiary_ratio = null;
-        this.usage = null;
-    }
+  constructor() {
+    this.mrid = null
+    this.accuracy_class = null
+    this.accuracy_limit = null
+    this.core_count = null
+    this.ct_class = null
+    this.knee_point_current = null
+    this.knee_point_voltage = null
+    this.max_ratio = null
+    this.nominal_ratio = null
+    this.primary_fls_rating = null
+    this.primary_ratio = null
+    this.rated_current = null
+    this.secondary_fls_rating = null
+    this.secondary_ratio = null
+    this.tertiary_fls_rating = null
+    this.tertiary_ratio = null
+    this.usage = null
+  }
 }
 
-export default CurrentTransformerInfo;
+export default CurrentTransformerInfo

@@ -1,8 +1,8 @@
-import AssetInfo from "../AssetInfo";
+import AssetInfo from '../AssetInfo'
 
 class PowerTransformerInfo extends AssetInfo {
-    constructor() {
-        super()
-    }
+  constructor() {
+    super()
+  }
 }
-export default PowerTransformerInfo;
+export default PowerTransformerInfo

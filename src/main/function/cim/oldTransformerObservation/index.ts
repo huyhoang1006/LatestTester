@@ -2,36 +2,62 @@ import db from '../../datacontext/index'
 import * as transformerObservationFunc from '../transformerObservation/index'
 
 export const getOldTransformerObservationById = async (mrid: string) => {
-    try {
-        const transformerObservation: any = await transformerObservationFunc.getTransformerObservationById(mrid)
-        if (!transformerObservation.success) {
-            return { success: false, data: null, message: 'TransformerObservation not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get(
-                `SELECT * FROM old_transformer_observation WHERE mrid=?`,
-                [mrid],
-                (err: any, row: any) => {
-                    if (err) return reject({ success: false, err, message: 'Get oldTransformerObservation by id failed' })
-                    if (!row) return resolve({ success: false, data: null, message: 'OldTransformerObservation not found' })
-                    return resolve({ success: true, data: { ...transformerObservation.data, ...row }, message: 'Get oldTransformerObservation by id completed' })
-                }
-            )
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get oldTransformerObservation by id failed' }
+  try {
+    const transformerObservation: any =
+      await transformerObservationFunc.getTransformerObservationById(mrid)
+    if (!transformerObservation.success) {
+      return { success: false, data: null, message: 'TransformerObservation not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get(
+        `SELECT * FROM old_transformer_observation WHERE mrid=?`,
+        [mrid],
+        (err: any, row: any) => {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Get oldTransformerObservation by id failed'
+            })
+          if (!row)
+            return resolve({
+              success: false,
+              data: null,
+              message: 'OldTransformerObservation not found'
+            })
+          return resolve({
+            success: true,
+            data: { ...transformerObservation.data, ...row },
+            message: 'Get oldTransformerObservation by id completed'
+          })
+        }
+      )
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get oldTransformerObservation by id failed' }
+  }
 }
 
-export const insertOldTransformerObservationTransaction = async (oldTransformerObservation: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const obsResult: any = await transformerObservationFunc.insertTransformerObservationTransaction(oldTransformerObservation, dbsql)
-            if (!obsResult.success) {
-                return reject({ success: false, message: 'Insert transformerObservation failed', err: obsResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO old_transformer_observation(
+export const insertOldTransformerObservationTransaction = async (
+  oldTransformerObservation: any,
+  dbsql: any
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const obsResult: any =
+        await transformerObservationFunc.insertTransformerObservationTransaction(
+          oldTransformerObservation,
+          dbsql
+        )
+      if (!obsResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert transformerObservation failed',
+          err: obsResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO old_transformer_observation(
                     mrid, bottom_oil_temp, humidity, weather, ambient_temp, reference_temp, winding_temp, work_task_id
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(mrid) DO UPDATE SET
@@ -43,36 +69,58 @@ export const insertOldTransformerObservationTransaction = async (oldTransformerO
                     winding_temp = excluded.winding_temp,
                     work_task_id = excluded.work_task_id
                 `,
-                [
-                    oldTransformerObservation.mrid,
-                    oldTransformerObservation.bottom_oil_temp,
-                    oldTransformerObservation.humidity,
-                    oldTransformerObservation.weather,
-                    oldTransformerObservation.ambient_temp,
-                    oldTransformerObservation.reference_temp,
-                    oldTransformerObservation.winding_temp,
-                    oldTransformerObservation.work_task_id
-                ],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Insert oldTransformerObservation failed' })
-                    return resolve({ success: true, data: oldTransformerObservation, message: 'Insert oldTransformerObservation completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Insert oldTransformerObservation failed' })
+        [
+          oldTransformerObservation.mrid,
+          oldTransformerObservation.bottom_oil_temp,
+          oldTransformerObservation.humidity,
+          oldTransformerObservation.weather,
+          oldTransformerObservation.ambient_temp,
+          oldTransformerObservation.reference_temp,
+          oldTransformerObservation.winding_temp,
+          oldTransformerObservation.work_task_id
+        ],
+        function (err: any) {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Insert oldTransformerObservation failed'
+            })
+          return resolve({
+            success: true,
+            data: oldTransformerObservation,
+            message: 'Insert oldTransformerObservation completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Insert oldTransformerObservation failed' })
+    }
+  })
 }
 
-export const updateOldTransformerObservationByIdTransaction = async (mrid: string, oldTransformerObservation: any, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const obsResult: any = await transformerObservationFunc.updateTransformerObservationByIdTransaction(mrid, oldTransformerObservation, dbsql)
-            if (!obsResult.success) {
-                return reject({ success: false, message: 'Update transformerObservation failed', err: obsResult.err })
-            }
-            dbsql.run(
-                `UPDATE old_transformer_observation SET
+export const updateOldTransformerObservationByIdTransaction = async (
+  mrid: string,
+  oldTransformerObservation: any,
+  dbsql: any
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const obsResult: any =
+        await transformerObservationFunc.updateTransformerObservationByIdTransaction(
+          mrid,
+          oldTransformerObservation,
+          dbsql
+        )
+      if (!obsResult.success) {
+        return reject({
+          success: false,
+          message: 'Update transformerObservation failed',
+          err: obsResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE old_transformer_observation SET
                     bottom_oil_temp = ?,
                     humidity = ?,
                     weather = ?,
@@ -81,55 +129,91 @@ export const updateOldTransformerObservationByIdTransaction = async (mrid: strin
                     winding_temp = ?,
                     work_task_id = ?
                 WHERE mrid = ?`,
-                [
-                    oldTransformerObservation.bottom_oil_temp,
-                    oldTransformerObservation.humidity,
-                    oldTransformerObservation.weather,
-                    oldTransformerObservation.ambient_temp,
-                    oldTransformerObservation.reference_temp,
-                    oldTransformerObservation.winding_temp,
-                    oldTransformerObservation.work_task_id,
-                    mrid
-                ],
-                function (err: any) {
-                    if (err) return reject({ success: false, err, message: 'Update oldTransformerObservation failed' })
-                    return resolve({ success: true, data: oldTransformerObservation, message: 'Update oldTransformerObservation completed' })
-                }
-            )
-        } catch (err) {
-            return reject({ success: false, err, message: 'Update oldTransformerObservation failed' })
+        [
+          oldTransformerObservation.bottom_oil_temp,
+          oldTransformerObservation.humidity,
+          oldTransformerObservation.weather,
+          oldTransformerObservation.ambient_temp,
+          oldTransformerObservation.reference_temp,
+          oldTransformerObservation.winding_temp,
+          oldTransformerObservation.work_task_id,
+          mrid
+        ],
+        function (err: any) {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Update oldTransformerObservation failed'
+            })
+          return resolve({
+            success: true,
+            data: oldTransformerObservation,
+            message: 'Update oldTransformerObservation completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Update oldTransformerObservation failed' })
+    }
+  })
 }
 
 export const deleteOldTransformerObservationByIdTransaction = async (mrid: string, dbsql: any) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            dbsql.run("DELETE FROM old_transformer_observation WHERE mrid=?", [mrid], function (this: any, err: any) {
-                if (err) return reject({ success: false, err, message: 'Delete oldTransformerObservation failed' })
-                if (this.changes === 0) return resolve({ success: false, data: null, message: 'OldTransformerObservation not found' })
-                transformerObservationFunc.deleteTransformerObservationByIdTransaction(mrid, dbsql)
-                return resolve({ success: true, data: null, message: 'Delete oldTransformerObservation completed' })
+  return new Promise(async (resolve, reject) => {
+    try {
+      dbsql.run(
+        'DELETE FROM old_transformer_observation WHERE mrid=?',
+        [mrid],
+        function (this: any, err: any) {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Delete oldTransformerObservation failed'
             })
-        } catch (err) {
-            return reject({ success: false, err, message: 'Delete oldTransformerObservation failed' })
+          if (this.changes === 0)
+            return resolve({
+              success: false,
+              data: null,
+              message: 'OldTransformerObservation not found'
+            })
+          transformerObservationFunc.deleteTransformerObservationByIdTransaction(mrid, dbsql)
+          return resolve({
+            success: true,
+            data: null,
+            message: 'Delete oldTransformerObservation completed'
+          })
         }
-    })
+      )
+    } catch (err) {
+      return reject({ success: false, err, message: 'Delete oldTransformerObservation failed' })
+    }
+  })
 }
 
 export const getOldTransformerObservationByWorkTaskId = async (workTaskId: string) => {
-    return new Promise((resolve, reject) => {
-        db.get(
-            `SELECT oto.*, tobs.*, io.*
+  return new Promise((resolve, reject) => {
+    db.get(
+      `SELECT oto.*, tobs.*, io.*
              FROM old_transformer_observation oto
              LEFT JOIN transformer_observation tobs ON oto.mrid = tobs.mrid
              LEFT JOIN identified_object io ON tobs.mrid = io.mrid
              WHERE oto.work_task_id = ?`,
-            [workTaskId],
-            (err: any, row: any) => {
-                if (err) return reject({ success: false, err, message: 'Get oldTransformerObservation by work_task_id failed' })
-                return resolve({ success: true, data: row, message: 'Get oldTransformerObservation by work_task_id completed' })
-            }
-        )
-    })
+      [workTaskId],
+      (err: any, row: any) => {
+        if (err)
+          return reject({
+            success: false,
+            err,
+            message: 'Get oldTransformerObservation by work_task_id failed'
+          })
+        return resolve({
+          success: true,
+          data: row,
+          message: 'Get oldTransformerObservation by work_task_id completed'
+        })
+      }
+    )
+  })
 }

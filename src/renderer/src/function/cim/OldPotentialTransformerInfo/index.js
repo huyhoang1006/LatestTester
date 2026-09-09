@@ -3,37 +3,54 @@ import * as PotentialTransformerInfoFunc from '../PotentialTransformerInfo/index
 
 // Lấy oldPotentialTransformerInfo theo mrid
 export const getOldPotentialTransformerInfoById = async (mrid) => {
-    try {
-        const ptInfoResult = await PotentialTransformerInfoFunc.getPotentialTransformerInfoById(mrid)
-        if (!ptInfoResult.success) {
-            return { success: false, data: null, message: 'PotentialTransformerInfo not found' }
-        }
-        return new Promise((resolve, reject) => {
-            db.get(
-                `SELECT * FROM old_potential_transformer_info WHERE mrid=?`,
-                [mrid],
-                (err, row) => {
-                    if (err) return reject({ success: false, err, message: 'Get oldPotentialTransformerInfo by id failed' })
-                    if (!row) return resolve({ success: false, data: null, message: 'OldPotentialTransformerInfo not found' })
-                    return resolve({ success: true, data: { ...ptInfoResult.data, ...row }, message: 'Get oldPotentialTransformerInfo by id completed' })
-                }
-            )
-        })
-    } catch (err) {
-        return { success: false, err, message: 'Get oldPotentialTransformerInfo by id failed' }
+  try {
+    const ptInfoResult = await PotentialTransformerInfoFunc.getPotentialTransformerInfoById(mrid)
+    if (!ptInfoResult.success) {
+      return { success: false, data: null, message: 'PotentialTransformerInfo not found' }
     }
+    return new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM old_potential_transformer_info WHERE mrid=?`, [mrid], (err, row) => {
+        if (err)
+          return reject({
+            success: false,
+            err,
+            message: 'Get oldPotentialTransformerInfo by id failed'
+          })
+        if (!row)
+          return resolve({
+            success: false,
+            data: null,
+            message: 'OldPotentialTransformerInfo not found'
+          })
+        return resolve({
+          success: true,
+          data: { ...ptInfoResult.data, ...row },
+          message: 'Get oldPotentialTransformerInfo by id completed'
+        })
+      })
+    })
+  } catch (err) {
+    return { success: false, err, message: 'Get oldPotentialTransformerInfo by id failed' }
+  }
 }
 
 // Thêm mới oldPotentialTransformerInfo (transaction)
 export const insertOldPotentialTransformerTransaction = async (info, dbsql) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const ptInfoResult = await PotentialTransformerInfoFunc.insertPotentialTransformerTransaction(info, dbsql)
-            if (!ptInfoResult.success) {
-                return reject({ success: false, message: 'Insert potentialTransformerInfo failed', err: ptInfoResult.err })
-            }
-            dbsql.run(
-                `INSERT INTO old_potential_transformer_info(
+  return new Promise(async (resolve, reject) => {
+    try {
+      const ptInfoResult = await PotentialTransformerInfoFunc.insertPotentialTransformerTransaction(
+        info,
+        dbsql
+      )
+      if (!ptInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Insert potentialTransformerInfo failed',
+          err: ptInfoResult.err
+        })
+      }
+      dbsql.run(
+        `INSERT INTO old_potential_transformer_info(
                     mrid, standard, rated_frequency, upr_formula, windings, c1, c2
                 ) VALUES (?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(mrid) DO UPDATE SET
@@ -44,36 +61,58 @@ export const insertOldPotentialTransformerTransaction = async (info, dbsql) => {
                     c1 = excluded.c1,
                     c2 = excluded.c2
                 `,
-                [
-                    info.mrid,
-                    info.standard,
-                    info.rated_frequency,
-                    info.upr_formula,
-                    info.windings,
-                    info.c1,
-                    info.c2
-                ],
-                function (err) {
-                    if (err) return reject({ success: false, err, message: 'Insert oldPotentialTransformerInfo failed' })
-                    return resolve({ success: true, data: info, message: 'Insert oldPotentialTransformerInfo completed' })
-                }
-            )
-        } catch (error) {
-            return reject({ success: false, err: error, message: 'Insert oldPotentialTransformerInfo transaction failed' })
+        [
+          info.mrid,
+          info.standard,
+          info.rated_frequency,
+          info.upr_formula,
+          info.windings,
+          info.c1,
+          info.c2
+        ],
+        function (err) {
+          if (err)
+            return reject({
+              success: false,
+              err,
+              message: 'Insert oldPotentialTransformerInfo failed'
+            })
+          return resolve({
+            success: true,
+            data: info,
+            message: 'Insert oldPotentialTransformerInfo completed'
+          })
         }
-    })
+      )
+    } catch (error) {
+      return reject({
+        success: false,
+        err: error,
+        message: 'Insert oldPotentialTransformerInfo transaction failed'
+      })
+    }
+  })
 }
 
 // Cập nhật oldPotentialTransformerInfo (transaction)
 export const updateOldPotentialTransformerInfoTransaction = async (mrid, info, dbsql) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const ptInfoResult = await PotentialTransformerInfoFunc.updatePotentialTransformerInfoTransaction(mrid, info, dbsql)
-            if (!ptInfoResult.success) {
-                return reject({ success: false, message: 'Update potentialTransformerInfo failed', err: ptInfoResult.err })
-            }
-            dbsql.run(
-                `UPDATE old_potential_transformer_info SET
+  return new Promise(async (resolve, reject) => {
+    try {
+      const ptInfoResult =
+        await PotentialTransformerInfoFunc.updatePotentialTransformerInfoTransaction(
+          mrid,
+          info,
+          dbsql
+        )
+      if (!ptInfoResult.success) {
+        return reject({
+          success: false,
+          message: 'Update potentialTransformerInfo failed',
+          err: ptInfoResult.err
+        })
+      }
+      dbsql.run(
+        `UPDATE old_potential_transformer_info SET
                     standard = ?,
                     rated_frequency = ?,
                     upr_formula = ?,
@@ -81,73 +120,92 @@ export const updateOldPotentialTransformerInfoTransaction = async (mrid, info, d
                     c1 = ?,
                     c2 = ?
                 WHERE mrid = ?`,
-                [
-                    info.standard,
-                    info.rated_frequency,
-                    info.upr_formula,
-                    info.windings,
-                    info.c1,
-                    info.c2,
-                    mrid
-                ],
-                function (err) {
-                    if (err) {
-                        return reject({ success: false, err, message: 'Update oldPotentialTransformerInfo failed' })
-                    }
-                    return resolve({ success: true, data: info, message: 'Update oldPotentialTransformerInfo completed' })
-                }
-            )
-        } catch (error) {
-            return reject({ success: false, err: error, message: 'Update oldPotentialTransformerInfo transaction failed' })
+        [
+          info.standard,
+          info.rated_frequency,
+          info.upr_formula,
+          info.windings,
+          info.c1,
+          info.c2,
+          mrid
+        ],
+        function (err) {
+          if (err) {
+            return reject({
+              success: false,
+              err,
+              message: 'Update oldPotentialTransformerInfo failed'
+            })
+          }
+          return resolve({
+            success: true,
+            data: info,
+            message: 'Update oldPotentialTransformerInfo completed'
+          })
         }
-    })
+      )
+    } catch (error) {
+      return reject({
+        success: false,
+        err: error,
+        message: 'Update oldPotentialTransformerInfo transaction failed'
+      })
+    }
+  })
 }
 
 // Xóa oldPotentialTransformerInfo (transaction)
 export const deleteOldPotentialTransformerInfoTransaction = async (mrid, dbsql) => {
-
-    return new Promise(async (resolve, reject) => {
-        try {
-            // 1️⃣ Xóa bản ghi trong old_potential_transformer_info trước
-            dbsql.run("DELETE FROM old_potential_transformer_info WHERE mrid=?", [mrid], async function (err) {
-                if (err) {
-                    return reject({
-                        success: false,
-                        err,
-                        message: 'Delete oldPotentialTransformerInfo failed'
-                    });
-                }
-
-                try {
-                    // 2️⃣ Sau khi xóa thành công, mới xóa potential_transformer_info
-                    const ptInfoResult = await PotentialTransformerInfoFunc.deletePotentialTransformerInfoTransaction(mrid, dbsql);
-                    if (!ptInfoResult.success) {
-                        return reject({
-                            success: false,
-                            message: 'Delete potentialTransformerInfo failed',
-                            err: ptInfoResult.err
-                        });
-                    }
-
-                    return resolve({
-                        success: true,
-                        data: mrid,
-                        message: 'Delete oldPotentialTransformerInfo + potentialTransformerInfo completed'
-                    });
-                } catch (innerErr) {
-                    return reject({
-                        success: false,
-                        err: innerErr,
-                        message: 'Delete potentialTransformerInfo transaction failed'
-                    });
-                }
-            });
-        } catch (error) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // 1️⃣ Xóa bản ghi trong old_potential_transformer_info trước
+      dbsql.run(
+        'DELETE FROM old_potential_transformer_info WHERE mrid=?',
+        [mrid],
+        async function (err) {
+          if (err) {
             return reject({
+              success: false,
+              err,
+              message: 'Delete oldPotentialTransformerInfo failed'
+            })
+          }
+
+          try {
+            // 2️⃣ Sau khi xóa thành công, mới xóa potential_transformer_info
+            const ptInfoResult =
+              await PotentialTransformerInfoFunc.deletePotentialTransformerInfoTransaction(
+                mrid,
+                dbsql
+              )
+            if (!ptInfoResult.success) {
+              return reject({
                 success: false,
-                err: error,
-                message: 'Delete oldPotentialTransformerInfo transaction failed'
-            });
+                message: 'Delete potentialTransformerInfo failed',
+                err: ptInfoResult.err
+              })
+            }
+
+            return resolve({
+              success: true,
+              data: mrid,
+              message: 'Delete oldPotentialTransformerInfo + potentialTransformerInfo completed'
+            })
+          } catch (innerErr) {
+            return reject({
+              success: false,
+              err: innerErr,
+              message: 'Delete potentialTransformerInfo transaction failed'
+            })
+          }
         }
-    });
-};
+      )
+    } catch (error) {
+      return reject({
+        success: false,
+        err: error,
+        message: 'Delete oldPotentialTransformerInfo transaction failed'
+      })
+    }
+  })
+}

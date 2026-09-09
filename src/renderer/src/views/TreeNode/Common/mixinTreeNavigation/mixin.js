@@ -1,5 +1,3 @@
-
-
 import deleteData from '@/views/TreeNode/Client/ClientSide/mixin/Delete/deleteDataClient'
 import handleDeleteFromContextMenu from '@/views/TreeNode/Client/ClientSide/mixin/Delete/handleDeleteFromContextMenu'
 import showAddBay from '@/views/TreeNode/Client/ClientSide/mixin/Bay/showAddBay'
@@ -53,7 +51,6 @@ import contextDataHelpers from '@/views/TreeNode/Client/ClientSide/mixin/Context
 //TabSync
 import tabPropertiesSync from '@/views/TreeNode/Client/ClientSide/mixin/TabSync/tabPropertiesSync'
 
-
 //Server
 import downloadNode from '@/views/TreeNode/Server/mixin/Download/downloadNode'
 import logServer from '@/views/TreeNode/Server/mixin/Resize/logServer.js'
@@ -61,8 +58,6 @@ import getOwner from '@/views/TreeNode/Server/mixin/getOwner'
 import fetchChildrenServer from '@/views/TreeNode/Server/mixin/fetchChildrenServer'
 import breadCum from '@/views/TreeNode/Server/TopBarServer/mixin'
 import showOwnerServerRoot from '@/views/TreeNode/Server/mixin/showOwnerServerRoot'
-
-
 
 import treeNodeFind from '@/views/TreeNode/Common/treeNodeFindMixin'
 import moveNode from '@/views/TreeNode/Common/MoveNode/moveNode'
@@ -96,29 +91,93 @@ import exportWord from '@/views/TreeNode/Common/Export/exportWord'
 import exportXML from '@/views/TreeNode/Common/Export/exportXML'
 import importCIM from '@/views/TreeNode/Common/Import/importCIM'
 import handleRefreshNode from '@/views/TreeNode/Common/Refresh/handleRefreshNode'
-
-
-
+import handleContextMenuActions from '@/views/TreeNode/Common/handleContextMenuActions'
 
 export default {
-    mixins: [treeNodeFind, deleteData, handleDeleteFromContextMenu, showAddBay, showAddBushing,
-        showAddCapacitor, showAddCircuitBreaker, showAddConnector, showAddCt,
-        showAddJob, showAddOrganisation, showAddPowerCable, showAddReactor,
-        showAddRotatingMachine, showAddSubInTree, showAddSubs, showAddSurgeArrester,
-        showAddTransformer, showAddVt, showAddVoltageLevel, showLocationRoot, moveNode,
-        confirmMove, handleDeleteNode, duplicateNode, duplicateAsset, showDataClient,
-        cleanDtoForDuplicate, bayConfirm, bushingConfirm, capacitorConfirm,
-        circuitBreakerConfirm, disconnectorConfirm, ctConfirm, jobConfirm,
-        organisationConfirm, powerCableConfirm, reactorConfirm, rotatingMachineConfirm,
-        substationConfirm, surgeArresterConfirm, transformerConfirm, vtConfirm,
-        voltageLevelConfirm, resizeClient, contextDataHelpers, tabPropertiesSync,
-        logClient, logServer, resizeServer, confirmDownloadNode, downloadNode,
-        buildMoveTreeData, fetchChildrenForMoveMixin, generateUuid, getOwner,
-        fetchChildrenServer, fetchChildrenClient, _import,
-        importJSONFromContext, handleAddCommand, handleOpenNode, fetchAssetByPsr,
-        fetchJobsByAssetId, exportTreeToJSON, hideProperties, removeTab,
-        pathMap, fmeca, showProperties, showDataServer, checkChildren, showPropertiesData,
-        breadCum, showOwnerServerRoot, exportExcel, exportJSONCIM, exportPDF, exportSingleNodeToJSON,
-        exportWord, exportXML, importCIM, handleRefreshNode
-        ]
+  mixins: [
+    treeNodeFind,
+    deleteData,
+    handleDeleteFromContextMenu,
+    showAddBay,
+    showAddBushing,
+    showAddCapacitor,
+    showAddCircuitBreaker,
+    showAddConnector,
+    showAddCt,
+    showAddJob,
+    showAddOrganisation,
+    showAddPowerCable,
+    showAddReactor,
+    showAddRotatingMachine,
+    showAddSubInTree,
+    showAddSubs,
+    showAddSurgeArrester,
+    showAddTransformer,
+    showAddVt,
+    showAddVoltageLevel,
+    showLocationRoot,
+    moveNode,
+    confirmMove,
+    handleDeleteNode,
+    duplicateNode,
+    duplicateAsset,
+    showDataClient,
+    cleanDtoForDuplicate,
+    bayConfirm,
+    bushingConfirm,
+    capacitorConfirm,
+    circuitBreakerConfirm,
+    disconnectorConfirm,
+    ctConfirm,
+    jobConfirm,
+    organisationConfirm,
+    powerCableConfirm,
+    reactorConfirm,
+    rotatingMachineConfirm,
+    substationConfirm,
+    surgeArresterConfirm,
+    transformerConfirm,
+    vtConfirm,
+    voltageLevelConfirm,
+    resizeClient,
+    contextDataHelpers,
+    tabPropertiesSync,
+    logClient,
+    logServer,
+    resizeServer,
+    confirmDownloadNode,
+    downloadNode,
+    buildMoveTreeData,
+    fetchChildrenForMoveMixin,
+    generateUuid,
+    getOwner,
+    fetchChildrenServer,
+    fetchChildrenClient,
+    _import,
+    importJSONFromContext,
+    handleAddCommand,
+    handleOpenNode,
+    fetchAssetByPsr,
+    fetchJobsByAssetId,
+    exportTreeToJSON,
+    hideProperties,
+    removeTab,
+    pathMap,
+    fmeca,
+    showProperties,
+    showDataServer,
+    checkChildren,
+    showPropertiesData,
+    breadCum,
+    showOwnerServerRoot,
+    exportExcel,
+    exportJSONCIM,
+    exportPDF,
+    exportSingleNodeToJSON,
+    exportWord,
+    exportXML,
+    importCIM,
+    handleRefreshNode,
+    handleContextMenuActions
+  ]
 }
